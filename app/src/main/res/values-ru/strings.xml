@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Logic Mix</string>
+    <string name="home_title">Logic Mix</string>
+    <string name="local_profile">Локальный профиль</string>
+    <string name="offline_ready">Готово к работе без интернета.</string>
+    <string name="loading_profile">Загрузка локального профиля…</string>
+    <string name="settings">Настройки</string>
+    <string name="sound">Звук</string>
+    <string name="back">Назад</string>
+</resources>
