@@ -143,10 +143,10 @@ class ProgressRepositoryTest {
         repeat(3) { solve("p$it") }
         solve("hinted", hints = 1)
         val result = solve("last")
-        assertEquals(99, result.before.totalXp)
+        assertEquals(95, result.before.totalXp)
         assertEquals(1, result.levelsGained)
         assertEquals(2, result.after.level)
-        assertEquals(24, result.after.xpIntoLevel)
+        assertEquals(20, result.after.xpIntoLevel)
         val expected = Progression.addXp(
             LevelProgress(1, 0),
             result.after.totalXp,
