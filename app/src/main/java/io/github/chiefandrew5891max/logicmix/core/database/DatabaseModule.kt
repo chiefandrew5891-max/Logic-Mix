@@ -15,8 +15,22 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): LogicMixDatabase =
-        Room.databaseBuilder(context, LogicMixDatabase::class.java, "logic_mix.db").build()
+        Room.databaseBuilder(context, LogicMixDatabase::class.java, "logic_mix.db")
+            .addMigrations(*LogicMixMigrations.ALL)
+            .build()
 
     @Provides
     fun provideProfileDao(database: LogicMixDatabase): ProfileDao = database.profileDao()
+
+    @Provides
+    fun provideProgressDao(database: LogicMixDatabase): ProgressDao = database.progressDao()
+
+    @Provides
+    fun provideSolvedPuzzleDao(database: LogicMixDatabase): SolvedPuzzleDao = database.solvedPuzzleDao()
+
+    @Provides
+    fun provideAttemptDao(database: LogicMixDatabase): AttemptDao = database.attemptDao()
+
+    @Provides
+    fun provideXpTransactionDao(database: LogicMixDatabase): XpTransactionDao = database.xpTransactionDao()
 }

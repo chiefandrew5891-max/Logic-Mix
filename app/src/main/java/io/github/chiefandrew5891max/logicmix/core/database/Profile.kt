@@ -28,7 +28,21 @@ interface ProfileDao {
     fun observe(id: String): Flow<Profile?>
 }
 
-@Database(entities = [Profile::class], version = 1, exportSchema = true)
+@Database(
+    entities = [
+        Profile::class,
+        ProgressEntity::class,
+        SolvedPuzzleEntity::class,
+        AttemptEntity::class,
+        XpTransactionEntity::class,
+    ],
+    version = 2,
+    exportSchema = true,
+)
 abstract class LogicMixDatabase : RoomDatabase() {
     abstract fun profileDao(): ProfileDao
+    abstract fun progressDao(): ProgressDao
+    abstract fun solvedPuzzleDao(): SolvedPuzzleDao
+    abstract fun attemptDao(): AttemptDao
+    abstract fun xpTransactionDao(): XpTransactionDao
 }
