@@ -35,6 +35,8 @@ class ProgressRepository internal constructor(
     fun observeProgress(profileId: String): Flow<PlayerProgress> =
         progressDao.observe(profileId).map { PlayerProgress.fromTotalXp(it?.totalXp ?: 0) }
 
+    fun observeStreak(profileId: String): Flow<Int> = progressDao.observe(profileId).map { it?.streak ?: 0 }
+
     // The profile row must already exist (see LocalProfileRepository.ensureProfile).
     suspend fun ensureProgress(profileId: String) {
         progressDao.insertIfAbsent(

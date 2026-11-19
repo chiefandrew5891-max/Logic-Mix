@@ -7,4 +7,27 @@
     <string name="settings">设置</string>
     <string name="sound">声音</string>
     <string name="back">返回</string>
+    <string name="home_level">等级 %1$d</string>
+    <string name="home_xp_progress">%1$d / %2$d XP</string>
+    <string name="home_xp_max">已达到最高等级</string>
+    <string name="home_streak">连胜</string>
+    <string name="home_start_game">开始游戏</string>
+    <string name="home_continue">继续</string>
+    <string name="home_daily_title">每日挑战</string>
+    <string name="home_daily_subtitle">每天 5 道新题</string>
+    <string name="home_rewards_title">奖励</string>
+    <string name="home_rewards_subtitle">徽章与成就</string>
+    <string name="home_modes_title">游戏模式</string>
+    <string name="mode_career">生涯</string>
+    <string name="mode_career_subtitle">主要进度</string>
+    <string name="mode_endless">无尽</string>
+    <string name="mode_endless_subtitle">无限畅玩</string>
+    <string name="home_categories_title">谜题类别</string>
+    <string name="category_matchstick">火柴</string>
+    <string name="category_number_sequence">数列</string>
+    <string name="category_word_logic">文字逻辑</string>
+    <string name="category_mini_crossword">迷你填字</string>
+    <string name="category_visual_logic">视觉逻辑</string>
+    <string name="coming_soon_title">即将推出</string>
+    <string name="coming_soon_body">此模式将在后续更新中推出。</string>
 </resources>

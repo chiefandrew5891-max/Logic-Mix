@@ -7,4 +7,27 @@
     <string name="settings">Impostazioni</string>
     <string name="sound">Suono</string>
     <string name="back">Indietro</string>
+    <string name="home_level">Livello %1$d</string>
+    <string name="home_xp_progress">%1$d / %2$d XP</string>
+    <string name="home_xp_max">Livello massimo raggiunto</string>
+    <string name="home_streak">Serie</string>
+    <string name="home_start_game">Inizia a giocare</string>
+    <string name="home_continue">Continua</string>
+    <string name="home_daily_title">Sfida giornaliera</string>
+    <string name="home_daily_subtitle">5 nuovi enigmi ogni giorno</string>
+    <string name="home_rewards_title">Premi</string>
+    <string name="home_rewards_subtitle">Badge e obiettivi</string>
+    <string name="home_modes_title">Modalità di gioco</string>
+    <string name="mode_career">Carriera</string>
+    <string name="mode_career_subtitle">Progresso principale</string>
+    <string name="mode_endless">Infinita</string>
+    <string name="mode_endless_subtitle">Gioca senza limiti</string>
+    <string name="home_categories_title">Categorie di enigmi</string>
+    <string name="category_matchstick">Fiammiferi</string>
+    <string name="category_number_sequence">Sequenze numeriche</string>
+    <string name="category_word_logic">Logica delle parole</string>
+    <string name="category_mini_crossword">Mini cruciverba</string>
+    <string name="category_visual_logic">Logica visiva</string>
+    <string name="coming_soon_title">In arrivo</string>
+    <string name="coming_soon_body">Questa modalità sarà disponibile in un prossimo aggiornamento.</string>
 </resources>

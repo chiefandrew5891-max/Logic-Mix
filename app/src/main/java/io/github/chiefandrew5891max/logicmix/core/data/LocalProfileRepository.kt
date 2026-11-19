@@ -20,7 +20,7 @@ class LocalProfileRepository @Inject constructor(private val dao: ProfileDao) {
         )
     }
 
-    private companion object {
+    companion object {
         const val LOCAL_PROFILE_ID = "local"
     }
 }

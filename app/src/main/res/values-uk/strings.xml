@@ -7,4 +7,27 @@
     <string name="settings">Налаштування</string>
     <string name="sound">Звук</string>
     <string name="back">Назад</string>
+    <string name="home_level">Рівень %1$d</string>
+    <string name="home_xp_progress">%1$d / %2$d XP</string>
+    <string name="home_xp_max">Досягнуто максимального рівня</string>
+    <string name="home_streak">Серія</string>
+    <string name="home_start_game">Почати гру</string>
+    <string name="home_continue">Продовжити</string>
+    <string name="home_daily_title">Щоденне випробування</string>
+    <string name="home_daily_subtitle">5 нових завдань щодня</string>
+    <string name="home_rewards_title">Нагороди</string>
+    <string name="home_rewards_subtitle">Значки та досягнення</string>
+    <string name="home_modes_title">Режими гри</string>
+    <string name="mode_career">Кар\'єра</string>
+    <string name="mode_career_subtitle">Основний прогрес</string>
+    <string name="mode_endless">Нескінченний</string>
+    <string name="mode_endless_subtitle">Грай без обмежень</string>
+    <string name="home_categories_title">Категорії головоломок</string>
+    <string name="category_matchstick">Сірники</string>
+    <string name="category_number_sequence">Числові послідовності</string>
+    <string name="category_word_logic">Логіка слів</string>
+    <string name="category_mini_crossword">Міні-кросворди</string>
+    <string name="category_visual_logic">Візуальна логіка</string>
+    <string name="coming_soon_title">Незабаром</string>
+    <string name="coming_soon_body">Цей режим з\'явиться в одному з наступних оновлень.</string>
 </resources>

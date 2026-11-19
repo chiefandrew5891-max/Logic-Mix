@@ -7,4 +7,27 @@
     <string name="settings">Ajustes</string>
     <string name="sound">Sonido</string>
     <string name="back">Atrás</string>
+    <string name="home_level">Nivel %1$d</string>
+    <string name="home_xp_progress">%1$d / %2$d XP</string>
+    <string name="home_xp_max">Nivel máximo alcanzado</string>
+    <string name="home_streak">Racha</string>
+    <string name="home_start_game">Empezar a jugar</string>
+    <string name="home_continue">Continuar</string>
+    <string name="home_daily_title">Reto diario</string>
+    <string name="home_daily_subtitle">5 acertijos nuevos cada día</string>
+    <string name="home_rewards_title">Recompensas</string>
+    <string name="home_rewards_subtitle">Insignias y logros</string>
+    <string name="home_modes_title">Modos de juego</string>
+    <string name="mode_career">Carrera</string>
+    <string name="mode_career_subtitle">Progreso principal</string>
+    <string name="mode_endless">Infinito</string>
+    <string name="mode_endless_subtitle">Juega sin límites</string>
+    <string name="home_categories_title">Categorías de acertijos</string>
+    <string name="category_matchstick">Cerillas</string>
+    <string name="category_number_sequence">Secuencias numéricas</string>
+    <string name="category_word_logic">Lógica de palabras</string>
+    <string name="category_mini_crossword">Minicrucigramas</string>
+    <string name="category_visual_logic">Lógica visual</string>
+    <string name="coming_soon_title">Próximamente</string>
+    <string name="coming_soon_body">Este modo estará disponible en una próxima actualización.</string>
 </resources>

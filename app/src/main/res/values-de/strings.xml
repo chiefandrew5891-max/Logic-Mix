@@ -7,4 +7,27 @@
     <string name="settings">Einstellungen</string>
     <string name="sound">Ton</string>
     <string name="back">Zurück</string>
+    <string name="home_level">Level %1$d</string>
+    <string name="home_xp_progress">%1$d / %2$d XP</string>
+    <string name="home_xp_max">Höchstes Level erreicht</string>
+    <string name="home_streak">Serie</string>
+    <string name="home_start_game">Spiel starten</string>
+    <string name="home_continue">Weiter</string>
+    <string name="home_daily_title">Tägliche Herausforderung</string>
+    <string name="home_daily_subtitle">Jeden Tag 5 neue Rätsel</string>
+    <string name="home_rewards_title">Belohnungen</string>
+    <string name="home_rewards_subtitle">Abzeichen und Erfolge</string>
+    <string name="home_modes_title">Spielmodi</string>
+    <string name="mode_career">Karriere</string>
+    <string name="mode_career_subtitle">Hauptfortschritt</string>
+    <string name="mode_endless">Endlos</string>
+    <string name="mode_endless_subtitle">Spiele ohne Limit</string>
+    <string name="home_categories_title">Rätselkategorien</string>
+    <string name="category_matchstick">Streichhölzer</string>
+    <string name="category_number_sequence">Zahlenfolgen</string>
+    <string name="category_word_logic">Wortlogik</string>
+    <string name="category_mini_crossword">Mini-Kreuzworträtsel</string>
+    <string name="category_visual_logic">Visuelle Logik</string>
+    <string name="coming_soon_title">Demnächst</string>
+    <string name="coming_soon_body">Dieser Modus ist in einem kommenden Update verfügbar.</string>
 </resources>

@@ -7,4 +7,27 @@
     <string name="settings">Настройки</string>
     <string name="sound">Звук</string>
     <string name="back">Назад</string>
+    <string name="home_level">Уровень %1$d</string>
+    <string name="home_xp_progress">%1$d / %2$d XP</string>
+    <string name="home_xp_max">Достигнут максимальный уровень</string>
+    <string name="home_streak">Серия</string>
+    <string name="home_start_game">Начать игру</string>
+    <string name="home_continue">Продолжить</string>
+    <string name="home_daily_title">Ежедневное испытание</string>
+    <string name="home_daily_subtitle">5 новых задач каждый день</string>
+    <string name="home_rewards_title">Награды</string>
+    <string name="home_rewards_subtitle">Значки и достижения</string>
+    <string name="home_modes_title">Режимы игры</string>
+    <string name="mode_career">Карьера</string>
+    <string name="mode_career_subtitle">Основной прогресс</string>
+    <string name="mode_endless">Бесконечный</string>
+    <string name="mode_endless_subtitle">Играй без ограничений</string>
+    <string name="home_categories_title">Категории головоломок</string>
+    <string name="category_matchstick">Спички</string>
+    <string name="category_number_sequence">Числовые последовательности</string>
+    <string name="category_word_logic">Логика слов</string>
+    <string name="category_mini_crossword">Мини-кроссворды</string>
+    <string name="category_visual_logic">Визуальная логика</string>
+    <string name="coming_soon_title">Скоро</string>
+    <string name="coming_soon_body">Этот режим появится в одном из ближайших обновлений.</string>
 </resources>
