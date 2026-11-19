@@ -33,11 +33,14 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import io.github.chiefandrew5891max.logicmix.R
 import io.github.chiefandrew5891max.logicmix.core.designsystem.LogicMixIcon
+import io.github.chiefandrew5891max.logicmix.core.designsystem.LogicMixSettingsIcon
 import io.github.chiefandrew5891max.logicmix.core.designsystem.LogicMixTokens
 import io.github.chiefandrew5891max.logicmix.domain.game.GameMode
 
@@ -130,6 +133,7 @@ fun HomeScreen(
 
 @Composable
 private fun TopBar(onSettings: () -> Unit) {
+    val settingsLabel = stringResource(R.string.settings)
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Text(
             text = stringResource(R.string.home_title),
@@ -143,10 +147,11 @@ private fun TopBar(onSettings: () -> Unit) {
                 .clip(LogicMixTokens.radii.medium)
                 .background(LogicMixTokens.colors.cardBrush)
                 .border(BorderStroke(1.dp, LogicMixTokens.colors.cardBorder), LogicMixTokens.radii.medium)
-                .clickable(role = Role.Button, onClickLabel = stringResource(R.string.settings), onClick = onSettings),
+                .semantics { contentDescription = settingsLabel }
+                .clickable(role = Role.Button, onClickLabel = settingsLabel, onClick = onSettings),
             contentAlignment = Alignment.Center,
         ) {
-            LogicMixIcon(R.drawable.ic_settings, MaterialTheme.colorScheme.onSurface, contentDescription = stringResource(R.string.settings))
+            LogicMixSettingsIcon(size = 28.dp)
         }
     }
 }
