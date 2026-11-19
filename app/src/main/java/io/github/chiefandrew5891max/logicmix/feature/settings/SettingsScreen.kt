@@ -31,6 +31,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
@@ -193,6 +194,7 @@ private fun SwitchRow(@DrawableRes icon: Int, title: String, subtitle: String, c
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun VolumeRow(label: String, volume: Float, enabled: Boolean, onChange: (Float) -> Unit) {
     Column(Modifier.fillMaxWidth()) {
