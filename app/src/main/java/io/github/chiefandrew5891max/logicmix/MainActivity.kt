@@ -14,7 +14,6 @@ import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.chiefandrew5891max.logicmix.core.data.SettingsRepository
 import io.github.chiefandrew5891max.logicmix.core.designsystem.ThemeMode
-import io.github.chiefandrew5891max.logicmix.core.locale.AppLanguage
 import io.github.chiefandrew5891max.logicmix.core.locale.LocaleApplier
 import javax.inject.Inject
 import io.github.chiefandrew5891max.logicmix.core.designsystem.LogicMixTheme
@@ -30,8 +29,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val themeMode by settings.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
-            val language by settings.language.collectAsState(initial = AppLanguage.fromStored(null))
-            LaunchedEffect(language) { LocaleApplier.apply(language) }
+            val language by settings.language.collectAsState(initial = null)
+            LaunchedEffect(language) { language?.let { LocaleApplier.apply(it) } }
             LogicMixTheme(themeMode) {
                 LogicMixNavigation(rememberNavController())
             }

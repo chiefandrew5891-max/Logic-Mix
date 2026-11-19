@@ -1,5 +1,6 @@
 package io.github.chiefandrew5891max.logicmix.feature.home
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -36,6 +37,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import io.github.chiefandrew5891max.logicmix.R
+import io.github.chiefandrew5891max.logicmix.core.designsystem.LogicMixIcon
 import io.github.chiefandrew5891max.logicmix.core.designsystem.LogicMixTokens
 import io.github.chiefandrew5891max.logicmix.domain.game.GameMode
 
@@ -51,11 +53,11 @@ fun HomeRoute(
 }
 
 private val Categories = listOf(
-    "🔥" to R.string.category_matchstick,
-    "🔢" to R.string.category_number_sequence,
-    "🔤" to R.string.category_word_logic,
-    "🧩" to R.string.category_mini_crossword,
-    "🔷" to R.string.category_visual_logic,
+    R.drawable.ic_cat_matchstick to R.string.category_matchstick,
+    R.drawable.ic_cat_numbers to R.string.category_number_sequence,
+    R.drawable.ic_cat_words to R.string.category_word_logic,
+    R.drawable.ic_cat_crossword to R.string.category_mini_crossword,
+    R.drawable.ic_cat_visual to R.string.category_visual_logic,
 )
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -88,14 +90,14 @@ fun HomeScreen(
             )
             Row(horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM)) {
                 FeatureCard(
-                    glyph = "📅",
+                    icon = R.drawable.ic_daily,
                     title = stringResource(R.string.home_daily_title),
                     subtitle = stringResource(R.string.home_daily_subtitle),
                     onClick = { onPlay(GameMode.DAILY) },
                     modifier = Modifier.weight(1f),
                 )
                 FeatureCard(
-                    glyph = "🏆",
+                    icon = R.drawable.ic_rewards,
                     title = stringResource(R.string.home_rewards_title),
                     subtitle = stringResource(R.string.home_rewards_subtitle),
                     onClick = onRewards,
@@ -106,11 +108,11 @@ fun HomeScreen(
             SectionTitle(stringResource(R.string.home_modes_title))
             Row(horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM)) {
                 ModeCard(
-                    "🏔️", stringResource(R.string.mode_career), stringResource(R.string.mode_career_subtitle),
+                    R.drawable.ic_career, stringResource(R.string.mode_career), stringResource(R.string.mode_career_subtitle),
                     { onPlay(GameMode.CAREER) }, Modifier.weight(1f),
                 )
                 ModeCard(
-                    "♾️", stringResource(R.string.mode_endless), stringResource(R.string.mode_endless_subtitle),
+                    R.drawable.ic_endless, stringResource(R.string.mode_endless), stringResource(R.string.mode_endless_subtitle),
                     { onPlay(GameMode.ENDLESS) }, Modifier.weight(1f),
                 )
             }
@@ -120,7 +122,7 @@ fun HomeScreen(
                 verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS),
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Categories.forEach { (glyph, label) -> CategoryChip(glyph, stringResource(label)) }
+                Categories.forEach { (icon, label) -> CategoryChip(icon, stringResource(label)) }
             }
         }
     }
@@ -144,7 +146,7 @@ private fun TopBar(onSettings: () -> Unit) {
                 .clickable(role = Role.Button, onClickLabel = stringResource(R.string.settings), onClick = onSettings),
             contentAlignment = Alignment.Center,
         ) {
-            Text("⚙️", style = LogicMixTokens.typography.titleLarge)
+            LogicMixIcon(R.drawable.ic_settings, MaterialTheme.colorScheme.onSurface, contentDescription = stringResource(R.string.settings))
         }
     }
 }
@@ -172,7 +174,7 @@ private fun PlayerCard(state: HomeUiState) {
                 Modifier.padding(start = LogicMixTokens.spacing),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text("🔥", style = LogicMixTokens.typography.headlineMedium)
+                LogicMixIcon(R.drawable.ic_streak, colors.gold, size = 28.dp)
                 Text(
                     text = state.streak.toString(),
                     style = LogicMixTokens.typography.headlineMedium,
@@ -212,18 +214,21 @@ private fun PrimaryButton(label: String, onClick: () -> Unit) {
             .padding(horizontal = LogicMixTokens.spacingL, vertical = LogicMixTokens.spacingM),
         contentAlignment = Alignment.Center,
     ) {
-        Text(
-            text = "▶  $label".uppercase(),
-            style = LogicMixTokens.typography.headlineMedium,
-            color = colors.onGold,
-            textAlign = TextAlign.Center,
-        )
+        Row(horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS), verticalAlignment = Alignment.CenterVertically) {
+            LogicMixIcon(R.drawable.ic_play, colors.onGold, size = 28.dp)
+            Text(
+                text = label.uppercase(),
+                style = LogicMixTokens.typography.headlineMedium,
+                color = colors.onGold,
+                textAlign = TextAlign.Center,
+            )
+        }
     }
 }
 
 @Composable
 private fun FeatureCard(
-    glyph: String,
+    @DrawableRes icon: Int,
     title: String,
     subtitle: String,
     onClick: () -> Unit,
@@ -233,7 +238,7 @@ private fun FeatureCard(
     val brush = if (gold) LogicMixTokens.colors.rewardBrush else LogicMixTokens.colors.cardBrush
     CardSurface(modifier.clickable(role = Role.Button, onClick = onClick), LogicMixTokens.radii.large, brush) {
         Column(Modifier.padding(LogicMixTokens.spacingM), verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingXs)) {
-            Text(glyph, style = LogicMixTokens.typography.headlineMedium)
+            LogicMixIcon(icon, if (gold) LogicMixTokens.colors.gold else MaterialTheme.colorScheme.secondary, size = 32.dp)
             Text(title, style = LogicMixTokens.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
             Text(subtitle, style = LogicMixTokens.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
@@ -241,14 +246,14 @@ private fun FeatureCard(
 }
 
 @Composable
-private fun ModeCard(glyph: String, title: String, subtitle: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun ModeCard(@DrawableRes icon: Int, title: String, subtitle: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     CardSurface(modifier.clickable(role = Role.Button, onClick = onClick), LogicMixTokens.radii.large) {
         Column(
             Modifier.fillMaxWidth().padding(LogicMixTokens.spacingM),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingXs),
         ) {
-            Text(glyph, style = LogicMixTokens.typography.headlineMedium)
+            LogicMixIcon(icon, MaterialTheme.colorScheme.primary, size = 32.dp)
             Text(title, style = LogicMixTokens.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface, textAlign = TextAlign.Center)
             Text(subtitle, style = LogicMixTokens.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
         }
@@ -257,14 +262,14 @@ private fun ModeCard(glyph: String, title: String, subtitle: String, onClick: ()
 
 // Informational only: category selection belongs to the settings screen, so this is deliberately not clickable.
 @Composable
-private fun CategoryChip(glyph: String, label: String) {
+private fun CategoryChip(@DrawableRes icon: Int, label: String) {
     CardSurface(shape = LogicMixTokens.radii.extraLarge) {
         Row(
             Modifier.padding(horizontal = LogicMixTokens.spacingM, vertical = LogicMixTokens.spacingS),
             horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(glyph, style = LogicMixTokens.typography.bodyLarge)
+            LogicMixIcon(icon, MaterialTheme.colorScheme.secondary, size = 20.dp)
             Text(label, style = LogicMixTokens.typography.labelMedium, color = MaterialTheme.colorScheme.onSurface)
         }
     }
