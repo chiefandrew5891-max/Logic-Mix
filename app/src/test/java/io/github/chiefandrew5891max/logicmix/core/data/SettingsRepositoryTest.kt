@@ -75,3 +75,11 @@ class SettingsRepositoryTest {
         assertEquals(AppLanguage.SYSTEM, repo.language.first())
     }
 }
+
+class LanguageOptionsTest {
+    @Test fun allEightLanguagesPlusSystemRoundTripThroughStorage() {
+        assertEquals(9, AppLanguage.entries.size)
+        assertEquals(9, AppLanguage.entries.map { it.storedValue }.toSet().size)
+        AppLanguage.entries.forEach { assertEquals(it, AppLanguage.fromStored(it.storedValue)) }
+    }
+}

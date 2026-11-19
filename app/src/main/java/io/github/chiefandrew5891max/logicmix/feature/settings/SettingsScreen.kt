@@ -1,6 +1,19 @@
 package io.github.chiefandrew5891max.logicmix.feature.settings
 
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.semantics.selected
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,13 +32,11 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -122,11 +133,8 @@ internal fun SettingsContent(
                 }
             }
 
-            Section(stringResource(R.string.settings_section_language)) {
-                AppLanguage.entries.forEach { option ->
-                    LanguageRow(languageLabel(option), option == language) { onLanguage(option) }
-                }
-            }
+            Text(stringResource(R.string.settings_section_language), style = LogicMixTokens.typography.titleMedium, color = colors.gold)
+            LanguageAccordion(language, onLanguage)
 
             Section(stringResource(R.string.settings_section_info)) {
                 InfoRow(stringResource(R.string.settings_version, BuildConfig.VERSION_NAME), null)
@@ -192,11 +200,33 @@ private fun VolumeRow(label: String, volume: Float, enabled: Boolean, onChange: 
             Text(label, style = LogicMixTokens.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Text(stringResource(R.string.volume_percent, (volume * 100).toInt()), style = LogicMixTokens.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
+        val sliderColors = SliderDefaults.colors(
+            thumbColor = MaterialTheme.colorScheme.primary,
+            activeTrackColor = MaterialTheme.colorScheme.primary,
+            inactiveTrackColor = LogicMixTokens.colors.xpTrack,
+            disabledThumbColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+            disabledActiveTrackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.38f),
+            disabledInactiveTrackColor = LogicMixTokens.colors.xpTrack.copy(alpha = 0.5f),
+        )
         Slider(
             value = volume,
             onValueChange = onChange,
             enabled = enabled,
+            colors = sliderColors,
             modifier = Modifier.semantics { contentDescription = label },
+            thumb = {
+                Box(Modifier.size(20.dp).clip(CircleShape).background(if (enabled) MaterialTheme.colorScheme.primary else sliderColors.disabledThumbColor))
+            },
+            track = { state ->
+                SliderDefaults.Track(
+                    sliderState = state,
+                    enabled = enabled,
+                    colors = sliderColors,
+                    thumbTrackGapSize = 0.dp,
+                    trackInsideCornerSize = 0.dp,
+                    drawStopIndicator = null,
+                )
+            },
         )
     }
 }
@@ -220,13 +250,57 @@ private fun ThemeTile(@DrawableRes icon: Int, label: Int, selected: Boolean, onC
 }
 
 @Composable
-private fun LanguageRow(label: String, selected: Boolean, onClick: () -> Unit) {
-    Row(
-        Modifier.fillMaxWidth().selectable(selected = selected, role = Role.RadioButton, onClick = onClick),
-        verticalAlignment = Alignment.CenterVertically,
+internal fun LanguageAccordion(selected: AppLanguage, onSelect: (AppLanguage) -> Unit) {
+    val colors = LogicMixTokens.colors
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    val rotation by animateFloatAsState(if (expanded) 180f else 0f, tween(200), label = "arrow")
+    val shape = LogicMixTokens.radii.large
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .background(colors.cardBrush)
+            .border(BorderStroke(1.dp, colors.cardBorder), shape)
+            .animateContentSize(tween(220)),
     ) {
-        RadioButton(selected = selected, onClick = null, modifier = Modifier.padding(end = LogicMixTokens.spacingM))
-        Text(label, style = LogicMixTokens.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.padding(vertical = LogicMixTokens.spacingS))
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .heightIn(min = 56.dp)
+                .clickable(role = Role.DropdownList) { expanded = !expanded }
+                .padding(horizontal = LogicMixTokens.spacingM, vertical = LogicMixTokens.spacingS),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                languageLabel(selected),
+                style = LogicMixTokens.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.weight(1f),
+            )
+            LogicMixIcon(R.drawable.ic_arrow_down, MaterialTheme.colorScheme.onSurfaceVariant, Modifier.rotate(rotation), size = 20.dp)
+        }
+        if (expanded) {
+            Column(Modifier.fillMaxWidth().heightIn(max = 240.dp).verticalScroll(rememberScrollState())) {
+                AppLanguage.entries.forEach { option ->
+                    val isSelected = option == selected
+                    Text(
+                        languageLabel(option),
+                        style = LogicMixTokens.typography.bodyLarge,
+                        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 48.dp)
+                            .semantics { this.selected = isSelected }
+                            .clickable(role = Role.Button) {
+                                expanded = false
+                                onSelect(option)
+                            }
+                            .padding(horizontal = LogicMixTokens.spacingM, vertical = LogicMixTokens.spacingS)
+                            .wrapContentHeight(Alignment.CenterVertically),
+                    )
+                }
+            }
+        }
     }
 }
 
