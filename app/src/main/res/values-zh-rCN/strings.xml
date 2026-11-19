@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Logic Mix</string>
+    <string name="home_title">Logic Mix</string>
+    <string name="local_profile">本地资料</string>
+    <string name="offline_ready">可离线使用。</string>
+    <string name="loading_profile">正在加载本地资料…</string>
+    <string name="settings">设置</string>
+    <string name="sound">声音</string>
+    <string name="back">返回</string>
+</resources>

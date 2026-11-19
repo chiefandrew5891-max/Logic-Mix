@@ -1,7 +1,7 @@
 package io.github.chiefandrew5891max.logicmix
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -22,17 +23,27 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import io.github.chiefandrew5891max.logicmix.core.data.SettingsRepository
+import io.github.chiefandrew5891max.logicmix.core.designsystem.ThemeMode
+import io.github.chiefandrew5891max.logicmix.core.locale.AppLanguage
+import io.github.chiefandrew5891max.logicmix.core.locale.LocaleApplier
+import javax.inject.Inject
 import io.github.chiefandrew5891max.logicmix.core.designsystem.LogicMixTheme
 import io.github.chiefandrew5891max.logicmix.core.designsystem.LogicMixTokens
 import io.github.chiefandrew5891max.logicmix.feature.home.HomeViewModel
 import io.github.chiefandrew5891max.logicmix.feature.settings.SettingsScreen
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
+    @Inject lateinit var settings: SettingsRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            LogicMixTheme {
+            val themeMode by settings.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
+            val language by settings.language.collectAsState(initial = AppLanguage.fromStored(null))
+            LaunchedEffect(language) { LocaleApplier.apply(language) }
+            LogicMixTheme(themeMode) {
                 LogicMixNavigation(rememberNavController())
             }
         }
