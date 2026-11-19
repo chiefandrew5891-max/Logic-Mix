@@ -54,4 +54,20 @@
     <string name="settings_privacy">Datenschutzerklärung</string>
     <string name="settings_planned">Kommt später</string>
     <string name="volume_percent">%1$d %%</string>
+    <string name="game_title">Zahlenfolgen</string>
+    <string name="game_task_info">Aufgabe %1$d von %2$d · Schwierigkeit %3$d</string>
+    <string name="game_find_next">Finde die nächste Zahl</string>
+    <string name="game_answer_label">Deine Antwort</string>
+    <string name="game_submit">Prüfen</string>
+    <string name="game_hint_button">Hinweis (%1$d/%2$d)</string>
+    <string name="game_hint_line">Hinweis %1$d: %2$s</string>
+    <string name="game_correct">Richtig!</string>
+    <string name="game_wrong">Nicht ganz. Versuche es noch einmal.</string>
+    <string name="game_invalid">Gib eine ganze Zahl ein.</string>
+    <string name="game_xp_earned">+%1$d XP</string>
+    <string name="game_no_xp">Keine XP: Diese Aufgabe war bereits gelöst.</string>
+    <string name="game_explanation">Regel: %1$s</string>
+    <string name="game_next">Nächste Aufgabe</string>
+    <string name="game_all_done">Alle Aufgaben gelöst</string>
+    <string name="game_all_done_body">Du hast alle Zahlenfolgen in diesem Paket gelöst. Neue Aufgaben kommen mit Updates.</string>
 </resources>

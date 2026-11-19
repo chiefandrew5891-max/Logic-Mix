@@ -17,6 +17,8 @@ import io.github.chiefandrew5891max.logicmix.core.designsystem.ThemeMode
 import io.github.chiefandrew5891max.logicmix.core.locale.LocaleApplier
 import javax.inject.Inject
 import io.github.chiefandrew5891max.logicmix.core.designsystem.LogicMixTheme
+import io.github.chiefandrew5891max.logicmix.domain.game.GameMode
+import io.github.chiefandrew5891max.logicmix.feature.game.GameRoute
 import io.github.chiefandrew5891max.logicmix.feature.home.ComingSoonScreen
 import io.github.chiefandrew5891max.logicmix.feature.home.HomeRoute
 import io.github.chiefandrew5891max.logicmix.feature.settings.SettingsScreen
@@ -42,6 +44,7 @@ object Routes {
     const val HOME = "home"
     const val SETTINGS = "settings"
     const val COMING_SOON = "coming_soon"
+    const val GAME = "game"
 }
 
 @Composable
@@ -49,10 +52,15 @@ private fun LogicMixNavigation(navController: NavHostController) {
     NavHost(navController = navController, startDestination = Routes.HOME) {
         composable(Routes.HOME) {
             HomeRoute(
-                onPlay = { navController.navigate(Routes.COMING_SOON) },
+                onPlay = { mode ->
+                    navController.navigate(if (mode == GameMode.CAREER) Routes.GAME else Routes.COMING_SOON)
+                },
                 onRewards = { navController.navigate(Routes.COMING_SOON) },
                 onSettings = { navController.navigate(Routes.SETTINGS) },
             )
+        }
+        composable(Routes.GAME) {
+            GameRoute(onBack = { navController.popBackStack() })
         }
         composable(Routes.COMING_SOON) {
             ComingSoonScreen(onBack = { navController.popBackStack() })

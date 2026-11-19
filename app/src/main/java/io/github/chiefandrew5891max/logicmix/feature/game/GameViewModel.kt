@@ -1,0 +1,130 @@
+package io.github.chiefandrew5891max.logicmix.feature.game
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.chiefandrew5891max.logicmix.core.data.GameSessionStore
+import io.github.chiefandrew5891max.logicmix.core.data.LocalProfileRepository
+import io.github.chiefandrew5891max.logicmix.core.data.ProgressRepository
+import io.github.chiefandrew5891max.logicmix.domain.game.AttemptOutcome
+import io.github.chiefandrew5891max.logicmix.domain.game.GameMode
+import io.github.chiefandrew5891max.logicmix.domain.game.NumberSequenceEngine
+import io.github.chiefandrew5891max.logicmix.domain.game.NumberSequencePack
+import io.github.chiefandrew5891max.logicmix.domain.game.NumberSequencePuzzle
+import io.github.chiefandrew5891max.logicmix.domain.game.SolveResult
+import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+
+enum class Feedback { NONE, CORRECT, WRONG, INVALID }
+
+data class GameUiState(
+    val loading: Boolean = true,
+    val finished: Boolean = false,
+    val puzzle: NumberSequencePuzzle? = null,
+    val number: Int = 0,
+    val total: Int = NumberSequencePack.puzzles.size,
+    val hintsUsed: Int = 0,
+    val input: String = "",
+    val feedback: Feedback = Feedback.NONE,
+    val xpAwarded: Int = 0,
+    val startedAt: Long = 0L,
+) {
+    val solved: Boolean get() = feedback == Feedback.CORRECT
+    val shownHints: List<String> get() = puzzle?.hints?.take(hintsUsed).orEmpty()
+    val canUseHint: Boolean get() = puzzle != null && !solved && hintsUsed < puzzle.hints.size
+    val canSubmit: Boolean get() = puzzle != null && !solved && input.isNotBlank()
+}
+
+@HiltViewModel
+class GameViewModel @Inject constructor(
+    private val profiles: LocalProfileRepository,
+    private val progress: ProgressRepository,
+    private val sessions: GameSessionStore,
+) : ViewModel() {
+    private val profileId = LocalProfileRepository.LOCAL_PROFILE_ID
+    private val _state = MutableStateFlow(GameUiState())
+    val state: StateFlow<GameUiState> = _state.asStateFlow()
+
+    init { load() }
+
+    private fun load() {
+        viewModelScope.launch {
+            _state.value = GameUiState(loading = true)
+            profiles.ensureProfile()
+            progress.ensureProgress(profileId)
+            val solved = progress.solvedPuzzleIds(profileId).toSet()
+            val resumed = sessions.session.first()?.puzzleId?.let(NumberSequencePack::byId)?.takeIf { it.id !in solved }
+            val puzzle = resumed ?: NumberSequencePack.firstUnsolved(solved)
+            if (puzzle == null) {
+                sessions.clear()
+                _state.value = GameUiState(loading = false, finished = true)
+                return@launch
+            }
+            val session = sessions.begin(puzzle.id, System.currentTimeMillis())
+            _state.value = GameUiState(
+                loading = false,
+                puzzle = puzzle,
+                number = NumberSequencePack.puzzles.indexOf(puzzle) + 1,
+                hintsUsed = session.hintsUsed.coerceAtMost(puzzle.hints.size),
+                startedAt = session.startedAt,
+            )
+        }
+    }
+
+    fun onInput(text: String) {
+        _state.update { if (it.solved) it else it.copy(input = text.take(MAX_INPUT), feedback = Feedback.NONE) }
+    }
+
+    fun useHint() {
+        val s = _state.value
+        val puzzle = s.puzzle ?: return
+        if (!s.canUseHint) return
+        val used = s.hintsUsed + 1
+        _state.update { it.copy(hintsUsed = used) }
+        viewModelScope.launch { sessions.setHintsUsed(puzzle.id, used) }
+    }
+
+    fun submit() {
+        val s = _state.value
+        val puzzle = s.puzzle ?: return
+        if (!s.canSubmit) return
+        when (NumberSequenceEngine.checkAnswer(puzzle, s.input)) {
+            SolveResult.InvalidInput -> _state.update { it.copy(feedback = Feedback.INVALID) }
+            SolveResult.Incorrect -> {
+                _state.update { it.copy(feedback = Feedback.WRONG) }
+                record(puzzle, s, AttemptOutcome.INCORRECT)
+            }
+            SolveResult.Correct -> {
+                // Lock the screen immediately so a double tap cannot submit twice.
+                _state.update { it.copy(feedback = Feedback.CORRECT) }
+                viewModelScope.launch {
+                    val result = progress.recordAttempt(
+                        profileId, puzzle.id, GameMode.CAREER, AttemptOutcome.CORRECT,
+                        s.startedAt, System.currentTimeMillis(), s.hintsUsed,
+                    )
+                    sessions.clear()
+                    _state.update { it.copy(xpAwarded = result.xpAwarded) }
+                }
+            }
+        }
+    }
+
+    fun next() {
+        if (_state.value.solved) load()
+    }
+
+    private fun record(puzzle: NumberSequencePuzzle, s: GameUiState, outcome: AttemptOutcome) {
+        viewModelScope.launch {
+            progress.recordAttempt(profileId, puzzle.id, GameMode.CAREER, outcome, s.startedAt, System.currentTimeMillis(), s.hintsUsed)
+        }
+    }
+
+    private companion object {
+        const val MAX_INPUT = 12
+    }
+}

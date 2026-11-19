@@ -54,4 +54,20 @@
     <string name="settings_privacy">Политика конфиденциальности</string>
     <string name="settings_planned">Появится позже</string>
     <string name="volume_percent">%1$d%%</string>
+    <string name="game_title">Числовые последовательности</string>
+    <string name="game_task_info">Задача %1$d из %2$d · Сложность %3$d</string>
+    <string name="game_find_next">Найдите следующее число</string>
+    <string name="game_answer_label">Ваш ответ</string>
+    <string name="game_submit">Проверить</string>
+    <string name="game_hint_button">Подсказка (%1$d/%2$d)</string>
+    <string name="game_hint_line">Подсказка %1$d: %2$s</string>
+    <string name="game_correct">Верно!</string>
+    <string name="game_wrong">Неверно. Попробуйте ещё раз.</string>
+    <string name="game_invalid">Введите целое число.</string>
+    <string name="game_xp_earned">+%1$d XP</string>
+    <string name="game_no_xp">XP не начислены: задача уже решена.</string>
+    <string name="game_explanation">Правило: %1$s</string>
+    <string name="game_next">Следующая задача</string>
+    <string name="game_all_done">Все задачи пройдены</string>
+    <string name="game_all_done_body">Вы решили все числовые последовательности из этого набора. Новые задачи появятся в обновлениях.</string>
 </resources>

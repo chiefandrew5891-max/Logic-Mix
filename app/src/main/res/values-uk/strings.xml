@@ -54,4 +54,20 @@
     <string name="settings_privacy">Політика конфіденційності</string>
     <string name="settings_planned">З’явиться пізніше</string>
     <string name="volume_percent">%1$d%%</string>
+    <string name="game_title">Числові послідовності</string>
+    <string name="game_task_info">Завдання %1$d з %2$d · Складність %3$d</string>
+    <string name="game_find_next">Знайдіть наступне число</string>
+    <string name="game_answer_label">Ваша відповідь</string>
+    <string name="game_submit">Перевірити</string>
+    <string name="game_hint_button">Підказка (%1$d/%2$d)</string>
+    <string name="game_hint_line">Підказка %1$d: %2$s</string>
+    <string name="game_correct">Правильно!</string>
+    <string name="game_wrong">Неправильно. Спробуйте ще раз.</string>
+    <string name="game_invalid">Введіть ціле число.</string>
+    <string name="game_xp_earned">+%1$d XP</string>
+    <string name="game_no_xp">XP не нараховано: завдання вже розв’язано.</string>
+    <string name="game_explanation">Правило: %1$s</string>
+    <string name="game_next">Наступне завдання</string>
+    <string name="game_all_done">Усі завдання виконано</string>
+    <string name="game_all_done_body">Ви розв’язали всі числові послідовності з цього набору. Нові завдання з’являться в оновленнях.</string>
 </resources>

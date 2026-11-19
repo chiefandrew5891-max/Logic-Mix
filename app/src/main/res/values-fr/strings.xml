@@ -54,4 +54,20 @@
     <string name="settings_privacy">Politique de confidentialité</string>
     <string name="settings_planned">Bientôt disponible</string>
     <string name="volume_percent">%1$d %%</string>
+    <string name="game_title">Suites numériques</string>
+    <string name="game_task_info">Tâche %1$d sur %2$d · Difficulté %3$d</string>
+    <string name="game_find_next">Trouvez le nombre suivant</string>
+    <string name="game_answer_label">Votre réponse</string>
+    <string name="game_submit">Vérifier</string>
+    <string name="game_hint_button">Indice (%1$d/%2$d)</string>
+    <string name="game_hint_line">Indice %1$d : %2$s</string>
+    <string name="game_correct">Correct !</string>
+    <string name="game_wrong">Pas tout à fait. Réessayez.</string>
+    <string name="game_invalid">Saisissez un nombre entier.</string>
+    <string name="game_xp_earned">+%1$d XP</string>
+    <string name="game_no_xp">Pas d’XP : cette tâche était déjà résolue.</string>
+    <string name="game_explanation">Règle : %1$s</string>
+    <string name="game_next">Tâche suivante</string>
+    <string name="game_all_done">Toutes les tâches terminées</string>
+    <string name="game_all_done_body">Vous avez résolu toutes les suites numériques de ce pack. De nouvelles tâches arriveront avec les mises à jour.</string>
 </resources>

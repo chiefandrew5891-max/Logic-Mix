@@ -54,4 +54,20 @@
     <string name="settings_privacy">隐私政策</string>
     <string name="settings_planned">即将推出</string>
     <string name="volume_percent">%1$d%%</string>
+    <string name="game_title">数列</string>
+    <string name="game_task_info">第 %1$d 题，共 %2$d 题 · 难度 %3$d</string>
+    <string name="game_find_next">找出下一个数</string>
+    <string name="game_answer_label">你的答案</string>
+    <string name="game_submit">检查</string>
+    <string name="game_hint_button">提示（%1$d/%2$d）</string>
+    <string name="game_hint_line">提示 %1$d：%2$s</string>
+    <string name="game_correct">正确！</string>
+    <string name="game_wrong">不对，再试一次。</string>
+    <string name="game_invalid">请输入整数。</string>
+    <string name="game_xp_earned">+%1$d XP</string>
+    <string name="game_no_xp">没有 XP：此题已解答过。</string>
+    <string name="game_explanation">规律：%1$s</string>
+    <string name="game_next">下一题</string>
+    <string name="game_all_done">所有题目已完成</string>
+    <string name="game_all_done_body">你已解完本题包中的所有数列。新题目将在更新中推出。</string>
 </resources>

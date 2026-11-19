@@ -54,4 +54,20 @@
     <string name="settings_privacy">Política de privacidad</string>
     <string name="settings_planned">Próximamente</string>
     <string name="volume_percent">%1$d%%</string>
+    <string name="game_title">Secuencias numéricas</string>
+    <string name="game_task_info">Tarea %1$d de %2$d · Dificultad %3$d</string>
+    <string name="game_find_next">Encuentra el siguiente número</string>
+    <string name="game_answer_label">Tu respuesta</string>
+    <string name="game_submit">Comprobar</string>
+    <string name="game_hint_button">Pista (%1$d/%2$d)</string>
+    <string name="game_hint_line">Pista %1$d: %2$s</string>
+    <string name="game_correct">¡Correcto!</string>
+    <string name="game_wrong">No exactamente. Inténtalo de nuevo.</string>
+    <string name="game_invalid">Introduce un número entero.</string>
+    <string name="game_xp_earned">+%1$d XP</string>
+    <string name="game_no_xp">Sin XP: esta tarea ya estaba resuelta.</string>
+    <string name="game_explanation">Regla: %1$s</string>
+    <string name="game_next">Siguiente tarea</string>
+    <string name="game_all_done">Todas las tareas completadas</string>
+    <string name="game_all_done_body">Has resuelto todas las secuencias numéricas de este paquete. Habrá nuevas tareas en futuras actualizaciones.</string>
 </resources>
