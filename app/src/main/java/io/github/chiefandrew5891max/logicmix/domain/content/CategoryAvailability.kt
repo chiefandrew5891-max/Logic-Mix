@@ -2,7 +2,25 @@ package io.github.chiefandrew5891max.logicmix.domain.content
 
 import io.github.chiefandrew5891max.logicmix.core.locale.AppLanguage
 
-enum class GameCategory { WORD_SEARCH }
+/** Declaration order is the display order on the home screen; ids are persisted by name. */
+enum class GameCategory {
+    MATCHSTICK, NUMBER_SEQUENCE, WORD_LOGIC, MINI_CROSSWORD, VISUAL_LOGIC, WORD_SEARCH, SUDOKU;
+
+    /** Name of the optional PNG in res/drawable-nodpi; see IMAGE_ASSETS.md. */
+    val imageName: String
+        get() = when (this) {
+            MATCHSTICK -> "game_matchsticks"
+            NUMBER_SEQUENCE -> "game_number_sequences"
+            WORD_LOGIC -> "game_word_logic"
+            MINI_CROSSWORD -> "game_mini_crosswords"
+            VISUAL_LOGIC -> "game_visual_logic"
+            WORD_SEARCH -> "game_fillwords"
+            SUDOKU -> "game_sudoku"
+        }
+
+    /** Categories with a real playable screen; the rest open the localized coming-soon screen. */
+    val isPlayable: Boolean get() = this == NUMBER_SEQUENCE || this == WORD_SEARCH
+}
 
 /**
  * Which UI languages a category is offered for. A hidden category has no entry point at all.
@@ -19,4 +37,8 @@ object CategoryAvailability {
 
     fun available(language: AppLanguage): Set<GameCategory> =
         GameCategory.entries.filter { isAvailable(it, language) }.toSet()
+
+    /** Available categories in display order. */
+    fun ordered(language: AppLanguage): List<GameCategory> =
+        GameCategory.entries.filter { isAvailable(it, language) }
 }

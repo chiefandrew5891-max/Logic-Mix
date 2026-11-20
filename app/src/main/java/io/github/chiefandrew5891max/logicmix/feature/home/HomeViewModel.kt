@@ -29,6 +29,7 @@ class HomeViewModel @Inject constructor(
         progress.observeStreak(LocalProfileRepository.LOCAL_PROFILE_ID),
         sessions.hasActiveSession,
         settings.effectiveLanguage().map { CategoryAvailability.available(it) },
+        settings.gameStyle,
         HomeStateMapper::map,
     ).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState())
 

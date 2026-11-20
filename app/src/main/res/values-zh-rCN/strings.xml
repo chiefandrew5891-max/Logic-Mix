@@ -88,4 +88,27 @@
     <string name="ws_all_done">所有关卡已完成</string>
     <string name="ws_all_done_body">你已完成该语言的所有关卡，更多关卡将在后续更新中推出。</string>
     <string name="ws_grid_desc">%1$d × %1$d 字母网格</string>
+    <string name="category_sudoku">数独</string>
+    <string name="style_title">选择你的游戏风格</string>
+    <string name="style_subtitle">选择你想如何训练逻辑思维。之后可以在设置中更改。</string>
+    <string name="style_arcade">街机</string>
+    <string name="style_trainer">训练</string>
+    <string name="style_categories">单独分类</string>
+    <string name="style_arcade_desc">动态混合谜题，包含连击、奖励和更快的节奏。</string>
+    <string name="style_trainer_desc">按你选择的分类，以舒适的节奏进行个性化逻辑训练。</string>
+    <string name="style_categories_desc">单独游玩所选的一种谜题分类。</string>
+    <string name="style_confirm">确认</string>
+    <string name="style_trainer_title">选择训练分类</string>
+    <string name="style_trainer_hint">为你的个人训练选择一个或多个分类。</string>
+    <string name="style_category_title">选择分类</string>
+    <string name="style_category_hint">选择你想先玩的分类。其他分类仍然可用。</string>
+    <string name="style_info_arcade_body">已保存街机风格。混合模式准备好后，将混合所有分类的谜题。</string>
+    <string name="style_info_trainer_body">已保存训练分类。混合模式准备好后，将由这些分类组成。</string>
+    <string name="style_info_play">玩数列</string>
+    <string name="style_info_home">返回主页</string>
+    <string name="settings_section_game_style">游戏风格</string>
+    <string name="settings_game_style_current">当前风格</string>
+    <string name="settings_game_style_none">尚未选择</string>
+    <string name="settings_trainer_edit">训练分类</string>
+    <string name="settings_category_edit">偏好分类</string>
 </resources>

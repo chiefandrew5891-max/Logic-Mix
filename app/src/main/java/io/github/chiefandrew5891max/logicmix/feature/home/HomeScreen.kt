@@ -5,7 +5,11 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import io.github.chiefandrew5891max.logicmix.core.designsystem.rememberDrawableId
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -52,19 +56,13 @@ fun HomeRoute(
     onRewards: () -> Unit,
     onSettings: () -> Unit,
     onWordSearch: () -> Unit = {},
+    onCategory: (GameCategory) -> Unit = {},
+    onPrimary: (HomeUiState) -> Unit = { onPlay(GameMode.CAREER) },
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsState()
-    HomeScreen(state, onPlay, onRewards, onSettings, onWordSearch)
+    HomeScreen(state, onPlay, onRewards, onSettings, onWordSearch, onCategory, { onPrimary(state) })
 }
-
-private val Categories = listOf(
-    R.drawable.ic_cat_matchstick to R.string.category_matchstick,
-    R.drawable.ic_cat_numbers to R.string.category_number_sequence,
-    R.drawable.ic_cat_words to R.string.category_word_logic,
-    R.drawable.ic_cat_crossword to R.string.category_mini_crossword,
-    R.drawable.ic_cat_visual to R.string.category_visual_logic,
-)
 
 @Composable
 fun HomeScreen(
@@ -73,6 +71,8 @@ fun HomeScreen(
     onRewards: () -> Unit,
     onSettings: () -> Unit,
     onWordSearch: () -> Unit = {},
+    onCategory: (GameCategory) -> Unit = {},
+    onPrimary: () -> Unit = { onPlay(GameMode.CAREER) },
 ) {
     val colors = LogicMixTokens.colors
     Box(Modifier.fillMaxSize().background(colors.backgroundBrush)) {
@@ -92,7 +92,7 @@ fun HomeScreen(
                 label = stringResource(
                     if (state.primaryAction == PrimaryAction.CONTINUE) R.string.home_continue else R.string.home_start_game,
                 ),
-                onClick = { onPlay(GameMode.CAREER) },
+                onClick = onPrimary,
             )
             EqualHeightRow {
                 FeatureCard(
@@ -123,12 +123,7 @@ fun HomeScreen(
                 )
             }
             SectionTitle(stringResource(R.string.home_categories_title))
-            Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS)) {
-                Categories.forEach { (icon, label) -> CategoryChip(icon, stringResource(label)) }
-                if (GameCategory.WORD_SEARCH in state.categories) {
-                    CategoryChip(R.drawable.ic_cat_words, stringResource(R.string.category_word_search), onWordSearch)
-                }
-            }
+            CategoryGrid(categories = GameCategory.entries.filter { it in state.categories }, onClick = onCategory)
         }
     }
 }
@@ -137,12 +132,24 @@ fun HomeScreen(
 private fun TopBar(onSettings: () -> Unit) {
     val settingsLabel = stringResource(R.string.settings)
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Text(
-            text = stringResource(R.string.home_title),
-            style = LogicMixTokens.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.onBackground,
-            modifier = Modifier.weight(1f),
-        )
+        val logoId = rememberDrawableId("logo_logic_mix_main")
+        if (logoId != 0) {
+            // The wordmark PNG replaces the text title; the app name stays available to accessibility services.
+            Image(
+                painter = painterResource(logoId),
+                contentDescription = stringResource(R.string.app_name),
+                contentScale = ContentScale.Fit,
+                alignment = Alignment.CenterStart,
+                modifier = Modifier.weight(1f).heightIn(max = 88.dp),
+            )
+        } else {
+            Text(
+                text = stringResource(R.string.home_title),
+                style = LogicMixTokens.typography.headlineLarge,
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.weight(1f),
+            )
+        }
         Box(
             modifier = Modifier
                 .size(LogicMixTokens.minTouchTarget)
@@ -269,25 +276,6 @@ private fun ModeCard(@DrawableRes icon: Int, title: String, subtitle: String, on
             LogicMixIcon(icon, MaterialTheme.colorScheme.primary, size = 32.dp)
             Text(title, style = LogicMixTokens.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface, textAlign = TextAlign.Center)
             Text(subtitle, style = LogicMixTokens.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
-        }
-    }
-}
-
-// Chips without a click handler are informational; only categories with a playable engine open a screen.
-@Composable
-private fun CategoryChip(@DrawableRes icon: Int, label: String, onClick: (() -> Unit)? = null) {
-    CardSurface(Modifier.fillMaxWidth(), shape = LogicMixTokens.radii.extraLarge) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .heightIn(min = LogicMixTokens.minTouchTarget)
-                .then(if (onClick != null) Modifier.clickable(role = Role.Button, onClick = onClick) else Modifier)
-                .padding(horizontal = LogicMixTokens.spacingM, vertical = LogicMixTokens.spacingS),
-            horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            LogicMixIcon(icon, MaterialTheme.colorScheme.secondary, size = 20.dp)
-            Text(label, style = LogicMixTokens.typography.labelMedium, color = MaterialTheme.colorScheme.onSurface)
         }
     }
 }

@@ -88,4 +88,27 @@
     <string name="ws_all_done">Усі рівні пройдено</string>
     <string name="ws_all_done_body">Ви пройшли всі рівні філвордів для цієї мови. Нові рівні з’являться в оновленнях.</string>
     <string name="ws_grid_desc">Сітка літер %1$d на %1$d</string>
+    <string name="category_sudoku">Судоку</string>
+    <string name="style_title">Оберіть стиль гри</string>
+    <string name="style_subtitle">Оберіть, як ви хочете тренувати логіку. Це можна змінити пізніше в налаштуваннях.</string>
+    <string name="style_arcade">Аркада</string>
+    <string name="style_trainer">Тренажер</string>
+    <string name="style_categories">Окремі категорії</string>
+    <string name="style_arcade_desc">Динамічна суміш головоломок із серіями, бонусними нагородами та швидким темпом.</string>
+    <string name="style_trainer_desc">Персональне тренування логіки за вибраними вами категоріями в комфортному темпі.</string>
+    <string name="style_categories_desc">Грайте в одну вибрану категорію головоломок окремо.</string>
+    <string name="style_confirm">Підтвердити</string>
+    <string name="style_trainer_title">Оберіть категорії для тренування</string>
+    <string name="style_trainer_hint">Позначте одну або кілька категорій для особистого тренування.</string>
+    <string name="style_category_title">Оберіть категорію</string>
+    <string name="style_category_hint">Позначте категорію, з якої хочете почати. Інші категорії залишаються доступними.</string>
+    <string name="style_info_arcade_body">Стиль «Аркада» збережено. Коли змішаний режим буде готовий, у ньому з’являться головоломки з усіх категорій.</string>
+    <string name="style_info_trainer_body">Категорії для тренування збережено. Коли змішаний режим буде готовий, його буде зібрано з них.</string>
+    <string name="style_info_play">Грати: Числові послідовності</string>
+    <string name="style_info_home">На головний екран</string>
+    <string name="settings_section_game_style">Стиль гри</string>
+    <string name="settings_game_style_current">Поточний стиль</string>
+    <string name="settings_game_style_none">Ще не обрано</string>
+    <string name="settings_trainer_edit">Категорії тренажера</string>
+    <string name="settings_category_edit">Улюблена категорія</string>
 </resources>

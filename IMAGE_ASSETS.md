@@ -1,0 +1,44 @@
+# Image assets (11 PNG files)
+
+The app builds and runs **without** these files: missing images are replaced by a Compose-drawn placeholder
+(and the text title on the home screen). Once a correctly named file is added and the app is rebuilt,
+the real image is used automatically — no Kotlin changes are needed. Lookup is by resource name
+(`core/designsystem/NeonComponents.kt`, `rememberDrawableId`).
+
+## Destination
+
+`app/src/main/res/drawable-nodpi/`
+
+## Files
+
+| Purpose | Filename |
+|---|---|
+| Matchsticks | `game_matchsticks.png` |
+| Number sequences | `game_number_sequences.png` |
+| Word logic | `game_word_logic.png` |
+| Mini crosswords | `game_mini_crosswords.png` |
+| Visual logic | `game_visual_logic.png` |
+| Fillwords | `game_fillwords.png` |
+| Sudoku | `game_sudoku.png` |
+| Arcade style | `mode_arcade.png` |
+| Trainer style | `mode_trainer.png` |
+| Individual categories style | `mode_categories.png` |
+| Main-screen wordmark | `logo_logic_mix_main.png` |
+
+Names must be lowercase, use only `a-z`, `0-9`, `_`, and keep the `.png` extension. Do not add titles to the images:
+category and style names are real localized text drawn by the app. The launcher icon is not affected.
+
+## Adding them
+
+1. In Android Studio's Project view switch to **Project**, open `app/src/main/res/drawable-nodpi`.
+2. Copy the 11 PNG files into that folder (drag and drop, or paste), confirm the dialog.
+3. Rebuild: **Build > Rebuild Project**, then Run on the device.
+4. Commit and push:
+
+```
+git add app/src/main/res/drawable-nodpi/*.png
+git commit -m "feat(ui): add 3D category, style and logo artwork"
+git push origin <your-branch>
+```
+
+`app/src/main/res/raw/keep.xml` keeps these resources from being stripped if resource shrinking is enabled later.

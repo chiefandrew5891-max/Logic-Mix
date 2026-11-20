@@ -7,8 +7,12 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import io.github.chiefandrew5891max.logicmix.core.designsystem.ThemeMode
 import io.github.chiefandrew5891max.logicmix.core.locale.AppLanguage
+import io.github.chiefandrew5891max.logicmix.domain.content.GameCategory
+import io.github.chiefandrew5891max.logicmix.domain.content.GameStyle
+import io.github.chiefandrew5891max.logicmix.domain.content.GameStylePrefs
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -61,7 +65,33 @@ class SettingsRepository internal constructor(private val store: DataStore<Prefe
         store.edit { it[LANGUAGE] = language.storedValue }
     }
 
+    // Absent keys (existing installs) read as "onboarding not done", so the selector is shown once.
+    val gameStyle: Flow<GameStylePrefs> = store.data.map { p ->
+        GameStylePrefs(
+            onboardingDone = p[ONBOARDING_DONE] ?: false,
+            style = GameStyle.fromStored(p[GAME_STYLE]),
+            trainerCategories = p[TRAINER_CATEGORIES].orEmpty().mapNotNull(::category).toSet(),
+            preferredCategory = category(p[PREFERRED_CATEGORY]),
+        )
+    }
+
+    /** Saves a confirmed style together with its selection in one atomic edit. */
+    suspend fun confirmGameStyle(style: GameStyle, trainer: Set<GameCategory>? = null, preferred: GameCategory? = null) {
+        store.edit {
+            it[ONBOARDING_DONE] = true
+            it[GAME_STYLE] = style.name
+            if (trainer != null) it[TRAINER_CATEGORIES] = trainer.map(GameCategory::name).toSet()
+            if (preferred != null) it[PREFERRED_CATEGORY] = preferred.name
+        }
+    }
+
     private companion object {
+        val ONBOARDING_DONE = booleanPreferencesKey("game_style_onboarding_done")
+        val GAME_STYLE = stringPreferencesKey("game_style")
+        val TRAINER_CATEGORIES = stringSetPreferencesKey("trainer_categories")
+        val PREFERRED_CATEGORY = stringPreferencesKey("preferred_category")
+        fun category(name: String?): GameCategory? = GameCategory.entries.firstOrNull { it.name == name }
+
         val SOUND_ENABLED = booleanPreferencesKey("sound_enabled")
         val MUSIC_ENABLED = booleanPreferencesKey("music_enabled")
         val EFFECTS_ENABLED = booleanPreferencesKey("effects_enabled")

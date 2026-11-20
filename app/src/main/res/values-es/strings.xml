@@ -88,4 +88,27 @@
     <string name="ws_all_done">Todos los niveles completados</string>
     <string name="ws_all_done_body">Has completado todos los niveles de este idioma. Habrá nuevos niveles en futuras actualizaciones.</string>
     <string name="ws_grid_desc">Cuadrícula de letras %1$d por %1$d</string>
+    <string name="category_sudoku">Sudoku</string>
+    <string name="style_title">Elige tu estilo de juego</string>
+    <string name="style_subtitle">Elige cómo quieres entrenar tu lógica. Podrás cambiarlo más tarde en Ajustes.</string>
+    <string name="style_arcade">Arcade</string>
+    <string name="style_trainer">Entrenador</string>
+    <string name="style_categories">Categorías individuales</string>
+    <string name="style_arcade_desc">Acertijos mixtos y dinámicos con rachas, recompensas extra y un ritmo más rápido.</string>
+    <string name="style_trainer_desc">Un entrenamiento de lógica personalizado con las categorías que elijas, a un ritmo cómodo.</string>
+    <string name="style_categories_desc">Juega de forma independiente una sola categoría de acertijos.</string>
+    <string name="style_confirm">Confirmar</string>
+    <string name="style_trainer_title">Elige las categorías de entrenamiento</string>
+    <string name="style_trainer_hint">Selecciona una o más categorías para tu entrenamiento personal.</string>
+    <string name="style_category_title">Elige una categoría</string>
+    <string name="style_category_hint">Selecciona la categoría con la que quieres jugar primero. Las demás siguen disponibles.</string>
+    <string name="style_info_arcade_body">El estilo Arcade está guardado. Cuando el modo mixto esté listo, mezclará acertijos de todas las categorías.</string>
+    <string name="style_info_trainer_body">Tus categorías de entrenamiento están guardadas. Cuando el modo mixto esté listo, se creará a partir de ellas.</string>
+    <string name="style_info_play">Jugar Secuencias numéricas</string>
+    <string name="style_info_home">Volver al inicio</string>
+    <string name="settings_section_game_style">Estilo de juego</string>
+    <string name="settings_game_style_current">Estilo actual</string>
+    <string name="settings_game_style_none">Aún sin seleccionar</string>
+    <string name="settings_trainer_edit">Categorías del entrenador</string>
+    <string name="settings_category_edit">Categoría preferida</string>
 </resources>

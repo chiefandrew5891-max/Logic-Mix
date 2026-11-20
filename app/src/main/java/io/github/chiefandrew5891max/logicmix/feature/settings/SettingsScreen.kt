@@ -1,6 +1,13 @@
 package io.github.chiefandrew5891max.logicmix.feature.settings
 
 import androidx.annotation.DrawableRes
+import androidx.compose.material3.OutlinedButton
+import io.github.chiefandrew5891max.logicmix.core.designsystem.GameStyleCard
+import io.github.chiefandrew5891max.logicmix.domain.content.GameStyle
+import io.github.chiefandrew5891max.logicmix.domain.content.GameStylePrefs
+import io.github.chiefandrew5891max.logicmix.feature.gamestyle.StyleStep
+import io.github.chiefandrew5891max.logicmix.feature.gamestyle.descriptionRes
+import io.github.chiefandrew5891max.logicmix.feature.gamestyle.titleRes
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -57,7 +64,12 @@ import io.github.chiefandrew5891max.logicmix.core.designsystem.ThemeMode
 import io.github.chiefandrew5891max.logicmix.core.locale.AppLanguage
 
 @Composable
-fun SettingsScreen(onBack: () -> Unit, viewModel: SettingsViewModel = hiltViewModel()) {
+fun SettingsScreen(
+    onBack: () -> Unit,
+    onGameStyleStep: (StyleStep) -> Unit = {},
+    viewModel: SettingsViewModel = hiltViewModel(),
+) {
+    val gameStyle by viewModel.gameStyle.collectAsState(initial = GameStylePrefs())
     val audio by viewModel.audio.collectAsState(initial = DefaultAudio)
     val theme by viewModel.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
     val language by viewModel.language.collectAsState(initial = AppLanguage.SYSTEM)
@@ -73,6 +85,9 @@ fun SettingsScreen(onBack: () -> Unit, viewModel: SettingsViewModel = hiltViewMo
         onVibration = viewModel::setVibrationEnabled,
         onTheme = viewModel::setThemeMode,
         onLanguage = viewModel::setLanguage,
+        gameStyle = gameStyle,
+        onArcade = viewModel::selectArcade,
+        onGameStyleStep = onGameStyleStep,
     )
 }
 
@@ -89,6 +104,9 @@ internal fun SettingsContent(
     onVibration: (Boolean) -> Unit,
     onTheme: (ThemeMode) -> Unit,
     onLanguage: (AppLanguage) -> Unit,
+    gameStyle: GameStylePrefs = GameStylePrefs(),
+    onArcade: () -> Unit = {},
+    onGameStyleStep: (StyleStep) -> Unit = {},
 ) {
     val colors = LogicMixTokens.colors
     Box(Modifier.fillMaxSize().background(colors.backgroundBrush)) {
@@ -134,6 +152,8 @@ internal fun SettingsContent(
                 }
             }
 
+            GameStyleSection(gameStyle, onArcade, onGameStyleStep)
+
             Text(stringResource(R.string.settings_section_language), style = LogicMixTokens.typography.titleMedium, color = colors.gold)
             LanguageAccordion(language, onLanguage)
 
@@ -159,6 +179,39 @@ private fun languageLabel(language: AppLanguage): String = when (language) {
     AppLanguage.GERMAN -> stringResource(R.string.language_name_de)
     AppLanguage.FRENCH -> stringResource(R.string.language_name_fr)
     AppLanguage.CHINESE_SIMPLIFIED -> stringResource(R.string.language_name_zh)
+}
+
+@Composable
+private fun GameStyleSection(prefs: GameStylePrefs, onArcade: () -> Unit, onStep: (StyleStep) -> Unit) {
+    val colors = LogicMixTokens.colors
+    val current = prefs.style?.takeIf { prefs.onboardingDone }
+    Column(verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS)) {
+        Text(stringResource(R.string.settings_section_game_style), style = LogicMixTokens.typography.titleMedium, color = colors.gold)
+        Text(
+            stringResource(R.string.settings_game_style_current) + ": " +
+                (current?.let { stringResource(it.titleRes()) } ?: stringResource(R.string.settings_game_style_none)),
+            style = LogicMixTokens.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        GameStyle.entries.forEach { option ->
+            GameStyleCard(
+                option, stringResource(option.titleRes()), stringResource(option.descriptionRes()),
+                selected = current == option,
+                onClick = {
+                    when (option) {
+                        GameStyle.ARCADE -> onArcade()
+                        GameStyle.TRAINER -> onStep(StyleStep.TRAINER)
+                        GameStyle.CATEGORIES -> onStep(StyleStep.CATEGORY)
+                    }
+                },
+            )
+        }
+        OutlinedButton({ onStep(StyleStep.TRAINER) }, Modifier.fillMaxWidth().heightIn(min = LogicMixTokens.minTouchTarget)) {
+            Text(stringResource(R.string.settings_trainer_edit))
+        }
+        OutlinedButton({ onStep(StyleStep.CATEGORY) }, Modifier.fillMaxWidth().heightIn(min = LogicMixTokens.minTouchTarget)) {
+            Text(stringResource(R.string.settings_category_edit))
+        }
+    }
 }
 
 @Composable

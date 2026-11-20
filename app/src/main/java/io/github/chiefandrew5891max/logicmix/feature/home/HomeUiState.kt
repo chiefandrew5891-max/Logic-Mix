@@ -1,6 +1,7 @@
 package io.github.chiefandrew5891max.logicmix.feature.home
 
 import io.github.chiefandrew5891max.logicmix.domain.content.GameCategory
+import io.github.chiefandrew5891max.logicmix.domain.content.GameStylePrefs
 import io.github.chiefandrew5891max.logicmix.domain.progression.PlayerProgress
 import io.github.chiefandrew5891max.logicmix.domain.progression.Progression
 
@@ -14,6 +15,7 @@ data class HomeUiState(
     val streak: Int = 0,
     val primaryAction: PrimaryAction = PrimaryAction.START,
     val categories: Set<GameCategory> = GameCategory.entries.toSet(),
+    val gameStyle: GameStylePrefs = GameStylePrefs(),
 ) {
     val xpFraction: Float
         get() = xpForNextLevel?.let { (xpIntoLevel.toFloat() / it).coerceIn(0f, 1f) } ?: 1f
@@ -28,6 +30,7 @@ object HomeStateMapper {
         streak: Int,
         hasActiveSession: Boolean,
         categories: Set<GameCategory> = GameCategory.entries.toSet(),
+        gameStyle: GameStylePrefs = GameStylePrefs(),
     ) = HomeUiState(
         level = progress.level,
         xpIntoLevel = progress.xpIntoLevel,
@@ -35,5 +38,6 @@ object HomeStateMapper {
         streak = streak,
         primaryAction = primaryAction(hasActiveSession),
         categories = categories,
+        gameStyle = gameStyle,
     )
 }

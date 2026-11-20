@@ -6,6 +6,9 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import io.github.chiefandrew5891max.logicmix.core.designsystem.ThemeMode
 import io.github.chiefandrew5891max.logicmix.core.locale.AppLanguage
+import io.github.chiefandrew5891max.logicmix.domain.content.GameCategory
+import io.github.chiefandrew5891max.logicmix.domain.content.GameStyle
+import io.github.chiefandrew5891max.logicmix.domain.content.GameStylePrefs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -81,5 +84,21 @@ class LanguageOptionsTest {
         assertEquals(9, AppLanguage.entries.size)
         assertEquals(9, AppLanguage.entries.map { it.storedValue }.toSet().size)
         AppLanguage.entries.forEach { assertEquals(it, AppLanguage.fromStored(it.storedValue)) }
+    }
+
+    @Test fun gameStyleDefaultsToNotOnboarded() = runBlocking {
+        assertEquals(GameStylePrefs(), repo.gameStyle.first())
+    }
+
+    @Test fun confirmedGameStylePersistsWithStableIds() = runBlocking {
+        repo.confirmGameStyle(GameStyle.TRAINER, trainer = setOf(GameCategory.SUDOKU, GameCategory.WORD_LOGIC))
+        repo.confirmGameStyle(GameStyle.CATEGORIES, preferred = GameCategory.NUMBER_SEQUENCE)
+        val saved = repo.gameStyle.first()
+        assertTrue(saved.onboardingDone)
+        assertEquals(GameStyle.CATEGORIES, saved.style)
+        // The trainer selection is kept when only another part of the choice changes.
+        assertEquals(setOf(GameCategory.SUDOKU, GameCategory.WORD_LOGIC), saved.trainerCategories)
+        assertEquals(GameCategory.NUMBER_SEQUENCE, saved.preferredCategory)
+        assertEquals(AppLanguage.SYSTEM, repo.language.first())
     }
 }

@@ -88,4 +88,27 @@
     <string name="ws_all_done">Alle Level abgeschlossen</string>
     <string name="ws_all_done_body">Du hast alle Level für diese Sprache abgeschlossen. Neue Level folgen in Updates.</string>
     <string name="ws_grid_desc">Buchstabenraster %1$d mal %1$d</string>
+    <string name="category_sudoku">Sudoku</string>
+    <string name="style_title">Wähle deinen Spielstil</string>
+    <string name="style_subtitle">Wähle, wie du deine Logik trainieren möchtest. Du kannst das später in den Einstellungen ändern.</string>
+    <string name="style_arcade">Arcade</string>
+    <string name="style_trainer">Trainer</string>
+    <string name="style_categories">Einzelne Kategorien</string>
+    <string name="style_arcade_desc">Dynamische Rätselmischung mit Serien, Bonusbelohnungen und schnellerem Tempo.</string>
+    <string name="style_trainer_desc">Ein persönliches Logiktraining mit den gewählten Kategorien in angenehmem Tempo.</string>
+    <string name="style_categories_desc">Spiele eine ausgewählte Rätselkategorie für sich allein.</string>
+    <string name="style_confirm">Bestätigen</string>
+    <string name="style_trainer_title">Trainingskategorien wählen</string>
+    <string name="style_trainer_hint">Wähle eine oder mehrere Kategorien für dein persönliches Training.</string>
+    <string name="style_category_title">Kategorie wählen</string>
+    <string name="style_category_hint">Wähle die Kategorie, mit der du zuerst spielen möchtest. Alle anderen bleiben verfügbar.</string>
+    <string name="style_info_arcade_body">Der Arcade-Stil ist gespeichert. Sobald der gemischte Modus fertig ist, mischt er Rätsel aus allen Kategorien.</string>
+    <string name="style_info_trainer_body">Deine Trainingskategorien sind gespeichert. Sobald der gemischte Modus fertig ist, wird er daraus zusammengestellt.</string>
+    <string name="style_info_play">Zahlenfolgen spielen</string>
+    <string name="style_info_home">Zurück zum Start</string>
+    <string name="settings_section_game_style">Spielstil</string>
+    <string name="settings_game_style_current">Aktueller Stil</string>
+    <string name="settings_game_style_none">Noch nicht gewählt</string>
+    <string name="settings_trainer_edit">Trainer-Kategorien</string>
+    <string name="settings_category_edit">Bevorzugte Kategorie</string>
 </resources>

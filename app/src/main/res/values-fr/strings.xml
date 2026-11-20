@@ -88,4 +88,27 @@
     <string name="ws_all_done">Tous les niveaux terminés</string>
     <string name="ws_all_done_body">Vous avez terminé tous les niveaux de cette langue. De nouveaux niveaux arriveront avec les mises à jour.</string>
     <string name="ws_grid_desc">Grille de lettres %1$d sur %1$d</string>
+    <string name="category_sudoku">Sudoku</string>
+    <string name="style_title">Choisissez votre style de jeu</string>
+    <string name="style_subtitle">Choisissez comment entraîner votre logique. Vous pourrez le modifier plus tard dans les Réglages.</string>
+    <string name="style_arcade">Arcade</string>
+    <string name="style_trainer">Entraîneur</string>
+    <string name="style_categories">Catégories individuelles</string>
+    <string name="style_arcade_desc">Un mélange dynamique d’énigmes avec séries, récompenses bonus et rythme plus rapide.</string>
+    <string name="style_trainer_desc">Un entraînement de logique personnalisé avec les catégories choisies, à un rythme confortable.</string>
+    <string name="style_categories_desc">Jouez indépendamment à une seule catégorie d’énigmes.</string>
+    <string name="style_confirm">Confirmer</string>
+    <string name="style_trainer_title">Choisissez les catégories d’entraînement</string>
+    <string name="style_trainer_hint">Sélectionnez une ou plusieurs catégories pour votre entraînement personnel.</string>
+    <string name="style_category_title">Choisissez une catégorie</string>
+    <string name="style_category_hint">Sélectionnez la catégorie avec laquelle vous voulez jouer en premier. Les autres restent disponibles.</string>
+    <string name="style_info_arcade_body">Le style Arcade est enregistré. Quand le mode mixte sera prêt, il mélangera des énigmes de toutes les catégories.</string>
+    <string name="style_info_trainer_body">Vos catégories d’entraînement sont enregistrées. Quand le mode mixte sera prêt, il sera composé à partir d’elles.</string>
+    <string name="style_info_play">Jouer aux Suites numériques</string>
+    <string name="style_info_home">Retour à l’accueil</string>
+    <string name="settings_section_game_style">Style de jeu</string>
+    <string name="settings_game_style_current">Style actuel</string>
+    <string name="settings_game_style_none">Pas encore choisi</string>
+    <string name="settings_trainer_edit">Catégories de l’entraîneur</string>
+    <string name="settings_category_edit">Catégorie préférée</string>
 </resources>

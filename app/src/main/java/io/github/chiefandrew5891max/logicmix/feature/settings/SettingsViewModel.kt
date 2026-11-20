@@ -7,6 +7,7 @@ import io.github.chiefandrew5891max.logicmix.core.data.AudioSettings
 import io.github.chiefandrew5891max.logicmix.core.data.SettingsRepository
 import io.github.chiefandrew5891max.logicmix.core.designsystem.ThemeMode
 import io.github.chiefandrew5891max.logicmix.core.locale.AppLanguage
+import io.github.chiefandrew5891max.logicmix.domain.content.GameStyle
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 
@@ -15,6 +16,7 @@ class SettingsViewModel @Inject constructor(private val repository: SettingsRepo
     val audio = repository.audio
     val themeMode = repository.themeMode
     val language = repository.language
+    val gameStyle = repository.gameStyle
 
     private fun launch(block: suspend () -> Unit) { viewModelScope.launch { block() } }
 
@@ -25,6 +27,7 @@ class SettingsViewModel @Inject constructor(private val repository: SettingsRepo
     fun setVibrationEnabled(v: Boolean) = launch { repository.setVibrationEnabled(v) }
     fun setThemeMode(m: ThemeMode) = launch { repository.setThemeMode(m) }
     fun setLanguage(l: AppLanguage) = launch { repository.setLanguage(l) }
+    fun selectArcade() = launch { repository.confirmGameStyle(GameStyle.ARCADE) }
 }
 
 internal val DefaultAudio = AudioSettings()

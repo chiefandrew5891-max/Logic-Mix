@@ -1,5 +1,6 @@
 package io.github.chiefandrew5891max.logicmix.feature.home
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,7 +19,7 @@ import io.github.chiefandrew5891max.logicmix.core.designsystem.LogicMixTokens
 
 /** Honest destination for modes whose engines are not implemented yet; replaced by the game screen later. */
 @Composable
-fun ComingSoonScreen(onBack: () -> Unit) {
+fun ComingSoonScreen(onBack: () -> Unit, @StringRes categoryTitle: Int? = null) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -27,6 +28,9 @@ fun ComingSoonScreen(onBack: () -> Unit) {
         verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacing, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        categoryTitle?.let {
+            Text(stringResource(it), style = LogicMixTokens.typography.titleLarge, color = LogicMixTokens.colors.gold, textAlign = TextAlign.Center)
+        }
         Text(
             stringResource(R.string.coming_soon_title),
             style = LogicMixTokens.typography.headlineMedium,

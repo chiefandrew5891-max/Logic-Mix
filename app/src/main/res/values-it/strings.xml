@@ -88,4 +88,27 @@
     <string name="ws_all_done">Tutti i livelli completati</string>
     <string name="ws_all_done_body">Hai completato tutti i livelli per questa lingua. Nuovi livelli arriveranno con gli aggiornamenti.</string>
     <string name="ws_grid_desc">Griglia di lettere %1$d per %1$d</string>
+    <string name="category_sudoku">Sudoku</string>
+    <string name="style_title">Scegli il tuo stile di gioco</string>
+    <string name="style_subtitle">Scegli come allenare la tua logica. Potrai cambiarlo in seguito nelle Impostazioni.</string>
+    <string name="style_arcade">Arcade</string>
+    <string name="style_trainer">Allenatore</string>
+    <string name="style_categories">Categorie singole</string>
+    <string name="style_arcade_desc">Rompicapi misti e dinamici con serie, premi bonus e un ritmo più veloce.</string>
+    <string name="style_trainer_desc">Un allenamento di logica personalizzato con le categorie che scegli, a un ritmo comodo.</string>
+    <string name="style_categories_desc">Gioca in modo indipendente una sola categoria di rompicapi.</string>
+    <string name="style_confirm">Conferma</string>
+    <string name="style_trainer_title">Scegli le categorie di allenamento</string>
+    <string name="style_trainer_hint">Seleziona una o più categorie per il tuo allenamento personale.</string>
+    <string name="style_category_title">Scegli una categoria</string>
+    <string name="style_category_hint">Seleziona la categoria con cui vuoi giocare per prima. Tutte le altre restano disponibili.</string>
+    <string name="style_info_arcade_body">Lo stile Arcade è salvato. Quando la modalità mista sarà pronta, mescolerà rompicapi di tutte le categorie.</string>
+    <string name="style_info_trainer_body">Le categorie di allenamento sono salvate. Quando la modalità mista sarà pronta, verrà creata da queste.</string>
+    <string name="style_info_play">Gioca a Sequenze numeriche</string>
+    <string name="style_info_home">Torna alla home</string>
+    <string name="settings_section_game_style">Stile di gioco</string>
+    <string name="settings_game_style_current">Stile attuale</string>
+    <string name="settings_game_style_none">Non ancora selezionato</string>
+    <string name="settings_trainer_edit">Categorie dell’allenatore</string>
+    <string name="settings_category_edit">Categoria preferita</string>
 </resources>

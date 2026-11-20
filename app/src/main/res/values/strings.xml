@@ -88,4 +88,27 @@
     <string name="ws_all_done">All levels completed</string>
     <string name="ws_all_done_body">You have finished every word search level for this language. New levels will come in updates.</string>
     <string name="ws_grid_desc">Letter grid %1$d by %1$d</string>
+    <string name="category_sudoku">Sudoku</string>
+    <string name="style_title">Choose Your Game Style</string>
+    <string name="style_subtitle">Choose how you want to train your logic. You can change this later in Settings.</string>
+    <string name="style_arcade">Arcade</string>
+    <string name="style_trainer">Trainer</string>
+    <string name="style_categories">Individual categories</string>
+    <string name="style_arcade_desc">Dynamic mixed puzzle gameplay with streaks, bonus rewards, and a faster pace.</string>
+    <string name="style_trainer_desc">A personalized logic workout using the categories you select, at a comfortable pace.</string>
+    <string name="style_categories_desc">Play one selected puzzle category independently.</string>
+    <string name="style_confirm">Confirm</string>
+    <string name="style_trainer_title">Choose training categories</string>
+    <string name="style_trainer_hint">Select one or more categories for your personal workout.</string>
+    <string name="style_category_title">Choose a category</string>
+    <string name="style_category_hint">Select the category you want to play first. All other categories stay available.</string>
+    <string name="style_info_arcade_body">Arcade style is saved. It will mix puzzles from all categories once the mixed mode is ready.</string>
+    <string name="style_info_trainer_body">Your training categories are saved. The mix will be built from them once the mixed mode is ready.</string>
+    <string name="style_info_play">Play Number sequences</string>
+    <string name="style_info_home">Back to home</string>
+    <string name="settings_section_game_style">Game style</string>
+    <string name="settings_game_style_current">Current style</string>
+    <string name="settings_game_style_none">Not selected yet</string>
+    <string name="settings_trainer_edit">Trainer categories</string>
+    <string name="settings_category_edit">Preferred category</string>
 </resources>

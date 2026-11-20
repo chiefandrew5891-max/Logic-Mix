@@ -88,4 +88,27 @@
     <string name="ws_all_done">Все уровни пройдены</string>
     <string name="ws_all_done_body">Вы прошли все уровни филвордов для этого языка. Новые уровни появятся в обновлениях.</string>
     <string name="ws_grid_desc">Сетка букв %1$d на %1$d</string>
+    <string name="category_sudoku">Судоку</string>
+    <string name="style_title">Выберите стиль игры</string>
+    <string name="style_subtitle">Выберите, как вы хотите тренировать логику. Это можно изменить позже в настройках.</string>
+    <string name="style_arcade">Аркада</string>
+    <string name="style_trainer">Тренажёр</string>
+    <string name="style_categories">Отдельные категории</string>
+    <string name="style_arcade_desc">Динамичная смесь головоломок с сериями, бонусными наградами и быстрым темпом.</string>
+    <string name="style_trainer_desc">Персональная тренировка логики по выбранным вами категориям в комфортном темпе.</string>
+    <string name="style_categories_desc">Играйте в одну выбранную категорию головоломок отдельно.</string>
+    <string name="style_confirm">Подтвердить</string>
+    <string name="style_trainer_title">Выберите категории для тренировки</string>
+    <string name="style_trainer_hint">Отметьте одну или несколько категорий для личной тренировки.</string>
+    <string name="style_category_title">Выберите категорию</string>
+    <string name="style_category_hint">Отметьте категорию, с которой хотите играть. Остальные категории остаются доступными.</string>
+    <string name="style_info_arcade_body">Стиль «Аркада» сохранён. Когда смешанный режим будет готов, в нём появятся головоломки из всех категорий.</string>
+    <string name="style_info_trainer_body">Категории для тренировки сохранены. Когда смешанный режим будет готов, он будет собран из них.</string>
+    <string name="style_info_play">Играть: Числовые последовательности</string>
+    <string name="style_info_home">На главный экран</string>
+    <string name="settings_section_game_style">Стиль игры</string>
+    <string name="settings_game_style_current">Текущий стиль</string>
+    <string name="settings_game_style_none">Пока не выбран</string>
+    <string name="settings_trainer_edit">Категории тренажёра</string>
+    <string name="settings_category_edit">Предпочитаемая категория</string>
 </resources>
