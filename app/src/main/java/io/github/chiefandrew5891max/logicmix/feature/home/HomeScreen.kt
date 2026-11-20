@@ -42,6 +42,7 @@ import io.github.chiefandrew5891max.logicmix.R
 import io.github.chiefandrew5891max.logicmix.core.designsystem.LogicMixIcon
 import io.github.chiefandrew5891max.logicmix.core.designsystem.LogicMixSettingsIcon
 import io.github.chiefandrew5891max.logicmix.core.designsystem.LogicMixTokens
+import io.github.chiefandrew5891max.logicmix.domain.content.GameCategory
 import io.github.chiefandrew5891max.logicmix.domain.game.GameMode
 
 @Composable
@@ -49,10 +50,11 @@ fun HomeRoute(
     onPlay: (GameMode) -> Unit,
     onRewards: () -> Unit,
     onSettings: () -> Unit,
+    onWordSearch: () -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsState()
-    HomeScreen(state, onPlay, onRewards, onSettings)
+    HomeScreen(state, onPlay, onRewards, onSettings, onWordSearch)
 }
 
 private val Categories = listOf(
@@ -70,6 +72,7 @@ fun HomeScreen(
     onPlay: (GameMode) -> Unit,
     onRewards: () -> Unit,
     onSettings: () -> Unit,
+    onWordSearch: () -> Unit = {},
 ) {
     val colors = LogicMixTokens.colors
     Box(Modifier.fillMaxSize().background(colors.backgroundBrush)) {
@@ -126,6 +129,9 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Categories.forEach { (icon, label) -> CategoryChip(icon, stringResource(label)) }
+                if (GameCategory.WORD_SEARCH in state.categories) {
+                    CategoryChip(R.drawable.ic_cat_words, stringResource(R.string.category_word_search), onWordSearch)
+                }
             }
         }
     }
@@ -265,12 +271,14 @@ private fun ModeCard(@DrawableRes icon: Int, title: String, subtitle: String, on
     }
 }
 
-// Informational only: category selection belongs to the settings screen, so this is deliberately not clickable.
+// Chips without a click handler are informational; only categories with a playable engine open a screen.
 @Composable
-private fun CategoryChip(@DrawableRes icon: Int, label: String) {
+private fun CategoryChip(@DrawableRes icon: Int, label: String, onClick: (() -> Unit)? = null) {
     CardSurface(shape = LogicMixTokens.radii.extraLarge) {
         Row(
-            Modifier.padding(horizontal = LogicMixTokens.spacingM, vertical = LogicMixTokens.spacingS),
+            Modifier
+                .then(if (onClick != null) Modifier.heightIn(min = LogicMixTokens.minTouchTarget).clickable(role = Role.Button, onClick = onClick) else Modifier)
+                .padding(horizontal = LogicMixTokens.spacingM, vertical = LogicMixTokens.spacingS),
             horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS),
             verticalAlignment = Alignment.CenterVertically,
         ) {

@@ -70,4 +70,22 @@
     <string name="game_next">下一题</string>
     <string name="game_all_done">所有题目已完成</string>
     <string name="game_all_done_body">你已解完本题包中的所有数列。新题目将在更新中推出。</string>
+    <string name="category_word_search">单词搜索</string>
+    <string name="ws_title">单词搜索</string>
+    <string name="ws_level_info">第 %1$d / %2$d 关 · 难度 %3$d</string>
+    <string name="ws_words_progress">单词：%1$d / %2$d</string>
+    <string name="ws_extra_count">额外单词：%1$d</string>
+    <string name="ws_instruction">用手指划过相邻的字母，不能斜向移动。</string>
+    <string name="ws_current_word">当前单词：%1$s</string>
+    <string name="ws_fb_main">找到单词！</string>
+    <string name="ws_fb_extra">额外单词！</string>
+    <string name="ws_fb_duplicate">已经找到</string>
+    <string name="ws_fb_unknown">词典中没有</string>
+    <string name="ws_fb_short">太短</string>
+    <string name="ws_hint_button">提示（%1$d/%2$d）</string>
+    <string name="ws_level_complete">关卡完成！</string>
+    <string name="ws_next_level">下一关</string>
+    <string name="ws_all_done">所有关卡已完成</string>
+    <string name="ws_all_done_body">你已完成该语言的所有关卡，更多关卡将在后续更新中推出。</string>
+    <string name="ws_grid_desc">%1$d × %1$d 字母网格</string>
 </resources>

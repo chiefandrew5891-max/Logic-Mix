@@ -238,7 +238,7 @@ private fun NumberChip(text: String, highlight: Boolean) {
 }
 
 @Composable
-private fun ActionButton(label: String, onClick: () -> Unit, filled: Boolean, enabled: Boolean = true, icon: Int? = null) {
+internal fun ActionButton(label: String, onClick: () -> Unit, filled: Boolean, enabled: Boolean = true, icon: Int? = null) {
     val colors = LogicMixTokens.colors
     val shape = LogicMixTokens.radii.extraLarge
     val background: Brush = if (filled) colors.primaryActionBrush else colors.cardBrush
@@ -262,7 +262,7 @@ private fun ActionButton(label: String, onClick: () -> Unit, filled: Boolean, en
 }
 
 @Composable
-private fun Card(content: @Composable () -> Unit) {
+internal fun Card(content: @Composable () -> Unit) {
     val colors = LogicMixTokens.colors
     val shape: Shape = LogicMixTokens.radii.large
     Column(

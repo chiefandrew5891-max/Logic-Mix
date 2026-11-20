@@ -70,4 +70,22 @@
     <string name="game_next">Наступне завдання</string>
     <string name="game_all_done">Усі завдання виконано</string>
     <string name="game_all_done_body">Ви розв’язали всі числові послідовності з цього набору. Нові завдання з’являться в оновленнях.</string>
+    <string name="category_word_search">Філворди</string>
+    <string name="ws_title">Філворди</string>
+    <string name="ws_level_info">Рівень %1$d з %2$d · Складність %3$d</string>
+    <string name="ws_words_progress">Слова: %1$d / %2$d</string>
+    <string name="ws_extra_count">Додаткові слова: %1$d</string>
+    <string name="ws_instruction">Проведіть пальцем по сусідніх літерах. По діагоналі не можна.</string>
+    <string name="ws_current_word">Поточне слово: %1$s</string>
+    <string name="ws_fb_main">Слово знайдено!</string>
+    <string name="ws_fb_extra">Додаткове слово!</string>
+    <string name="ws_fb_duplicate">Вже знайдено</string>
+    <string name="ws_fb_unknown">Немає в словнику</string>
+    <string name="ws_fb_short">Занадто коротке</string>
+    <string name="ws_hint_button">Підказка (%1$d/%2$d)</string>
+    <string name="ws_level_complete">Рівень пройдено!</string>
+    <string name="ws_next_level">Наступний рівень</string>
+    <string name="ws_all_done">Усі рівні пройдено</string>
+    <string name="ws_all_done_body">Ви пройшли всі рівні філвордів для цієї мови. Нові рівні з’являться в оновленнях.</string>
+    <string name="ws_grid_desc">Сітка літер %1$d на %1$d</string>
 </resources>

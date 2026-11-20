@@ -70,4 +70,22 @@
     <string name="game_next">Tâche suivante</string>
     <string name="game_all_done">Toutes les tâches terminées</string>
     <string name="game_all_done_body">Vous avez résolu toutes les suites numériques de ce pack. De nouvelles tâches arriveront avec les mises à jour.</string>
+    <string name="category_word_search">Mots mêlés</string>
+    <string name="ws_title">Mots mêlés</string>
+    <string name="ws_level_info">Niveau %1$d sur %2$d · Difficulté %3$d</string>
+    <string name="ws_words_progress">Mots : %1$d / %2$d</string>
+    <string name="ws_extra_count">Mots bonus : %1$d</string>
+    <string name="ws_instruction">Faites glisser le doigt sur des lettres voisines. Les diagonales sont interdites.</string>
+    <string name="ws_current_word">Mot en cours : %1$s</string>
+    <string name="ws_fb_main">Mot trouvé !</string>
+    <string name="ws_fb_extra">Mot bonus !</string>
+    <string name="ws_fb_duplicate">Déjà trouvé</string>
+    <string name="ws_fb_unknown">Absent du dictionnaire</string>
+    <string name="ws_fb_short">Trop court</string>
+    <string name="ws_hint_button">Indice (%1$d/%2$d)</string>
+    <string name="ws_level_complete">Niveau terminé !</string>
+    <string name="ws_next_level">Niveau suivant</string>
+    <string name="ws_all_done">Tous les niveaux terminés</string>
+    <string name="ws_all_done_body">Vous avez terminé tous les niveaux de cette langue. De nouveaux niveaux arriveront avec les mises à jour.</string>
+    <string name="ws_grid_desc">Grille de lettres %1$d sur %1$d</string>
 </resources>

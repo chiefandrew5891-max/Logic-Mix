@@ -70,4 +70,22 @@
     <string name="game_next">Siguiente tarea</string>
     <string name="game_all_done">Todas las tareas completadas</string>
     <string name="game_all_done_body">Has resuelto todas las secuencias numéricas de este paquete. Habrá nuevas tareas en futuras actualizaciones.</string>
+    <string name="category_word_search">Sopa de letras</string>
+    <string name="ws_title">Sopa de letras</string>
+    <string name="ws_level_info">Nivel %1$d de %2$d · Dificultad %3$d</string>
+    <string name="ws_words_progress">Palabras: %1$d / %2$d</string>
+    <string name="ws_extra_count">Palabras extra: %1$d</string>
+    <string name="ws_instruction">Desliza el dedo por letras vecinas. No se permiten diagonales.</string>
+    <string name="ws_current_word">Palabra actual: %1$s</string>
+    <string name="ws_fb_main">¡Palabra encontrada!</string>
+    <string name="ws_fb_extra">¡Palabra extra!</string>
+    <string name="ws_fb_duplicate">Ya encontrada</string>
+    <string name="ws_fb_unknown">No está en el diccionario</string>
+    <string name="ws_fb_short">Demasiado corta</string>
+    <string name="ws_hint_button">Pista (%1$d/%2$d)</string>
+    <string name="ws_level_complete">¡Nivel completado!</string>
+    <string name="ws_next_level">Siguiente nivel</string>
+    <string name="ws_all_done">Todos los niveles completados</string>
+    <string name="ws_all_done_body">Has completado todos los niveles de este idioma. Habrá nuevos niveles en futuras actualizaciones.</string>
+    <string name="ws_grid_desc">Cuadrícula de letras %1$d por %1$d</string>
 </resources>

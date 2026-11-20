@@ -70,4 +70,22 @@
     <string name="game_next">Compito successivo</string>
     <string name="game_all_done">Tutti i compiti completati</string>
     <string name="game_all_done_body">Hai risolto tutte le sequenze numeriche di questo pacchetto. Nuovi compiti arriveranno con gli aggiornamenti.</string>
+    <string name="category_word_search">Caccia alle parole</string>
+    <string name="ws_title">Caccia alle parole</string>
+    <string name="ws_level_info">Livello %1$d di %2$d · Difficoltà %3$d</string>
+    <string name="ws_words_progress">Parole: %1$d / %2$d</string>
+    <string name="ws_extra_count">Parole extra: %1$d</string>
+    <string name="ws_instruction">Trascina il dito sulle lettere adiacenti. Le diagonali non sono ammesse.</string>
+    <string name="ws_current_word">Parola attuale: %1$s</string>
+    <string name="ws_fb_main">Parola trovata!</string>
+    <string name="ws_fb_extra">Parola extra!</string>
+    <string name="ws_fb_duplicate">Già trovata</string>
+    <string name="ws_fb_unknown">Non è nel dizionario</string>
+    <string name="ws_fb_short">Troppo corta</string>
+    <string name="ws_hint_button">Suggerimento (%1$d/%2$d)</string>
+    <string name="ws_level_complete">Livello completato!</string>
+    <string name="ws_next_level">Livello successivo</string>
+    <string name="ws_all_done">Tutti i livelli completati</string>
+    <string name="ws_all_done_body">Hai completato tutti i livelli per questa lingua. Nuovi livelli arriveranno con gli aggiornamenti.</string>
+    <string name="ws_grid_desc">Griglia di lettere %1$d per %1$d</string>
 </resources>

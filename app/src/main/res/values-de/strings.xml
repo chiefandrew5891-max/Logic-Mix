@@ -70,4 +70,22 @@
     <string name="game_next">Nächste Aufgabe</string>
     <string name="game_all_done">Alle Aufgaben gelöst</string>
     <string name="game_all_done_body">Du hast alle Zahlenfolgen in diesem Paket gelöst. Neue Aufgaben kommen mit Updates.</string>
+    <string name="category_word_search">Wortsuche</string>
+    <string name="ws_title">Wortsuche</string>
+    <string name="ws_level_info">Level %1$d von %2$d · Schwierigkeit %3$d</string>
+    <string name="ws_words_progress">Wörter: %1$d / %2$d</string>
+    <string name="ws_extra_count">Zusatzwörter: %1$d</string>
+    <string name="ws_instruction">Ziehe den Finger über benachbarte Buchstaben. Diagonalen sind nicht erlaubt.</string>
+    <string name="ws_current_word">Aktuelles Wort: %1$s</string>
+    <string name="ws_fb_main">Wort gefunden!</string>
+    <string name="ws_fb_extra">Zusatzwort!</string>
+    <string name="ws_fb_duplicate">Bereits gefunden</string>
+    <string name="ws_fb_unknown">Nicht im Wörterbuch</string>
+    <string name="ws_fb_short">Zu kurz</string>
+    <string name="ws_hint_button">Tipp (%1$d/%2$d)</string>
+    <string name="ws_level_complete">Level geschafft!</string>
+    <string name="ws_next_level">Nächstes Level</string>
+    <string name="ws_all_done">Alle Level abgeschlossen</string>
+    <string name="ws_all_done_body">Du hast alle Level für diese Sprache abgeschlossen. Neue Level folgen in Updates.</string>
+    <string name="ws_grid_desc">Buchstabenraster %1$d mal %1$d</string>
 </resources>

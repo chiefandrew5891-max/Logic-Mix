@@ -251,6 +251,9 @@ private fun ThemeTile(@DrawableRes icon: Int, label: Int, selected: Boolean, onC
     }
 }
 
+/** Expanded list: every language except the selected one, in the original order. */
+internal fun languageOptions(selected: AppLanguage): List<AppLanguage> = AppLanguage.entries.filter { it != selected }
+
 @Composable
 internal fun LanguageAccordion(selected: AppLanguage, onSelect: (AppLanguage) -> Unit) {
     val colors = LogicMixTokens.colors
@@ -283,8 +286,8 @@ internal fun LanguageAccordion(selected: AppLanguage, onSelect: (AppLanguage) ->
         }
         if (expanded) {
             Column(Modifier.fillMaxWidth().heightIn(max = 240.dp).verticalScroll(rememberScrollState())) {
-                AppLanguage.entries.forEach { option ->
-                    val isSelected = option == selected
+                languageOptions(selected).forEach { option ->
+                    val isSelected = false
                     Text(
                         languageLabel(option),
                         style = LogicMixTokens.typography.bodyLarge,

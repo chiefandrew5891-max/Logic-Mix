@@ -70,4 +70,22 @@
     <string name="game_next">Next task</string>
     <string name="game_all_done">All tasks completed</string>
     <string name="game_all_done_body">You have solved every number sequence in this pack. New tasks will come in updates.</string>
+    <string name="category_word_search">Word search</string>
+    <string name="ws_title">Word search</string>
+    <string name="ws_level_info">Level %1$d of %2$d · Difficulty %3$d</string>
+    <string name="ws_words_progress">Words: %1$d / %2$d</string>
+    <string name="ws_extra_count">Extra words: %1$d</string>
+    <string name="ws_instruction">Drag a finger across neighbouring letters. Diagonals are not allowed.</string>
+    <string name="ws_current_word">Current word: %1$s</string>
+    <string name="ws_fb_main">Word found!</string>
+    <string name="ws_fb_extra">Extra word!</string>
+    <string name="ws_fb_duplicate">Already found</string>
+    <string name="ws_fb_unknown">Not in the dictionary</string>
+    <string name="ws_fb_short">Too short</string>
+    <string name="ws_hint_button">Hint (%1$d/%2$d)</string>
+    <string name="ws_level_complete">Level complete!</string>
+    <string name="ws_next_level">Next level</string>
+    <string name="ws_all_done">All levels completed</string>
+    <string name="ws_all_done_body">You have finished every word search level for this language. New levels will come in updates.</string>
+    <string name="ws_grid_desc">Letter grid %1$d by %1$d</string>
 </resources>

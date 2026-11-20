@@ -22,6 +22,7 @@ import io.github.chiefandrew5891max.logicmix.feature.game.GameRoute
 import io.github.chiefandrew5891max.logicmix.feature.home.ComingSoonScreen
 import io.github.chiefandrew5891max.logicmix.feature.home.HomeRoute
 import io.github.chiefandrew5891max.logicmix.feature.settings.SettingsScreen
+import io.github.chiefandrew5891max.logicmix.feature.wordsearch.WordSearchRoute
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -45,6 +46,7 @@ object Routes {
     const val SETTINGS = "settings"
     const val COMING_SOON = "coming_soon"
     const val GAME = "game"
+    const val WORD_SEARCH = "word_search"
 }
 
 @Composable
@@ -57,10 +59,14 @@ private fun LogicMixNavigation(navController: NavHostController) {
                 },
                 onRewards = { navController.navigate(Routes.COMING_SOON) },
                 onSettings = { navController.navigate(Routes.SETTINGS) },
+                onWordSearch = { navController.navigate(Routes.WORD_SEARCH) },
             )
         }
         composable(Routes.GAME) {
             GameRoute(onBack = { navController.popBackStack() })
+        }
+        composable(Routes.WORD_SEARCH) {
+            WordSearchRoute(onBack = { navController.popBackStack() })
         }
         composable(Routes.COMING_SOON) {
             ComingSoonScreen(onBack = { navController.popBackStack() })

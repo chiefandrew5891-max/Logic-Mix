@@ -6,6 +6,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.chiefandrew5891max.logicmix.core.data.ActiveSessionProvider
 import io.github.chiefandrew5891max.logicmix.core.data.LocalProfileRepository
 import io.github.chiefandrew5891max.logicmix.core.data.ProgressRepository
+import io.github.chiefandrew5891max.logicmix.core.data.SettingsRepository
+import io.github.chiefandrew5891max.logicmix.core.locale.effectiveLanguage
+import io.github.chiefandrew5891max.logicmix.domain.content.CategoryAvailability
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -18,11 +22,13 @@ class HomeViewModel @Inject constructor(
     private val profiles: LocalProfileRepository,
     private val progress: ProgressRepository,
     sessions: ActiveSessionProvider,
+    settings: SettingsRepository,
 ) : ViewModel() {
     val uiState: StateFlow<HomeUiState> = combine(
         progress.observeProgress(LocalProfileRepository.LOCAL_PROFILE_ID),
         progress.observeStreak(LocalProfileRepository.LOCAL_PROFILE_ID),
         sessions.hasActiveSession,
+        settings.effectiveLanguage().map { CategoryAvailability.available(it) },
         HomeStateMapper::map,
     ).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState())
 
