@@ -2,6 +2,8 @@ package io.github.chiefandrew5891max.logicmix.feature.wordsearch
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -214,7 +216,8 @@ private fun FeedbackLine(state: WordSearchUiState) {
     }
     AnimatedVisibility(message != null) {
         Text(
-            stringResource(message ?: R.string.ws_fb_main),
+            stringResource(message ?: R.string.ws_fb_main) +
+                if (state.feedback == WordFeedback.EXTRA && state.extraXp > 0) "  " + stringResource(R.string.game_xp_earned, state.extraXp) else "",
             style = LogicMixTokens.typography.titleMedium,
             color = color,
             textAlign = TextAlign.Center,
@@ -263,6 +266,16 @@ private fun LetterGrid(
     val currentOnChange by rememberUpdatedState(onPathChange)
     val currentOnSubmit by rememberUpdatedState(onSubmit)
     val description = stringResource(R.string.ws_grid_desc, level.size)
+    val flashAlpha = remember { Animatable(0f) }
+    var shownFlash by remember { mutableStateOf(emptyList<Cell>()) }
+    LaunchedEffect(state.flash) {
+        if (state.flash.isNotEmpty()) {
+            shownFlash = state.flash
+            flashAlpha.snapTo(1f)
+            flashAlpha.animateTo(0f, tween(700))
+        }
+        shownFlash = emptyList()
+    }
 
     BoxWithConstraints(Modifier.fillMaxWidth().aspectRatio(1f).semantics { contentDescription = description }) {
         val sizePx = with(density) { maxWidth.toPx() }
@@ -337,6 +350,13 @@ private fun LetterGrid(
                     size = Size(cellPx - 2 * gap, cellPx - 2 * gap),
                     cornerRadius = CornerRadius(cellPx * 0.22f),
                     style = Stroke(cellPx * 0.07f),
+                )
+            }
+            if (shownFlash.size > 1 && flashAlpha.value > 0f) {
+                drawPath(
+                    smoothPath(shownFlash.map(center)),
+                    goldColor.copy(alpha = 0.8f * flashAlpha.value),
+                    style = Stroke(cellPx * 0.3f, cap = StrokeCap.Round, join = StrokeJoin.Round),
                 )
             }
             if (path.size > 1) {

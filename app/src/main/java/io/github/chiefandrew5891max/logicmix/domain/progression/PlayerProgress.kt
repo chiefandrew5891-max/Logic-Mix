@@ -1,6 +1,6 @@
 package io.github.chiefandrew5891max.logicmix.domain.progression
 
-enum class XpReason { FIRST_SOLVE }
+enum class XpReason { FIRST_SOLVE, EXTRA_WORD }
 
 // totalXp is the source of truth; level and xpIntoLevel are always derived from it with the B1 rules.
 data class PlayerProgress(val totalXp: Int, val level: Int, val xpIntoLevel: Int) {

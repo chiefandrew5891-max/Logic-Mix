@@ -24,6 +24,7 @@ import io.github.chiefandrew5891max.logicmix.domain.wordsearch.WordSearchLevels
 import io.github.chiefandrew5891max.logicmix.domain.wordsearch.WordSearchRewards
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -52,6 +53,9 @@ data class WordSearchUiState(
     val startedAt: Long = 0L,
     val hintCell: Cell? = null,
     val feedback: WordFeedback = WordFeedback.NONE,
+    // Short-lived confirmation of an extra word; never persisted, so it cannot reappear after a restart.
+    val flash: List<Cell> = emptyList(),
+    val extraXp: Int = 0,
 ) {
     val foundPlacements get() = level?.placements?.filter { it.word in mainFound }.orEmpty()
     val canUseHint: Boolean
@@ -141,14 +145,26 @@ class WordSearchViewModel @Inject constructor(
                         if (level.mainWords.all { it in _state.value.mainFound }) finish(level)
                     }
                     is WordCheck.Extra -> {
+                        // XP first: it is idempotent, so a crash before addWord cannot cause a second payout.
+                        val xp = progress.awardExtraWord(profileId, level.id, result.word, WordSearchRewards.EXTRA_WORD_XP)
                         store.addWord(level, result.word, main = false)
-                        _state.update { it.copy(extraFound = it.extraFound + result.word, feedback = WordFeedback.EXTRA) }
+                        _state.update {
+                            it.copy(extraFound = it.extraFound + result.word, feedback = WordFeedback.EXTRA, flash = path, extraXp = xp)
+                        }
+                        clearFlashLater(path)
                     }
                     is WordCheck.Duplicate -> _state.update { it.copy(feedback = WordFeedback.DUPLICATE) }
                     is WordCheck.Unknown, WordCheck.InvalidPath -> _state.update { it.copy(feedback = WordFeedback.UNKNOWN) }
                     WordCheck.TooShort -> _state.update { it.copy(feedback = WordFeedback.TOO_SHORT) }
                 }
             }
+        }
+    }
+
+    private fun clearFlashLater(path: List<Cell>) {
+        viewModelScope.launch {
+            delay(FLASH_MS)
+            _state.update { if (it.flash == path) it.copy(flash = emptyList()) else it }
         }
     }
 
@@ -179,6 +195,10 @@ class WordSearchViewModel @Inject constructor(
                 _state.update { it.copy(hintsUsed = it.hintsUsed + 1, hintCell = target.path.first(), feedback = WordFeedback.NONE) }
             }
         }
+    }
+
+    private companion object {
+        const val FLASH_MS = 800L
     }
 
     fun next() {

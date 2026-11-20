@@ -53,6 +53,10 @@ interface XpTransactionDao {
     @Insert
     suspend fun insert(entity: XpTransactionEntity): Long
 
+    // Returns -1 when this transaction id already exists, so a repeated award is a silent no-op.
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertIfAbsent(entity: XpTransactionEntity): Long
+
     @Query("SELECT COALESCE(SUM(amount), 0) FROM xp_transactions WHERE profileId = :profileId")
     suspend fun totalAmount(profileId: String): Int
 

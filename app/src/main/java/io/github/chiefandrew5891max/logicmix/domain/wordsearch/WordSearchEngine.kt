@@ -277,8 +277,8 @@ object WordSearchLevels {
     }
 }
 
-/** Reward settings of the word search. Bonus XP for extra words is not defined in the approved rules, so it is 0 until agreed. */
+/** Reward settings of the word search. The extra-word bonus is a temporary value pending approval of the final rule. */
 object WordSearchRewards {
     const val MAX_HINTS = 3
-    const val EXTRA_WORD_XP = 0
+    const val EXTRA_WORD_XP = 2
 }

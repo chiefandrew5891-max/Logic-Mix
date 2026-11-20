@@ -16,6 +16,7 @@ import io.github.chiefandrew5891max.logicmix.domain.progression.PlayerProgress
 import io.github.chiefandrew5891max.logicmix.domain.progression.Progression
 import io.github.chiefandrew5891max.logicmix.domain.wordsearch.WordDictionaries
 import io.github.chiefandrew5891max.logicmix.domain.wordsearch.WordSearchLevels
+import io.github.chiefandrew5891max.logicmix.domain.wordsearch.WordSearchRewards
 import io.github.chiefandrew5891max.logicmix.feature.home.HomeStateMapper
 import io.github.chiefandrew5891max.logicmix.feature.settings.languageOptions
 import kotlinx.coroutines.CoroutineScope
@@ -114,6 +115,17 @@ class WordSearchRewardTest {
                 PlayerProgress.fromTotalXp(first.xpAwarded + italian.xpAwarded).totalXp,
                 repo.getProgress(pid).totalXp,
             )
+
+            val before = repo.getProgress(pid).totalXp
+            val levelId = WordSearchLevels.levelId(ContentLanguage.EN, 0)
+            val xp = WordSearchRewards.EXTRA_WORD_XP
+            assertEquals(2, xp)
+            assertEquals(xp, repo.awardExtraWord(pid, levelId, "SEA", xp))
+            assertEquals(0, repo.awardExtraWord(pid, levelId, "SEA", xp))
+            assertEquals(0, repo.awardExtraWord(pid, levelId, "sea", xp))
+            assertEquals(xp, repo.awardExtraWord(pid, levelId, "SKY", xp))
+            assertEquals(xp, repo.awardExtraWord(pid, WordSearchLevels.levelId(ContentLanguage.EN, 1), "SEA", xp))
+            assertEquals(before + 3 * xp, repo.getProgress(pid).totalXp)
         } finally {
             db.close()
         }
@@ -121,6 +133,17 @@ class WordSearchRewardTest {
 }
 
 class WordSearchUiLogicTest {
+    private val level = WordSearchLevels.build(ContentLanguage.EN, 0, WordDictionaries.load(ContentLanguage.EN)!!)
+
+    @Test fun restoredStateHighlightsOnlyMainWordsAndNeverExtraRoutes() {
+        val main = level.mainWords.first()
+        val restored = WordSearchUiState(
+            loading = false, level = level, mainFound = setOf(main), extraFound = setOf("SEA"),
+        )
+        assertEquals(listOf(main), restored.foundPlacements.map { it.word })
+        assertTrue(restored.flash.isEmpty())
+    }
+
     @Test fun languageListNeverRepeatsTheSelectedLanguageAndKeepsOrder() {
         AppLanguage.entries.forEach { selected ->
             val options = languageOptions(selected)

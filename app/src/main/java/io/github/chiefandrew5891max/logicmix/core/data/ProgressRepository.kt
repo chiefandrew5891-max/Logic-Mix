@@ -111,6 +111,35 @@ class ProgressRepository internal constructor(
         }
     }
 
+    /**
+     * Awards [amount] XP for one extra word of a level, once per (profile, level, word); returns the XP
+     * actually added (0 for a repeat, also after an app restart). The transaction id is the dedup key.
+     */
+    suspend fun awardExtraWord(profileId: String, levelId: String, word: String, amount: Int): Int {
+        require(amount >= 0) { "amount must not be negative" }
+        if (amount == 0) return 0
+        return database.withTransaction {
+            val timestamp = now()
+            val inserted = xpDao.insertIfAbsent(
+                XpTransactionEntity(
+                    id = "$profileId:$levelId:${XpReason.EXTRA_WORD.name}:${word.uppercase()}",
+                    profileId = profileId,
+                    puzzleId = levelId,
+                    amount = amount,
+                    reason = XpReason.EXTRA_WORD,
+                    createdAt = timestamp,
+                ),
+            )
+            if (inserted == -1L) return@withTransaction 0
+            val existing = progressDao.get(profileId)
+            val after = PlayerProgress.fromTotalXp((existing?.totalXp ?: 0) + amount)
+            progressDao.upsert(
+                ProgressEntity(profileId, after.level, after.totalXp, streak = existing?.streak ?: 0, updatedAt = timestamp),
+            )
+            amount
+        }
+    }
+
     private fun xpTransactionId(profileId: String, puzzleId: String, reason: XpReason) =
         "$profileId:$puzzleId:${reason.name}"
 }

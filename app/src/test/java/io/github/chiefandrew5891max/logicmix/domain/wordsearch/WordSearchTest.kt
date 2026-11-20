@@ -111,6 +111,25 @@ class WordSearchRulesTest {
         assertEquals(WordCheck.Duplicate("TAO"), check(Cell(0, 2), Cell(0, 1), Cell(1, 1), extra = setOf("TAO")))
     }
 
+    @Test fun sameCellsMayFormDifferentWordsIncludingReversedOnes() {
+        // GOD is not a placed word; reading DOG backwards along the same cells gives GOD.
+        val withGod = WordDictionary(ContentLanguage.EN, listOf("CAT", "DOG"), listOf("GOD"))
+        val reversed = listOf(Cell(2, 2), Cell(2, 1), Cell(2, 0))
+        assertEquals(WordCheck.Main("DOG"), check(Cell(2, 0), Cell(2, 1), Cell(2, 2), main = emptySet()))
+        // Cells of an already found main word stay selectable for another word.
+        assertEquals(
+            WordCheck.Extra("GOD"),
+            WordSearchChecker.check(level, withGod, reversed, setOf("DOG"), emptySet()),
+        )
+        assertEquals(
+            WordCheck.Duplicate("GOD"),
+            WordSearchChecker.check(level, withGod, reversed, setOf("DOG"), setOf("GOD")),
+        )
+        // A cell may be shared by two different routes, just not twice inside one route.
+        assertTrue(WordSearchRules.isValidPath(listOf(Cell(0, 1), Cell(1, 1), Cell(2, 1)), 3))
+        assertFalse(WordSearchRules.isValidPath(listOf(Cell(0, 1), Cell(1, 1), Cell(0, 1)), 3))
+    }
+
     @Test fun unknownShortAndInvalidInputsAreRejected() {
         assertEquals(WordCheck.Unknown("TAC"), check(Cell(0, 2), Cell(0, 1), Cell(0, 0)))
         assertEquals(WordCheck.TooShort, check(Cell(0, 0), Cell(0, 1)))
