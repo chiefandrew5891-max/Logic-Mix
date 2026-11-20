@@ -77,14 +77,6 @@ class SettingsRepositoryTest {
         assertEquals(ThemeMode.SYSTEM, repo.themeMode.first())
         assertEquals(AppLanguage.SYSTEM, repo.language.first())
     }
-}
-
-class LanguageOptionsTest {
-    @Test fun allEightLanguagesPlusSystemRoundTripThroughStorage() {
-        assertEquals(9, AppLanguage.entries.size)
-        assertEquals(9, AppLanguage.entries.map { it.storedValue }.toSet().size)
-        AppLanguage.entries.forEach { assertEquals(it, AppLanguage.fromStored(it.storedValue)) }
-    }
 
     @Test fun gameStyleDefaultsToNotOnboarded() = runBlocking {
         assertEquals(GameStylePrefs(), repo.gameStyle.first())
@@ -100,5 +92,13 @@ class LanguageOptionsTest {
         assertEquals(setOf(GameCategory.SUDOKU, GameCategory.WORD_LOGIC), saved.trainerCategories)
         assertEquals(GameCategory.NUMBER_SEQUENCE, saved.preferredCategory)
         assertEquals(AppLanguage.SYSTEM, repo.language.first())
+    }
+}
+
+class LanguageOptionsTest {
+    @Test fun allEightLanguagesPlusSystemRoundTripThroughStorage() {
+        assertEquals(9, AppLanguage.entries.size)
+        assertEquals(9, AppLanguage.entries.map { it.storedValue }.toSet().size)
+        AppLanguage.entries.forEach { assertEquals(it, AppLanguage.fromStored(it.storedValue)) }
     }
 }
