@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -93,25 +94,25 @@ fun HomeScreen(
                 ),
                 onClick = { onPlay(GameMode.CAREER) },
             )
-            Row(horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM)) {
+            EqualHeightRow {
                 FeatureCard(
                     icon = R.drawable.ic_daily,
                     title = stringResource(R.string.home_daily_title),
                     subtitle = stringResource(R.string.home_daily_subtitle),
                     onClick = { onPlay(GameMode.DAILY) },
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
                 )
                 FeatureCard(
                     icon = R.drawable.ic_rewards,
                     title = stringResource(R.string.home_rewards_title),
                     subtitle = stringResource(R.string.home_rewards_subtitle),
                     onClick = onRewards,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
                     gold = true,
                 )
             }
             SectionTitle(stringResource(R.string.home_modes_title))
-            Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM)) {
+            EqualHeightRow {
                 ModeCard(
                     R.drawable.ic_career, stringResource(R.string.mode_career), stringResource(R.string.mode_career_subtitle),
                     { onPlay(GameMode.CAREER) }, Modifier.weight(1f).fillMaxHeight(),
@@ -232,6 +233,12 @@ private fun PrimaryButton(label: String, onClick: () -> Unit) {
     }
 }
 
+// Paired cards: equal width via weight(1f) and equal height via IntrinsicSize.Min + fillMaxHeight() on children.
+@Composable
+private fun EqualHeightRow(content: @Composable RowScope.() -> Unit) {
+    Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM), content = content)
+}
+
 @Composable
 private fun FeatureCard(
     @DrawableRes icon: Int,
@@ -243,7 +250,7 @@ private fun FeatureCard(
 ) {
     val brush = if (gold) LogicMixTokens.colors.rewardBrush else LogicMixTokens.colors.cardBrush
     CardSurface(modifier.clickable(role = Role.Button, onClick = onClick), LogicMixTokens.radii.large, brush) {
-        Column(Modifier.padding(LogicMixTokens.spacingM), verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingXs)) {
+        Column(Modifier.fillMaxSize().padding(LogicMixTokens.spacingM), verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingXs)) {
             LogicMixIcon(icon, if (gold) LogicMixTokens.colors.gold else MaterialTheme.colorScheme.secondary, size = 32.dp)
             Text(title, style = LogicMixTokens.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
             Text(subtitle, style = LogicMixTokens.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
