@@ -8,7 +8,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,7 +18,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -65,7 +65,6 @@ private val Categories = listOf(
     R.drawable.ic_cat_visual to R.string.category_visual_logic,
 )
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun HomeScreen(
     state: HomeUiState,
@@ -112,22 +111,18 @@ fun HomeScreen(
                 )
             }
             SectionTitle(stringResource(R.string.home_modes_title))
-            Row(horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM)) {
+            Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM)) {
                 ModeCard(
                     R.drawable.ic_career, stringResource(R.string.mode_career), stringResource(R.string.mode_career_subtitle),
-                    { onPlay(GameMode.CAREER) }, Modifier.weight(1f),
+                    { onPlay(GameMode.CAREER) }, Modifier.weight(1f).fillMaxHeight(),
                 )
                 ModeCard(
                     R.drawable.ic_endless, stringResource(R.string.mode_endless), stringResource(R.string.mode_endless_subtitle),
-                    { onPlay(GameMode.ENDLESS) }, Modifier.weight(1f),
+                    { onPlay(GameMode.ENDLESS) }, Modifier.weight(1f).fillMaxHeight(),
                 )
             }
             SectionTitle(stringResource(R.string.home_categories_title))
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS, Alignment.CenterHorizontally),
-                verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS),
-                modifier = Modifier.fillMaxWidth(),
-            ) {
+            Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS)) {
                 Categories.forEach { (icon, label) -> CategoryChip(icon, stringResource(label)) }
                 if (GameCategory.WORD_SEARCH in state.categories) {
                     CategoryChip(R.drawable.ic_cat_words, stringResource(R.string.category_word_search), onWordSearch)
@@ -260,7 +255,7 @@ private fun FeatureCard(
 private fun ModeCard(@DrawableRes icon: Int, title: String, subtitle: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     CardSurface(modifier.clickable(role = Role.Button, onClick = onClick), LogicMixTokens.radii.large) {
         Column(
-            Modifier.fillMaxWidth().padding(LogicMixTokens.spacingM),
+            Modifier.fillMaxSize().padding(LogicMixTokens.spacingM),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingXs),
         ) {
@@ -274,10 +269,12 @@ private fun ModeCard(@DrawableRes icon: Int, title: String, subtitle: String, on
 // Chips without a click handler are informational; only categories with a playable engine open a screen.
 @Composable
 private fun CategoryChip(@DrawableRes icon: Int, label: String, onClick: (() -> Unit)? = null) {
-    CardSurface(shape = LogicMixTokens.radii.extraLarge) {
+    CardSurface(Modifier.fillMaxWidth(), shape = LogicMixTokens.radii.extraLarge) {
         Row(
             Modifier
-                .then(if (onClick != null) Modifier.heightIn(min = LogicMixTokens.minTouchTarget).clickable(role = Role.Button, onClick = onClick) else Modifier)
+                .fillMaxWidth()
+                .heightIn(min = LogicMixTokens.minTouchTarget)
+                .then(if (onClick != null) Modifier.clickable(role = Role.Button, onClick = onClick) else Modifier)
                 .padding(horizontal = LogicMixTokens.spacingM, vertical = LogicMixTokens.spacingS),
             horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS),
             verticalAlignment = Alignment.CenterVertically,
