@@ -45,7 +45,7 @@ class MatchstickViewModel @Inject constructor(
     private suspend fun loadNext() {
         profiles.ensureProfile()
         progress.ensureProgress(profileId)
-        val puzzle = MatchPuzzles.firstUnsolved(progress.solvedPuzzleIds(profileId))
+        val puzzle = MatchPuzzles.firstUnsolved(progress.solvedPuzzleIds(profileId).toSet())
         _state.value = if (puzzle == null) MatchUiState(allDone = true)
         else MatchUiState(game = MatchGame(puzzle), startedAt = System.currentTimeMillis())
     }
