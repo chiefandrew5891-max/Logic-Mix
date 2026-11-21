@@ -42,6 +42,9 @@ import io.github.chiefandrew5891max.logicmix.feature.game.GameRoute
 import io.github.chiefandrew5891max.logicmix.feature.home.ComingSoonScreen
 import io.github.chiefandrew5891max.logicmix.feature.matchstick.MatchstickRoute
 import io.github.chiefandrew5891max.logicmix.feature.orb.OrbRoute
+import io.github.chiefandrew5891max.logicmix.feature.wordlogic.WordLogicRoute
+import io.github.chiefandrew5891max.logicmix.feature.crossword.CrosswordRoute
+import io.github.chiefandrew5891max.logicmix.feature.visual.VisualRoute
 import io.github.chiefandrew5891max.logicmix.feature.sudoku.SudokuRoute
 import io.github.chiefandrew5891max.logicmix.feature.home.HomeRoute
 import io.github.chiefandrew5891max.logicmix.feature.settings.SettingsScreen
@@ -77,6 +80,9 @@ object Routes {
     const val SUDOKU = "sudoku"
     const val MATCHSTICKS = "matchsticks"
     const val ORB_LINES = "orb_lines"
+    const val WORD_LOGIC = "word_logic"
+    const val MINI_CROSSWORD = "mini_crossword"
+    const val VISUAL_LOGIC = "visual_logic"
     const val CATEGORY_SOON = "category_soon/{category}"
     const val GAME_STYLE = "game_style/{start}"
     const val STYLE_INFO = "style_info/{style}"
@@ -91,6 +97,9 @@ object Routes {
         GameCategory.SUDOKU -> SUDOKU
         GameCategory.MATCHSTICK -> MATCHSTICKS
         GameCategory.ORB_LINES -> ORB_LINES
+        GameCategory.WORD_LOGIC -> WORD_LOGIC
+        GameCategory.MINI_CROSSWORD -> MINI_CROSSWORD
+        GameCategory.VISUAL_LOGIC -> VISUAL_LOGIC
         else -> "category_soon/${category.name}"
     }
 
@@ -148,6 +157,15 @@ private fun LogicMixNavigation(navController: NavHostController, gameStyle: Game
         }
         composable(Routes.ORB_LINES) {
             OrbRoute(onBack = goBack)
+        }
+        composable(Routes.WORD_LOGIC) {
+            WordLogicRoute(onBack = goBack)
+        }
+        composable(Routes.MINI_CROSSWORD) {
+            CrosswordRoute(onBack = goBack)
+        }
+        composable(Routes.VISUAL_LOGIC) {
+            VisualRoute(onBack = goBack)
         }
         composable(Routes.MATCHSTICKS) {
             MatchstickRoute(onBack = goBack)

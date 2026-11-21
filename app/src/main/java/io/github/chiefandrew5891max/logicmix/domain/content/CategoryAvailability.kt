@@ -20,7 +20,7 @@ enum class GameCategory {
         }
 
     /** Categories with a real playable screen; the rest open the localized coming-soon screen. */
-    val isPlayable: Boolean get() = this == NUMBER_SEQUENCE || this == WORD_SEARCH || this == SUDOKU || this == MATCHSTICK || this == ORB_LINES
+    val isPlayable: Boolean get() = this == NUMBER_SEQUENCE || this == WORD_LOGIC || this == MINI_CROSSWORD || this == VISUAL_LOGIC || this == WORD_SEARCH || this == SUDOKU || this == MATCHSTICK || this == ORB_LINES
 }
 
 /**
