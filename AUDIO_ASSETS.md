@@ -81,4 +81,4 @@ Add files, rebuild, open the app: music starts. Toggle the switch and move the s
 (resumes); start a call or another player (music yields).
 
 ## Orb Lines
-Uses existing effects (PUZZLE_MOVE select, PUZZLE_PLACE land, WRONG blocked, COMBO line clear, HINT, GAME_OVER, XP_GAIN, LEVEL_UP, BUTTON_TAP). Recommended new effects: sfx_orb_move, sfx_orb_spawn, sfx_orb_pop.
+Uses existing effects (WRONG blocked, HINT, GAME_OVER, XP_GAIN, LEVEL_UP, BUTTON_TAP). Dedicated effects: ORB_SELECT, ORB_MOVE, ORB_SPAWN, ORB_POP (sfx_orb_*.wav; must be placed in assets/sfx).

@@ -94,7 +94,7 @@ class OrbViewModel @Inject constructor(
             if (s.selected == cell) {
                 _state.update { it.copy(selected = null) }
             } else {
-                sfx.play(Sfx.PUZZLE_MOVE)
+                sfx.play(Sfx.ORB_SELECT)
                 _state.update { it.copy(selected = cell, hint = null, noHint = false) }
             }
             return
@@ -115,10 +115,10 @@ class OrbViewModel @Inject constructor(
 
     private suspend fun animate(g: OrbGame, from: Int, to: Int, move: OrbMove) {
         val color = g.cells[from]
+        sfx.play(Sfx.ORB_MOVE)
         _state.update { it.copy(selected = null, hint = null, noHint = false) }
         val start = g.cells.toMutableList().also { it[from] = 0 }
         show(OrbStage(start, (move.path.size * 38).coerceIn(140, 420), ++stageKey, moving = MovingBall(color, move.path)))
-        sfx.play(Sfx.PUZZLE_PLACE)
         val moved = start.toMutableList().also { it[to] = color }
         if (move.clearedByMove.isNotEmpty()) {
             comboSound(move.clearedByMove.size)
@@ -126,6 +126,7 @@ class OrbViewModel @Inject constructor(
         } else {
             val withSpawn = moved.toMutableList()
             move.spawned.forEachIndexed { i, cell -> withSpawn[cell] = g.next[i] }
+            if (move.spawned.isNotEmpty()) sfx.play(Sfx.ORB_SPAWN)
             show(OrbStage(withSpawn, 240, ++stageKey, spawning = move.spawned.toSet()))
             if (move.clearedBySpawn.isNotEmpty()) {
                 comboSound(move.clearedBySpawn.size)
@@ -138,7 +139,7 @@ class OrbViewModel @Inject constructor(
         if (move.game.over) sfx.play(Sfx.GAME_OVER)
     }
 
-    private fun comboSound(removed: Int) = sfx.playCombo(removed - OrbRules.MIN_LINE + 2)
+    private fun comboSound(removed: Int) = sfx.play(Sfx.ORB_POP)
 
     private fun claimXp(game: OrbGame) {
         if (xpClaimed || game.score < OrbRules.XP_SCORE) return
