@@ -106,13 +106,6 @@ class GarlandEngine(private val random: Random, private val count: Int = Garland
             if (kickAge >= 0f) v = maxOf(v, kickLevel(i) * 0.9f)
             levels[i] = v.coerceIn(0f, 1f)
         }
-        if (mode == GarlandMode.DoubleWave && live > 0f) {
-            val glow = centerGlow(modeTime) * smooth(live)
-            val lo = (count - 1) / 2
-            val hi = count / 2
-            levels[lo] = maxOf(levels[lo], glow).coerceIn(0f, 1f)
-            levels[hi] = maxOf(levels[hi], glow).coerceIn(0f, 1f)
-        }
     }
 
     private fun startMode(next: GarlandMode) {
@@ -162,7 +155,8 @@ class GarlandEngine(private val random: Random, private val count: Int = Garland
             val reach = -WAVE_WIDTH + minOf(f / 0.8f, 1f) * (0.5f + WAVE_WIDTH)
             val amp = 1f - smooth((f - 0.8f) / 0.2f)
             val p = position(i)
-            0.25f + 0.65f * amp * maxOf(bump(p - reach), bump(p - (1f - reach)))
+            val waves = 0.25f + 0.65f * amp * maxOf(bump(p - reach), bump(p - (1f - reach)))
+            if (i == (count - 1) / 2 || i == count / 2) maxOf(waves, centerGlow(t)) else waves
         }
         GarlandMode.GoldenCascade -> {
             val group = minOf(i * CASCADE_GROUPS / count, CASCADE_GROUPS - 1)
