@@ -62,6 +62,7 @@ class GarlandEngine(private val random: Random, private val count: Int = Garland
     private var modeLength = scheduler.nextDurationSeconds()
     private var speed = 1f
     private var direction = 1
+    private var previousDirection = 1
     private var wasPlaying = false
     private var kickAge = -1f
     private var kickDirection = 1
@@ -100,8 +101,8 @@ class GarlandEngine(private val random: Random, private val count: Int = Garland
         }
 
         for (i in 0 until count) {
-            val now = modeLevel(mode, i, modeTime)
-            val blended = previous?.let { p -> modeLevel(p, i, previousTime) * (1f - fade) + now * fade } ?: now
+            val now = modeLevel(mode, i, modeTime, direction)
+            val blended = previous?.let { p -> modeLevel(p, i, previousTime, previousDirection) * (1f - fade) + now * fade } ?: now
             var v = REST + (blended - REST) * smooth(live)
             if (kickAge >= 0f) v = maxOf(v, kickLevel(i) * 0.9f)
             levels[i] = v.coerceIn(0f, 1f)
@@ -111,6 +112,7 @@ class GarlandEngine(private val random: Random, private val count: Int = Garland
     private fun startMode(next: GarlandMode) {
         previous = mode
         previousTime = modeTime
+        previousDirection = direction
         mode = next
         modeTime = 0f
         fade = 0f
@@ -140,7 +142,7 @@ class GarlandEngine(private val random: Random, private val count: Int = Garland
 
     private fun position(i: Int) = if (count > 1) i / (count - 1f) else 0.5f
 
-    private fun modeLevel(m: GarlandMode, i: Int, t: Float): Float = when (m) {
+    private fun modeLevel(m: GarlandMode, i: Int, t: Float, dir: Int): Float = when (m) {
         GarlandMode.SoftTwinkle ->
             0.5f + 0.3f * sin(2f * PI.toFloat() * (rates[i] * t + phases[i]))
         GarlandMode.RunningLights -> sweep(position(i), t, 1)
@@ -160,7 +162,7 @@ class GarlandEngine(private val random: Random, private val count: Int = Garland
         }
         GarlandMode.GoldenCascade -> {
             val group = minOf(i * CASCADE_GROUPS / count, CASCADE_GROUPS - 1)
-            val g = if (direction > 0) group.toFloat() else (CASCADE_GROUPS - 1 - group).toFloat()
+            val g = if (dir > 0) group.toFloat() else (CASCADE_GROUPS - 1 - group).toFloat()
             val head = (t % (CASCADE_PERIOD * (CASCADE_GROUPS + 2.4f))) / CASCADE_PERIOD - 1.2f
             0.25f + 0.65f * smooth((1f - kotlin.math.abs(g - head) / 1.2f).coerceIn(0f, 1f))
         }
