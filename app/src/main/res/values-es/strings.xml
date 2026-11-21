@@ -144,4 +144,18 @@
     <string name="match_no_hint">No hay pistas disponibles.</string>
     <string name="match_next">Siguiente</string>
     <string name="match_all_done">¡Has resuelto todos los puzles de cerillas!</string>
+    <string name="category_orb_lines">Orb Lines</string>
+    <string name="orb_title">Orb Lines</string>
+    <string name="orb_score">Puntos</string>
+    <string name="orb_best">Récord</string>
+    <string name="orb_next">Siguientes</string>
+    <string name="orb_undo">Deshacer</string>
+    <string name="orb_hint">Pista</string>
+    <string name="orb_new">Nueva</string>
+    <string name="orb_new_title">¿Empezar una partida nueva?</string>
+    <string name="orb_new_body">Se perderá la partida actual.</string>
+    <string name="orb_over">Fin del juego</string>
+    <string name="orb_final_score">Puntuación final: %1$d</string>
+    <string name="orb_no_hint">Ahora no hay jugada que complete una línea.</string>
+    <string name="orb_rules">Mueve una bola por un camino libre. Alinea 5 o más del mismo color.</string>
 </resources>

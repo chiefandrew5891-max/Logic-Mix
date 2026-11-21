@@ -144,4 +144,18 @@
     <string name="match_no_hint">没有可用的提示。</string>
     <string name="match_next">下一关</string>
     <string name="match_all_done">你已解开所有火柴谜题！</string>
+    <string name="category_orb_lines">Orb Lines</string>
+    <string name="orb_title">Orb Lines</string>
+    <string name="orb_score">得分</string>
+    <string name="orb_best">最高分</string>
+    <string name="orb_next">下一个</string>
+    <string name="orb_undo">撤销</string>
+    <string name="orb_hint">提示</string>
+    <string name="orb_new">新游戏</string>
+    <string name="orb_new_title">开始新游戏？</string>
+    <string name="orb_new_body">当前游戏将丢失。</string>
+    <string name="orb_over">游戏结束</string>
+    <string name="orb_final_score">最终得分：%1$d</string>
+    <string name="orb_no_hint">目前没有能连成一线的移动。</string>
+    <string name="orb_rules">沿空路径移动小球，连成5个或更多同色。</string>
 </resources>

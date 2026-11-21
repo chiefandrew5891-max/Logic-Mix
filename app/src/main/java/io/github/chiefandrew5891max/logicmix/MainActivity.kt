@@ -39,6 +39,7 @@ import io.github.chiefandrew5891max.logicmix.domain.game.GameMode
 import io.github.chiefandrew5891max.logicmix.feature.game.GameRoute
 import io.github.chiefandrew5891max.logicmix.feature.home.ComingSoonScreen
 import io.github.chiefandrew5891max.logicmix.feature.matchstick.MatchstickRoute
+import io.github.chiefandrew5891max.logicmix.feature.orb.OrbRoute
 import io.github.chiefandrew5891max.logicmix.feature.sudoku.SudokuRoute
 import io.github.chiefandrew5891max.logicmix.feature.home.HomeRoute
 import io.github.chiefandrew5891max.logicmix.feature.settings.SettingsScreen
@@ -71,6 +72,7 @@ object Routes {
     const val WORD_SEARCH = "word_search"
     const val SUDOKU = "sudoku"
     const val MATCHSTICKS = "matchsticks"
+    const val ORB_LINES = "orb_lines"
     const val CATEGORY_SOON = "category_soon/{category}"
     const val GAME_STYLE = "game_style/{start}"
     const val STYLE_INFO = "style_info/{style}"
@@ -84,6 +86,7 @@ object Routes {
         GameCategory.WORD_SEARCH -> WORD_SEARCH
         GameCategory.SUDOKU -> SUDOKU
         GameCategory.MATCHSTICK -> MATCHSTICKS
+        GameCategory.ORB_LINES -> ORB_LINES
         else -> "category_soon/${category.name}"
     }
 
@@ -138,6 +141,9 @@ private fun LogicMixNavigation(navController: NavHostController, gameStyle: Game
         }
         composable(Routes.SUDOKU) {
             SudokuRoute(onBack = goBack)
+        }
+        composable(Routes.ORB_LINES) {
+            OrbRoute(onBack = goBack)
         }
         composable(Routes.MATCHSTICKS) {
             MatchstickRoute(onBack = goBack)

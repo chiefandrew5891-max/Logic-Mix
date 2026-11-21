@@ -144,4 +144,18 @@
     <string name="match_no_hint">No hint available.</string>
     <string name="match_next">Next</string>
     <string name="match_all_done">You solved all matchstick puzzles!</string>
+    <string name="category_orb_lines">Orb Lines</string>
+    <string name="orb_title">Orb Lines</string>
+    <string name="orb_score">Score</string>
+    <string name="orb_best">Best</string>
+    <string name="orb_next">Next</string>
+    <string name="orb_undo">Undo</string>
+    <string name="orb_hint">Hint</string>
+    <string name="orb_new">New</string>
+    <string name="orb_new_title">Start a new game?</string>
+    <string name="orb_new_body">The current game will be lost.</string>
+    <string name="orb_over">Game over</string>
+    <string name="orb_final_score">Final score: %1$d</string>
+    <string name="orb_no_hint">No move completes a line right now.</string>
+    <string name="orb_rules">Move a ball along a free path. Line up 5 or more of the same color.</string>
 </resources>

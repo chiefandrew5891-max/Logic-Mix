@@ -144,4 +144,18 @@
     <string name="match_no_hint">Подсказки нет.</string>
     <string name="match_next">Дальше</string>
     <string name="match_all_done">Вы решили все головоломки со спичками!</string>
+    <string name="category_orb_lines">Orb Lines</string>
+    <string name="orb_title">Orb Lines</string>
+    <string name="orb_score">Счёт</string>
+    <string name="orb_best">Рекорд</string>
+    <string name="orb_next">Далее</string>
+    <string name="orb_undo">Отмена</string>
+    <string name="orb_hint">Подсказка</string>
+    <string name="orb_new">Заново</string>
+    <string name="orb_new_title">Начать новую игру?</string>
+    <string name="orb_new_body">Текущая партия будет потеряна.</string>
+    <string name="orb_over">Игра окончена</string>
+    <string name="orb_final_score">Итоговый счёт: %1$d</string>
+    <string name="orb_no_hint">Сейчас нет хода, собирающего линию.</string>
+    <string name="orb_rules">Двигайте шарик по свободному пути. Соберите 5 и более одного цвета.</string>
 </resources>

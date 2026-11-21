@@ -144,4 +144,18 @@
     <string name="match_no_hint">Kein Hinweis verfügbar.</string>
     <string name="match_next">Weiter</string>
     <string name="match_all_done">Du hast alle Streichholzrätsel gelöst!</string>
+    <string name="category_orb_lines">Orb Lines</string>
+    <string name="orb_title">Orb Lines</string>
+    <string name="orb_score">Punkte</string>
+    <string name="orb_best">Rekord</string>
+    <string name="orb_next">Nächste</string>
+    <string name="orb_undo">Zurück</string>
+    <string name="orb_hint">Tipp</string>
+    <string name="orb_new">Neu</string>
+    <string name="orb_new_title">Neues Spiel starten?</string>
+    <string name="orb_new_body">Das aktuelle Spiel geht verloren.</string>
+    <string name="orb_over">Spiel vorbei</string>
+    <string name="orb_final_score">Endstand: %1$d</string>
+    <string name="orb_no_hint">Aktuell vervollständigt kein Zug eine Reihe.</string>
+    <string name="orb_rules">Bewege eine Kugel über einen freien Weg. Bilde Reihen aus 5 oder mehr gleichen Farben.</string>
 </resources>

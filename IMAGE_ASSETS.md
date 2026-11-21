@@ -20,6 +20,7 @@ the real image is used automatically — no Kotlin changes are needed. Lookup is
 | Visual logic | `game_visual_logic.png` |
 | Fillwords | `game_fillwords.png` |
 | Sudoku | `game_sudoku.png` |
+| Orb Lines | `game_orb_lines.png` |
 | Arcade style | `mode_arcade.png` |
 | Trainer style | `mode_trainer.png` |
 | Individual categories style | `mode_categories.png` |
@@ -42,3 +43,6 @@ git push origin <your-branch>
 ```
 
 `app/src/main/res/raw/keep.xml` keeps these resources from being stripped if resource shrinking is enabled later.
+
+## Reward icons
+`GoldStar` and `GoldTrophy` (core/designsystem/RewardIcons.kt) are programmatic placeholders; final artwork should be provided as transparent PNG/WebP (`reward_gold_star`, `reward_gold_trophy`).

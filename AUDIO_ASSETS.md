@@ -79,3 +79,6 @@ AAC in an M4A container (`.m4a`), played with AndroidX Media3 ExoPlayer. Keep fi
 
 Add files, rebuild, open the app: music starts. Toggle the switch and move the slider; press Home (pauses) and return
 (resumes); start a call or another player (music yields).
+
+## Orb Lines
+Uses existing effects (PUZZLE_MOVE select, PUZZLE_PLACE land, WRONG blocked, COMBO line clear, HINT, GAME_OVER, XP_GAIN, LEVEL_UP, BUTTON_TAP). Recommended new effects: sfx_orb_move, sfx_orb_spawn, sfx_orb_pop.

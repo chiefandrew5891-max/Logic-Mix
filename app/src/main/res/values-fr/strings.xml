@@ -144,4 +144,18 @@
     <string name="match_no_hint">Aucun indice disponible.</string>
     <string name="match_next">Suivant</string>
     <string name="match_all_done">Vous avez résolu tous les casse-têtes d\'allumettes !</string>
+    <string name="category_orb_lines">Orb Lines</string>
+    <string name="orb_title">Orb Lines</string>
+    <string name="orb_score">Score</string>
+    <string name="orb_best">Record</string>
+    <string name="orb_next">Suivantes</string>
+    <string name="orb_undo">Annuler</string>
+    <string name="orb_hint">Indice</string>
+    <string name="orb_new">Nouvelle</string>
+    <string name="orb_new_title">Commencer une nouvelle partie ?</string>
+    <string name="orb_new_body">La partie en cours sera perdue.</string>
+    <string name="orb_over">Partie terminée</string>
+    <string name="orb_final_score">Score final : %1$d</string>
+    <string name="orb_no_hint">Aucun coup ne complète une ligne pour l\'instant.</string>
+    <string name="orb_rules">Déplacez une bille par un chemin libre. Alignez 5 billes ou plus de la même couleur.</string>
 </resources>

@@ -144,4 +144,18 @@
     <string name="match_no_hint">Підказки немає.</string>
     <string name="match_next">Далі</string>
     <string name="match_all_done">Ви розв\'язали всі головоломки зі сірниками!</string>
+    <string name="category_orb_lines">Orb Lines</string>
+    <string name="orb_title">Orb Lines</string>
+    <string name="orb_score">Рахунок</string>
+    <string name="orb_best">Рекорд</string>
+    <string name="orb_next">Далі</string>
+    <string name="orb_undo">Скасувати</string>
+    <string name="orb_hint">Підказка</string>
+    <string name="orb_new">Заново</string>
+    <string name="orb_new_title">Почати нову гру?</string>
+    <string name="orb_new_body">Поточна партія буде втрачена.</string>
+    <string name="orb_over">Гру закінчено</string>
+    <string name="orb_final_score">Підсумковий рахунок: %1$d</string>
+    <string name="orb_no_hint">Зараз немає ходу, що збирає лінію.</string>
+    <string name="orb_rules">Рухайте кульку вільним шляхом. Зберіть 5 і більше одного кольору.</string>
 </resources>

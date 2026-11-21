@@ -144,4 +144,18 @@
     <string name="match_no_hint">Nessun suggerimento disponibile.</string>
     <string name="match_next">Avanti</string>
     <string name="match_all_done">Hai risolto tutti i puzzle con i fiammiferi!</string>
+    <string name="category_orb_lines">Orb Lines</string>
+    <string name="orb_title">Orb Lines</string>
+    <string name="orb_score">Punti</string>
+    <string name="orb_best">Record</string>
+    <string name="orb_next">Prossime</string>
+    <string name="orb_undo">Annulla</string>
+    <string name="orb_hint">Aiuto</string>
+    <string name="orb_new">Nuova</string>
+    <string name="orb_new_title">Iniziare una nuova partita?</string>
+    <string name="orb_new_body">La partita attuale andrà persa.</string>
+    <string name="orb_over">Partita finita</string>
+    <string name="orb_final_score">Punteggio finale: %1$d</string>
+    <string name="orb_no_hint">Nessuna mossa completa una linea ora.</string>
+    <string name="orb_rules">Sposta una sfera su un percorso libero. Allinea 5 o più dello stesso colore.</string>
 </resources>
