@@ -35,7 +35,8 @@ Status: **wired** = hooked to a real event; **pending** = the game event does no
 | sfx_card_select | unused (categories use button_tap) | - | unused |
 | sfx_correct | right answer (Number Sequences) | GameViewModel.submit | wired |
 | sfx_wrong | wrong answer | GameViewModel.submit | wired |
-| sfx_matchstick_pickup / _move / _place | matchsticks | - | pending (no Matchsticks game) |
+| sfx_matchstick_pickup / _move / _place | grab, new target while dragging (rate-limited), valid drop; plus sfx_correct / level_complete / xp_gain on win, sfx_wrong when moves run out, sfx_hint | MatchstickViewModel | wired |
+| Sudoku sounds | number_input / number_delete / wrong (conflict) / hint / level_complete / xp_gain; undo, redo, reset use button_tap | SudokuViewModel | wired |
 | sfx_letter_select | first letter of a swipe | WordSearchViewModel.onTrace | wired |
 | sfx_word_trace_base | next letters of a swipe; pitch rises along a major scale up to +12 semitones, resets per gesture | WordSearchViewModel.onTrace | wired |
 | sfx_word_found | main or extra word | WordSearchViewModel.submit | wired |

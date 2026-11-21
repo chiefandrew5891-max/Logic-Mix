@@ -38,6 +38,8 @@ import io.github.chiefandrew5891max.logicmix.core.designsystem.LogicMixTheme
 import io.github.chiefandrew5891max.logicmix.domain.game.GameMode
 import io.github.chiefandrew5891max.logicmix.feature.game.GameRoute
 import io.github.chiefandrew5891max.logicmix.feature.home.ComingSoonScreen
+import io.github.chiefandrew5891max.logicmix.feature.matchstick.MatchstickRoute
+import io.github.chiefandrew5891max.logicmix.feature.sudoku.SudokuRoute
 import io.github.chiefandrew5891max.logicmix.feature.home.HomeRoute
 import io.github.chiefandrew5891max.logicmix.feature.settings.SettingsScreen
 import io.github.chiefandrew5891max.logicmix.feature.wordsearch.WordSearchRoute
@@ -68,6 +70,7 @@ object Routes {
     const val GAME = "game"
     const val WORD_SEARCH = "word_search"
     const val SUDOKU = "sudoku"
+    const val MATCHSTICKS = "matchsticks"
     const val CATEGORY_SOON = "category_soon/{category}"
     const val GAME_STYLE = "game_style/{start}"
     const val STYLE_INFO = "style_info/{style}"
@@ -80,6 +83,7 @@ object Routes {
         GameCategory.NUMBER_SEQUENCE -> GAME
         GameCategory.WORD_SEARCH -> WORD_SEARCH
         GameCategory.SUDOKU -> SUDOKU
+        GameCategory.MATCHSTICK -> MATCHSTICKS
         else -> "category_soon/${category.name}"
     }
 
@@ -133,7 +137,10 @@ private fun LogicMixNavigation(navController: NavHostController, gameStyle: Game
             WordSearchRoute(onBack = goBack)
         }
         composable(Routes.SUDOKU) {
-            ComingSoonScreen(onBack = goBack, categoryTitle = GameCategory.SUDOKU.titleRes())
+            SudokuRoute(onBack = goBack)
+        }
+        composable(Routes.MATCHSTICKS) {
+            MatchstickRoute(onBack = goBack)
         }
         composable(Routes.CATEGORY_SOON, arguments = listOf(navArgument("category") { type = NavType.StringType })) { entry ->
             val category = GameCategory.entries.firstOrNull { it.name == entry.arguments?.getString("category") }
