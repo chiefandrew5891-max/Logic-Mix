@@ -16,7 +16,7 @@ the numeric order of the names; the playlist then loops.
 
 ## Sound effects
 
-Put the 32 WAV files directly into `app/src/main/assets/sfx/` (no subfolders) with the exact names below.
+Put the 33 WAV files directly into `app/src/main/assets/sfx/` (no subfolders) with the exact names below.
 `SoundEffectsController` (`core/audio/SoundEffectsController.kt`, SoundPool, loaded once at startup) plays them over the
 music without touching it. It follows the existing Settings: effects switch and effects volume (independent of music),
 no sound while the app is in the background. A missing/broken file is logged (tag `SoundEffects`) and skipped.
@@ -50,6 +50,7 @@ Status: **wired** = hooked to a real event; **pending** = the game event does no
 | sfx_hint | hint used | GameViewModel, WordSearchViewModel | wired |
 | sfx_timer_warning, sfx_game_over | - | - | pending (no timer/fail state) |
 | sfx_letter_input / _delete | crossword | - | pending (no crossword) |
+| sfx_number_input | each digit typed in the answer field (Number Sequences); no button_tap on the same press | GameViewModel.onInput | wired |
 
 ## Format
 

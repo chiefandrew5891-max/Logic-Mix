@@ -80,7 +80,12 @@ class GameViewModel @Inject constructor(
     }
 
     fun onInput(text: String) {
-        _state.update { if (it.solved) it else it.copy(input = text.take(MAX_INPUT), feedback = Feedback.NONE) }
+        val before = _state.value
+        if (before.solved) return
+        val accepted = text.take(MAX_INPUT)
+        // One click per digit actually added; deleting or rejected input stays silent.
+        if (accepted.length > before.input.length && accepted.last().isDigit()) sfx.play(Sfx.NUMBER_INPUT)
+        _state.update { if (it.solved) it else it.copy(input = accepted, feedback = Feedback.NONE) }
     }
 
     fun useHint() {

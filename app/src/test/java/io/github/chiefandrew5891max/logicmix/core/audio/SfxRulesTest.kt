@@ -6,9 +6,9 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class SfxRulesTest {
-    @Test fun thereAre32UniqueWavFiles() {
-        assertEquals(32, Sfx.entries.size)
-        assertEquals(32, Sfx.entries.map { it.file }.toSet().size)
+    @Test fun thereAre33UniqueWavFiles() {
+        assertEquals(33, Sfx.entries.size)
+        assertEquals(33, Sfx.entries.map { it.file }.toSet().size)
         assertTrue(Sfx.entries.all { it.file.startsWith("sfx_") && it.file.endsWith(".wav") })
     }
 
