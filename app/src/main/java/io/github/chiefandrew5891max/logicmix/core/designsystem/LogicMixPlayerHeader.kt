@@ -61,6 +61,8 @@ object LogoPlayerGeometry {
     val previous = Slot(0.5f - SIDE_DX, AXIS_Y, SIDE_DIAMETER)
     val playPause = Slot(0.5f, AXIS_Y, CENTER_DIAMETER)
     val next = Slot(0.5f + SIDE_DX, AXIS_Y, SIDE_DIAMETER)
+    /** Bottom-right corner, right of the plate and below the X of MIX. */
+    val settings = Slot(0.91f, 0.84f, 0.1f)
 
     /** Rectangle actually painted by ContentScale.Fit inside a container; slots must be mapped into it. */
     data class Fit(val left: Float, val top: Float, val width: Float, val height: Float)
@@ -92,8 +94,10 @@ fun LogicMixPlayerHeader(
     playPauseLabel: String,
     nextLabel: String,
     logoLabel: String,
+    onSettings: (() -> Unit)? = null,
+    settingsLabel: String = "",
     modifier: Modifier = Modifier,
-    maxWidth: Dp = 420.dp,
+    maxWidth: Dp = 560.dp,
 ) {
     val logoId = rememberDrawableId("logo_logic_mix_player")
     BoxWithConstraints(modifier.widthIn(max = maxWidth).fillMaxWidth().aspectRatio(LogoPlayerGeometry.ASPECT)) {
@@ -111,6 +115,16 @@ fun LogicMixPlayerHeader(
             ),
             Triple(LogoPlayerGeometry.next, R.drawable.ic_music_next, Triple(nextLabel, onNext, Teal)),
         )
+        if (onSettings != null) {
+            val gear = LogoPlayerGeometry.settings
+            val size = maxOf(48f, w.value * 0.08f).dp
+            SettingsGear(
+                label = settingsLabel,
+                onClick = onSettings,
+                touch = size,
+                modifier = Modifier.offset(w * gear.cx - size / 2, h * gear.cy - size / 2),
+            )
+        }
         slots.forEachIndexed { index, (slot, icon, spec) ->
             val visual = h * slot.diameter
             val touch = LogoPlayerGeometry.touchSize(w.value, visual.value).dp
@@ -184,5 +198,23 @@ private fun PlayerButton(
             val tint = if (rim == Gold) Gold else Color(0xFFE6F6FF)
             LogicMixIcon(icon, tint.copy(alpha = if (pressed || flash) 1f else 0.9f), size = visual * 0.5f)
         }
+    }
+}
+
+/** Bare gear icon: no frame or background; a press only dims and shrinks it. */
+@Composable
+private fun SettingsGear(label: String, onClick: () -> Unit, touch: Dp, modifier: Modifier) {
+    val source = remember { MutableInteractionSource() }
+    val pressed by source.collectIsPressedAsState()
+    val scale by animateFloatAsState(if (pressed) 0.88f else 1f, tween(120), label = "gearScale")
+    val tap = withTap(onClick)
+    Box(
+        modifier
+            .size(touch)
+            .semantics { contentDescription = label }
+            .clickable(interactionSource = source, indication = null, role = Role.Button, onClick = tap),
+        contentAlignment = Alignment.Center,
+    ) {
+        Box(Modifier.scale(scale).alpha(if (pressed) 0.7f else 1f)) { LogicMixSettingsIcon(size = 30.dp) }
     }
 }

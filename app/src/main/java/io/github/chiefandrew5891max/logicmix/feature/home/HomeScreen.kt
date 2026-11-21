@@ -147,34 +147,19 @@ fun HomeScreen(
 
 @Composable
 private fun TopBar(onSettings: () -> Unit, music: MusicPanelState, onPrevious: () -> Unit, onToggle: () -> Unit, onNext: () -> Unit) {
-    val settingsLabel = stringResource(R.string.settings)
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS)) {
-        Box(Modifier.weight(1f), contentAlignment = Alignment.TopCenter) {
-            LogicMixPlayerHeader(
-                playing = music.playing,
-                available = music.available,
-                onPrevious = onPrevious,
-                onTogglePlayback = onToggle,
-                onNext = onNext,
-                previousLabel = stringResource(R.string.music_previous),
-                playPauseLabel = stringResource(if (music.playing) R.string.music_pause else R.string.music_play),
-                nextLabel = stringResource(R.string.music_next),
-                logoLabel = stringResource(R.string.app_name),
-            )
-        }
-        Box(
-            modifier = Modifier
-                .size(LogicMixTokens.minTouchTarget)
-                .clip(LogicMixTokens.radii.medium)
-                .background(LogicMixTokens.colors.cardBrush)
-                .border(BorderStroke(1.dp, LogicMixTokens.colors.cardBorder), LogicMixTokens.radii.medium)
-                .semantics { contentDescription = settingsLabel }
-                .clickable(role = Role.Button, onClickLabel = settingsLabel, onClick = onSettings),
-            contentAlignment = Alignment.Center,
-        ) {
-            LogicMixSettingsIcon(size = 28.dp)
-        }
-    }
+    LogicMixPlayerHeader(
+        playing = music.playing,
+        available = music.available,
+        onPrevious = onPrevious,
+        onTogglePlayback = onToggle,
+        onNext = onNext,
+        previousLabel = stringResource(R.string.music_previous),
+        playPauseLabel = stringResource(if (music.playing) R.string.music_pause else R.string.music_play),
+        nextLabel = stringResource(R.string.music_next),
+        logoLabel = stringResource(R.string.app_name),
+        onSettings = onSettings,
+        settingsLabel = stringResource(R.string.settings),
+    )
 }
 
 @Composable
@@ -200,7 +185,12 @@ private fun PlayerCard(state: HomeUiState) {
                 Modifier.padding(start = LogicMixTokens.spacing),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                LogicMixIcon(R.drawable.ic_streak, colors.gold, size = 28.dp)
+                val fire = rememberDrawableId("icon_streak_fire")
+                if (fire != 0) {
+                    Image(painterResource(fire), null, contentScale = ContentScale.Fit, modifier = Modifier.size(32.dp))
+                } else {
+                    LogicMixIcon(R.drawable.ic_streak, colors.gold, size = 28.dp)
+                }
                 Text(
                     text = state.streak.toString(),
                     style = LogicMixTokens.typography.headlineMedium,
@@ -297,10 +287,13 @@ private fun ModeCard(@DrawableRes icon: Int, art: String, title: String, subtitl
 @Composable
 private fun CardArt(art: String, @DrawableRes fallback: Int, tint: Color) {
     val id = rememberDrawableId(art)
-    if (id != 0) {
-        Image(painterResource(id), contentDescription = null, contentScale = ContentScale.Fit, modifier = Modifier.size(40.dp))
-    } else {
-        LogicMixIcon(fallback, tint, size = 32.dp)
+    // Centered across the whole card width, not the text column.
+    Box(Modifier.fillMaxWidth().height(52.dp), contentAlignment = Alignment.Center) {
+        if (id != 0) {
+            Image(painterResource(id), contentDescription = null, contentScale = ContentScale.Fit, modifier = Modifier.size(52.dp))
+        } else {
+            LogicMixIcon(fallback, tint, size = 32.dp)
+        }
     }
 }
 
@@ -315,6 +308,9 @@ private fun SectionTitle(text: String) {
     )
 }
 
+/** Shared by the progress block and the four feature/mode cards (was 1dp). */
+private val CARD_BORDER = 2.dp
+
 @Composable
 private fun CardSurface(
     modifier: Modifier = Modifier,
@@ -326,6 +322,6 @@ private fun CardSurface(
         modifier
             .clip(shape)
             .background(brush)
-            .border(BorderStroke(1.dp, LogicMixTokens.colors.cardBorder), shape),
+            .border(BorderStroke(CARD_BORDER, LogicMixTokens.colors.cardBorder), shape),
     ) { content() }
 }
