@@ -11,6 +11,15 @@ The list is not limited to five: any `music_NN.m4a` up to `music_50` (two digits
 automatically, in numeric order. Gaps are fine. For a name outside this pattern, append it to
 `MusicPlaylist.extraTrackNames` (`core/audio/MusicPlaylist.kt`). Android resource names allow only `a-z`, `0-9`, `_`.
 
+Original (Suno) file names are NOT picked up: rename the files to `music_01.m4a`, `music_02.m4a`, ... Order of play is
+the numeric order of the names; the playlist then loops.
+
+## Sound effects (prepared, not wired yet)
+
+Put the 32 WAV files directly into `app/src/main/assets/sfx/` (no subfolders), keeping their names
+(`sfx_button_tap.wav`, `sfx_menu_open.wav`, ...). They are not played yet; the SFX controller comes later.
+Assets (unlike `res/raw`) keep original file names, so no renaming is needed.
+
 ## Format
 
 AAC in an M4A container (`.m4a`), played with AndroidX Media3 ExoPlayer. Keep files modest in size: they go into the APK.
