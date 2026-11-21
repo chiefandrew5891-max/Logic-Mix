@@ -78,7 +78,7 @@ fun WordSearchRoute(onBack: () -> Unit, viewModel: WordSearchViewModel = hiltVie
     val state by viewModel.state.collectAsState()
     // The language changed to one without word search: progress is already saved, so just leave.
     LaunchedEffect(state.available) { if (!state.available) onBack() }
-    WordSearchScreen(state, onBack, viewModel::submit, viewModel::useHint, viewModel::next)
+    WordSearchScreen(state, onBack, viewModel::submit, viewModel::useHint, viewModel::next, viewModel::onTrace)
 }
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -89,6 +89,7 @@ fun WordSearchScreen(
     onSubmit: (List<Cell>) -> Unit,
     onHint: () -> Unit,
     onNext: () -> Unit,
+    onTrace: (Int) -> Unit = {},
 ) {
     val colors = LogicMixTokens.colors
     Box(Modifier.fillMaxSize().background(colors.backgroundBrush).safeDrawingPadding()) {
@@ -134,7 +135,11 @@ fun WordSearchScreen(
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite },
                     )
-                    LetterGrid(level, state, path, { path = it }, onSubmit)
+                    LetterGrid(level, state, path, {
+                        // Sound only when the gesture grows; holding on a letter or backtracking is silent.
+                        if (it.size > path.size) onTrace(it.size)
+                        path = it
+                    }, onSubmit)
                     FeedbackLine(state)
                     FlowRow(
                         horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS, Alignment.CenterHorizontally),

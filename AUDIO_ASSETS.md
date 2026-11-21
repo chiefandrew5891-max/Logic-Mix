@@ -14,11 +14,42 @@ automatically, in numeric order. Gaps are fine. For a name outside this pattern,
 Original (Suno) file names are NOT picked up: rename the files to `music_01.m4a`, `music_02.m4a`, ... Order of play is
 the numeric order of the names; the playlist then loops.
 
-## Sound effects (prepared, not wired yet)
+## Sound effects
 
-Put the 32 WAV files directly into `app/src/main/assets/sfx/` (no subfolders), keeping their names
-(`sfx_button_tap.wav`, `sfx_menu_open.wav`, ...). They are not played yet; the SFX controller comes later.
-Assets (unlike `res/raw`) keep original file names, so no renaming is needed.
+Put the 32 WAV files directly into `app/src/main/assets/sfx/` (no subfolders) with the exact names below.
+`SoundEffectsController` (`core/audio/SoundEffectsController.kt`, SoundPool, loaded once at startup) plays them over the
+music without touching it. It follows the existing Settings: effects switch and effects volume (independent of music),
+no sound while the app is in the background. A missing/broken file is logged (tag `SoundEffects`) and skipped.
+Anti-chaos rules live in `core/audio/SfxRules.kt` (double-trigger guard, rate limit for move sounds, UI clicks never
+overlap each other or a major reward).
+
+Status: **wired** = hooked to a real event; **pending** = the game event does not exist yet (call `Sfx.X` there later).
+
+| File | Event | Where | Status |
+|---|---|---|---|
+| sfx_button_tap | button press | MainActivity (Rewards) | wired |
+| sfx_menu_open | open Settings | MainActivity | wired |
+| sfx_menu_close | close Settings | MainActivity | wired |
+| sfx_screen_transition | Play / Continue | MainActivity | wired |
+| sfx_toggle | settings switches | SettingsViewModel | wired |
+| sfx_card_select | category card | MainActivity | wired |
+| sfx_correct | right answer (Number Sequences) | GameViewModel.submit | wired |
+| sfx_wrong | wrong answer | GameViewModel.submit | wired |
+| sfx_matchstick_pickup / _move / _place | matchsticks | - | pending (no Matchsticks game) |
+| sfx_letter_select | first letter of a swipe | WordSearchViewModel.onTrace | wired |
+| sfx_word_trace_base | next letters of a swipe; pitch rises along a major scale up to +12 semitones, resets per gesture | WordSearchViewModel.onTrace | wired |
+| sfx_word_found | main or extra word | WordSearchViewModel.submit | wired |
+| sfx_word_invalid | unknown/duplicate word | WordSearchViewModel.submit | wired |
+| sfx_puzzle_move / _place | puzzle pieces | - | pending |
+| sfx_xp_gain | XP actually awarded | GameViewModel, WordSearchViewModel | wired |
+| sfx_bonus_points, sfx_coin_reward, sfx_reward | - | - | pending (no such rewards yet) |
+| sfx_combo | `playCombo(multiplier)`: x2 +0, x3 +2, x4 +4, x5 +5, x6 +7, x7+ +9 semitones, rate = 2^(n/12) | SoundEffectsController | pending (no combo yet) |
+| sfx_streak, sfx_achievement, sfx_daily_complete | - | - | pending (no such events yet) |
+| sfx_level_complete | level solved | GameViewModel, WordSearchViewModel | wired |
+| sfx_level_up | player level increased | same | wired |
+| sfx_hint | hint used | GameViewModel, WordSearchViewModel | wired |
+| sfx_timer_warning, sfx_game_over | - | - | pending (no timer/fail state) |
+| sfx_letter_input / _delete | crossword | - | pending (no crossword) |
 
 ## Format
 

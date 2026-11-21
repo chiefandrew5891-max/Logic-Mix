@@ -3,6 +3,8 @@ package io.github.chiefandrew5891max.logicmix.feature.wordsearch
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.chiefandrew5891max.logicmix.core.audio.Sfx
+import io.github.chiefandrew5891max.logicmix.core.audio.SoundEffectsController
 import io.github.chiefandrew5891max.logicmix.core.data.LocalProfileRepository
 import io.github.chiefandrew5891max.logicmix.core.data.ProgressRepository
 import io.github.chiefandrew5891max.logicmix.core.data.SettingsRepository
@@ -69,6 +71,7 @@ class WordSearchViewModel @Inject constructor(
     private val progress: ProgressRepository,
     private val store: WordSearchStore,
     settings: SettingsRepository,
+    private val sfx: SoundEffectsController,
 ) : ViewModel() {
     private val profileId = LocalProfileRepository.LOCAL_PROFILE_ID
     private val _state = MutableStateFlow(WordSearchUiState())
@@ -140,6 +143,7 @@ class WordSearchViewModel @Inject constructor(
                 if (s.completed) return@withLock
                 when (val result = WordSearchChecker.check(level, words, path, s.mainFound, s.extraFound)) {
                     is WordCheck.Main -> {
+                        sfx.play(Sfx.WORD_FOUND)
                         store.addWord(level, result.word, main = true)
                         _state.update { it.copy(mainFound = it.mainFound + result.word, feedback = WordFeedback.MAIN, hintCell = null) }
                         if (level.mainWords.all { it in _state.value.mainFound }) finish(level)
@@ -147,14 +151,22 @@ class WordSearchViewModel @Inject constructor(
                     is WordCheck.Extra -> {
                         // XP first: it is idempotent, so a crash before addWord cannot cause a second payout.
                         val xp = progress.awardExtraWord(profileId, level.id, result.word, WordSearchRewards.EXTRA_WORD_XP)
+                        sfx.play(Sfx.WORD_FOUND)
+                        if (xp > 0) sfx.play(Sfx.XP_GAIN)
                         store.addWord(level, result.word, main = false)
                         _state.update {
                             it.copy(extraFound = it.extraFound + result.word, feedback = WordFeedback.EXTRA, flash = path, extraXp = xp)
                         }
                         clearFlashLater(path)
                     }
-                    is WordCheck.Duplicate -> _state.update { it.copy(feedback = WordFeedback.DUPLICATE) }
-                    is WordCheck.Unknown, WordCheck.InvalidPath -> _state.update { it.copy(feedback = WordFeedback.UNKNOWN) }
+                    is WordCheck.Duplicate -> {
+                        sfx.play(Sfx.WORD_INVALID)
+                        _state.update { it.copy(feedback = WordFeedback.DUPLICATE) }
+                    }
+                    is WordCheck.Unknown, WordCheck.InvalidPath -> {
+                        sfx.play(Sfx.WORD_INVALID)
+                        _state.update { it.copy(feedback = WordFeedback.UNKNOWN) }
+                    }
                     WordCheck.TooShort -> _state.update { it.copy(feedback = WordFeedback.TOO_SHORT) }
                 }
             }
@@ -181,6 +193,8 @@ class WordSearchViewModel @Inject constructor(
             hintsUsed = s.hintsUsed,
         )
         store.complete(level, result.xpAwarded)
+        if (result.xpAwarded > 0) sfx.play(Sfx.XP_GAIN)
+        sfx.play(if (result.after.level > result.before.level) Sfx.LEVEL_UP else Sfx.LEVEL_COMPLETE)
         _state.update { it.copy(completed = true, xpAwarded = result.xpAwarded) }
     }
 
@@ -191,6 +205,7 @@ class WordSearchViewModel @Inject constructor(
                 val level = s.level ?: return@withLock
                 if (!s.canUseHint) return@withLock
                 val target = level.placements.first { it.word !in s.mainFound }
+                sfx.play(Sfx.HINT)
                 store.setHintsUsed(level, s.hintsUsed + 1)
                 _state.update { it.copy(hintsUsed = it.hintsUsed + 1, hintCell = target.path.first(), feedback = WordFeedback.NONE) }
             }
@@ -199,6 +214,11 @@ class WordSearchViewModel @Inject constructor(
 
     private companion object {
         const val FLASH_MS = 800L
+    }
+
+    /** [length] is the number of letters in the current finger gesture; sounds only on growth. */
+    fun onTrace(length: Int) {
+        if (length == 1) sfx.play(Sfx.LETTER_SELECT) else if (length > 1) sfx.playTrace(length - 1)
     }
 
     fun next() {

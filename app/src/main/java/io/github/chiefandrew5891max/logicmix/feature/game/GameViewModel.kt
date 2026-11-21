@@ -3,6 +3,8 @@ package io.github.chiefandrew5891max.logicmix.feature.game
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.chiefandrew5891max.logicmix.core.audio.Sfx
+import io.github.chiefandrew5891max.logicmix.core.audio.SoundEffectsController
 import io.github.chiefandrew5891max.logicmix.core.data.GameSessionStore
 import io.github.chiefandrew5891max.logicmix.core.data.LocalProfileRepository
 import io.github.chiefandrew5891max.logicmix.core.data.ProgressRepository
@@ -45,6 +47,7 @@ class GameViewModel @Inject constructor(
     private val profiles: LocalProfileRepository,
     private val progress: ProgressRepository,
     private val sessions: GameSessionStore,
+    private val sfx: SoundEffectsController,
 ) : ViewModel() {
     private val profileId = LocalProfileRepository.LOCAL_PROFILE_ID
     private val _state = MutableStateFlow(GameUiState())
@@ -85,6 +88,7 @@ class GameViewModel @Inject constructor(
         val puzzle = s.puzzle ?: return
         if (!s.canUseHint) return
         val used = s.hintsUsed + 1
+        sfx.play(Sfx.HINT)
         _state.update { it.copy(hintsUsed = used) }
         viewModelScope.launch { sessions.setHintsUsed(puzzle.id, used) }
     }
@@ -96,11 +100,13 @@ class GameViewModel @Inject constructor(
         when (NumberSequenceEngine.checkAnswer(puzzle, s.input)) {
             SolveResult.InvalidInput -> _state.update { it.copy(feedback = Feedback.INVALID) }
             SolveResult.Incorrect -> {
+                sfx.play(Sfx.WRONG)
                 _state.update { it.copy(feedback = Feedback.WRONG) }
                 record(puzzle, s, AttemptOutcome.INCORRECT)
             }
             SolveResult.Correct -> {
                 // Lock the screen immediately so a double tap cannot submit twice.
+                sfx.play(Sfx.CORRECT)
                 _state.update { it.copy(feedback = Feedback.CORRECT) }
                 viewModelScope.launch {
                     val result = progress.recordAttempt(
@@ -109,6 +115,8 @@ class GameViewModel @Inject constructor(
                     )
                     sessions.clear()
                     _state.update { it.copy(xpAwarded = result.xpAwarded) }
+                    if (result.xpAwarded > 0) sfx.play(Sfx.XP_GAIN)
+                    sfx.play(if (result.after.level > result.before.level) Sfx.LEVEL_UP else Sfx.LEVEL_COMPLETE)
                 }
             }
         }

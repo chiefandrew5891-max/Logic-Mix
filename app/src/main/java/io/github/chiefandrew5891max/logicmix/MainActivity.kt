@@ -26,6 +26,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import io.github.chiefandrew5891max.logicmix.core.audio.Sfx
+import io.github.chiefandrew5891max.logicmix.core.audio.SoundEffectsController
 import io.github.chiefandrew5891max.logicmix.core.data.SettingsRepository
 import io.github.chiefandrew5891max.logicmix.core.designsystem.ThemeMode
 import io.github.chiefandrew5891max.logicmix.core.locale.LocaleApplier
@@ -41,6 +43,7 @@ import io.github.chiefandrew5891max.logicmix.feature.wordsearch.WordSearchRoute
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     @Inject lateinit var settings: SettingsRepository
+    @Inject lateinit var sfx: SoundEffectsController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,7 +53,7 @@ class MainActivity : AppCompatActivity() {
             LaunchedEffect(language) { language?.let { LocaleApplier.apply(it) } }
             LogicMixTheme(themeMode) {
                 val gameStyle by settings.gameStyle.collectAsState(initial = null)
-                LogicMixNavigation(rememberNavController(), gameStyle)
+                LogicMixNavigation(rememberNavController(), gameStyle, sfx)
             }
         }
     }
@@ -86,7 +89,7 @@ object Routes {
 }
 
 @Composable
-private fun LogicMixNavigation(navController: NavHostController, gameStyle: GameStylePrefs?) {
+private fun LogicMixNavigation(navController: NavHostController, gameStyle: GameStylePrefs?, sfx: SoundEffectsController) {
     // The selector is pushed once per launch for installs that have not completed it yet.
     var onboardingShown by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(gameStyle?.onboardingDone) {
@@ -102,12 +105,14 @@ private fun LogicMixNavigation(navController: NavHostController, gameStyle: Game
         composable(Routes.HOME) {
             HomeRoute(
                 onPlay = { mode ->
+                    sfx.play(Sfx.SCREEN_TRANSITION)
                     navController.navigate(if (mode == GameMode.CAREER) Routes.GAME else Routes.COMING_SOON)
                 },
-                onRewards = { navController.navigate(Routes.COMING_SOON) },
-                onSettings = { navController.navigate(Routes.SETTINGS) },
-                onCategory = { navController.navigate(Routes.forCategory(it)) },
+                onRewards = { sfx.play(Sfx.BUTTON_TAP); navController.navigate(Routes.COMING_SOON) },
+                onSettings = { sfx.play(Sfx.MENU_OPEN); navController.navigate(Routes.SETTINGS) },
+                onCategory = { sfx.play(Sfx.CARD_SELECT); navController.navigate(Routes.forCategory(it)) },
                 onPrimary = { state ->
+                    sfx.play(Sfx.SCREEN_TRANSITION)
                     val target = StartTarget.resolve(state.primaryAction == PrimaryAction.CONTINUE, state.gameStyle, state.categories)
                     navController.navigate(Routes.forTarget(target))
                 },
@@ -143,7 +148,7 @@ private fun LogicMixNavigation(navController: NavHostController, gameStyle: Game
         }
         composable(Routes.SETTINGS) {
             SettingsScreen(
-                onBack = { navController.popBackStack() },
+                onBack = { sfx.play(Sfx.MENU_CLOSE); navController.popBackStack() },
                 onGameStyleStep = { navController.navigate(Routes.gameStyle(it)) },
             )
         }
