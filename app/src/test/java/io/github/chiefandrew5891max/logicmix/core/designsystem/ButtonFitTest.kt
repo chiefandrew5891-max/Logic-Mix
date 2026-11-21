@@ -55,3 +55,37 @@ class ButtonFitTest {
         }
     }
 }
+
+class LogoPlayerGeometryTest {
+    private val g = LogoPlayerGeometry
+
+    @Test fun buttonsAreSymmetricOnOneAxis() {
+        assertEquals(0.5f, g.playPause.cx, 0f)
+        assertEquals(g.playPause.cx - g.previous.cx, g.next.cx - g.playPause.cx, 1e-6f)
+        assertTrue(g.previous.cy == g.playPause.cy && g.next.cy == g.playPause.cy)
+        assertTrue(g.playPause.diameter > g.previous.diameter)
+    }
+
+    @Test fun fitRectKeepsAspectAndCentersInsideLetterboxedContainer() {
+        val r = g.fit(1000f, 1000f)
+        assertEquals(1000f, r.width, 0.01f)
+        assertEquals(1000f / g.ASPECT, r.height, 0.01f)
+        assertEquals((1000f - r.height) / 2f, r.top, 0.01f)
+        val tall = g.fit(1000f, 200f)
+        assertEquals(200f * g.ASPECT, tall.width, 0.01f)
+        assertEquals(0f, tall.top, 0.01f)
+    }
+
+    @Test fun touchTargetsNeverOverlapAndReach48dpWhenThereIsRoom() {
+        for (w in listOf(240f, 270f, 328f, 420f)) {
+            val touch = g.touchSize(w, 0.165f * w / g.ASPECT)
+            assertTrue(touch <= g.SIDE_DX * w + 0.01f || touch == 0.165f * w / g.ASPECT)
+        }
+        assertEquals(48f, g.touchSize(420f, 20f), 0f)
+    }
+
+    @Test fun buttonsStayInsidePlateAboveTheLights() {
+        assertTrue(g.playPause.cy + g.playPause.diameter / 2 < 0.87f)
+        assertTrue(g.previous.cx - g.previous.diameter / g.ASPECT / 2 > 0.2f)
+    }
+}

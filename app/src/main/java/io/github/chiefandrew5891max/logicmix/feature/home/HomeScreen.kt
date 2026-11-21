@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import io.github.chiefandrew5891max.logicmix.core.designsystem.rememberDrawableId
+import io.github.chiefandrew5891max.logicmix.core.designsystem.LogicMixPlayerHeader
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -144,16 +145,23 @@ fun HomeScreen(
     }
 }
 
-private val MUSIC_BUTTON = 40.dp
-private val MUSIC_GAP = 4.dp
-private val MUSIC_WIDTH = MUSIC_BUTTON * 3 + MUSIC_GAP * 2
-// Below this width the wordmark would have to shrink, so the music controls move to their own row.
-private val SIDE_BY_SIDE_MIN = 376.dp
-
 @Composable
 private fun TopBar(onSettings: () -> Unit, music: MusicPanelState, onPrevious: () -> Unit, onToggle: () -> Unit, onNext: () -> Unit) {
     val settingsLabel = stringResource(R.string.settings)
-    val settingsButton = @Composable {
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS)) {
+        Box(Modifier.weight(1f), contentAlignment = Alignment.TopCenter) {
+            LogicMixPlayerHeader(
+                playing = music.playing,
+                available = music.available,
+                onPrevious = onPrevious,
+                onTogglePlayback = onToggle,
+                onNext = onNext,
+                previousLabel = stringResource(R.string.music_previous),
+                playPauseLabel = stringResource(if (music.playing) R.string.music_pause else R.string.music_play),
+                nextLabel = stringResource(R.string.music_next),
+                logoLabel = stringResource(R.string.app_name),
+            )
+        }
         Box(
             modifier = Modifier
                 .size(LogicMixTokens.minTouchTarget)
@@ -165,192 +173,6 @@ private fun TopBar(onSettings: () -> Unit, music: MusicPanelState, onPrevious: (
             contentAlignment = Alignment.Center,
         ) {
             LogicMixSettingsIcon(size = 28.dp)
-        }
-    }
-    BoxWithConstraints(Modifier.fillMaxWidth()) {
-        val sideBySide = maxWidth >= SIDE_BY_SIDE_MIN
-        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(MUSIC_GAP)) {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Logo(Modifier.weight(1f))
-                if (sideBySide) {
-                    Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(MUSIC_GAP)) {
-                        settingsButton()
-                        MusicControls(music, onPrevious, onToggle, onNext)
-                    }
-                } else {
-                    settingsButton()
-                }
-            }
-            if (!sideBySide) MusicControls(music, onPrevious, onToggle, onNext)
-        }
-    }
-}
-
-@Composable
-private fun Logo(modifier: Modifier) {
-    val logoId = rememberDrawableId("logo_logic_mix_main")
-    if (logoId != 0) {
-        // The wordmark PNG replaces the text title; the app name stays available to accessibility services.
-        Image(
-            painter = painterResource(logoId),
-            contentDescription = stringResource(R.string.app_name),
-            contentScale = ContentScale.Fit,
-            alignment = Alignment.CenterStart,
-            modifier = modifier.heightIn(max = 88.dp),
-        )
-    } else {
-        Text(
-            text = stringResource(R.string.home_title),
-            style = LogicMixTokens.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.onBackground,
-            modifier = modifier,
-        )
-    }
-}
-
-/** Previous | Play/Pause | Next. Play/Pause is the global music switch, so settings and player stay consistent. */
-@Composable
-private fun MusicControls(music: MusicPanelState, onPrevious: () -> Unit, onToggle: () -> Unit, onNext: () -> Unit) {
-    Row(horizontalArrangement = Arrangement.spacedBy(MUSIC_GAP)) {
-        MusicButton(R.drawable.ic_music_prev, stringResource(R.string.music_previous), music.available, onPrevious)
-        MusicButton(
-            if (music.playing) R.drawable.ic_music_pause else R.drawable.ic_play,
-            stringResource(if (music.playing) R.string.music_pause else R.string.music_play),
-            music.available,
-            onToggle,
-        )
-        MusicButton(R.drawable.ic_music_next, stringResource(R.string.music_next), music.available, onNext)
-    }
-}
-
-@Composable
-private fun MusicButton(@DrawableRes icon: Int, description: String, enabled: Boolean, onClick: () -> Unit) {
-    val shape = LogicMixTokens.radii.small
-    Box(
-        Modifier
-            .size(MUSIC_BUTTON)
-            .clip(shape)
-            .background(LogicMixTokens.colors.cardBrush)
-            .border(BorderStroke(1.dp, LogicMixTokens.colors.cardBorder), shape)
-            .clickable(enabled = enabled, role = Role.Button, onClick = withTap(onClick)),
-        contentAlignment = Alignment.Center,
-    ) {
-        LogicMixIcon(icon, MaterialTheme.colorScheme.onSurface.copy(alpha = if (enabled) 1f else 0.4f), contentDescription = description, size = 20.dp)
-    }
-}
-
-@Composable
-private fun PlayerCard(state: HomeUiState) {
-    val colors = LogicMixTokens.colors
-    CardSurface(Modifier.fillMaxWidth(), LogicMixTokens.radii.large) {
-        Row(Modifier.padding(LogicMixTokens.spacing), verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS)) {
-                Text(
-                    text = stringResource(R.string.home_level, state.level),
-                    style = LogicMixTokens.typography.titleLarge,
-                    color = colors.gold,
-                )
-                XpBar(state.xpFraction)
-                Text(
-                    text = state.xpForNextLevel?.let { stringResource(R.string.home_xp_progress, state.xpIntoLevel, it) }
-                        ?: stringResource(R.string.home_xp_max),
-                    style = LogicMixTokens.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            Column(
-                Modifier.padding(start = LogicMixTokens.spacing),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                LogicMixIcon(R.drawable.ic_streak, colors.gold, size = 28.dp)
-                Text(
-                    text = state.streak.toString(),
-                    style = LogicMixTokens.typography.headlineMedium,
-                    color = colors.gold,
-                )
-                Text(
-                    text = stringResource(R.string.home_streak),
-                    style = LogicMixTokens.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun XpBar(fraction: Float) {
-    val colors = LogicMixTokens.colors
-    val shape = RoundedCornerShape(50)
-    Box(Modifier.fillMaxWidth().height(12.dp).clip(shape).background(colors.xpTrack)) {
-        if (fraction > 0f) {
-            Box(Modifier.fillMaxWidth(fraction).height(12.dp).clip(shape).background(colors.xpFill))
-        }
-    }
-}
-
-@Composable
-private fun PrimaryButton(label: String, onClick: () -> Unit) {
-    val colors = LogicMixTokens.colors
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = LogicMixTokens.buttonHeight)
-            .clip(LogicMixTokens.radii.extraLarge)
-            .background(colors.primaryActionBrush)
-            .clickable(role = Role.Button, onClick = onClick)
-            .padding(horizontal = LogicMixTokens.spacingL, vertical = LogicMixTokens.spacingM),
-        contentAlignment = Alignment.Center,
-    ) {
-        Row(horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS), verticalAlignment = Alignment.CenterVertically) {
-            LogicMixIcon(R.drawable.ic_play, colors.onGold, size = 28.dp)
-            Text(
-                text = label.uppercase(),
-                style = LogicMixTokens.typography.headlineMedium,
-                color = colors.onGold,
-                textAlign = TextAlign.Center,
-            )
-        }
-    }
-}
-
-// Paired cards: equal width via weight(1f) and equal height via IntrinsicSize.Min + fillMaxHeight() on children.
-@Composable
-private fun EqualHeightRow(content: @Composable RowScope.() -> Unit) {
-    Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM), content = content)
-}
-
-@Composable
-private fun FeatureCard(
-    @DrawableRes icon: Int,
-    art: String,
-    title: String,
-    subtitle: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    gold: Boolean = false,
-) {
-    val brush = if (gold) LogicMixTokens.colors.rewardBrush else LogicMixTokens.colors.cardBrush
-    CardSurface(modifier.clickable(role = Role.Button, onClick = onClick), LogicMixTokens.radii.large, brush) {
-        Column(Modifier.fillMaxSize().padding(LogicMixTokens.spacingM), verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingXs)) {
-            CardArt(art, icon, if (gold) LogicMixTokens.colors.gold else MaterialTheme.colorScheme.secondary)
-            Text(title, style = LogicMixTokens.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
-            Text(subtitle, style = LogicMixTokens.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-    }
-}
-
-@Composable
-private fun ModeCard(@DrawableRes icon: Int, art: String, title: String, subtitle: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    CardSurface(modifier.clickable(role = Role.Button, onClick = onClick), LogicMixTokens.radii.large) {
-        Column(
-            Modifier.fillMaxSize().padding(LogicMixTokens.spacingM),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingXs),
-        ) {
-            CardArt(art, icon, MaterialTheme.colorScheme.primary)
-            Text(title, style = LogicMixTokens.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface, textAlign = TextAlign.Center)
-            Text(subtitle, style = LogicMixTokens.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
         }
     }
 }
