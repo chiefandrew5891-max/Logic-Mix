@@ -11,10 +11,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class CategoryGridTest {
-    @Test fun sevenCategoriesInApprovedOrderUseThreeColumnsWithoutFiller() {
+    @Test fun eightCategoriesInApprovedOrderUseThreeColumnsWithoutFiller() {
         val all = CategoryAvailability.ordered(AppLanguage.ENGLISH)
         assertEquals(
-            listOf("MATCHSTICK", "NUMBER_SEQUENCE", "WORD_LOGIC", "MINI_CROSSWORD", "VISUAL_LOGIC", "WORD_SEARCH", "SUDOKU"),
+            listOf("MATCHSTICK", "NUMBER_SEQUENCE", "WORD_LOGIC", "MINI_CROSSWORD", "VISUAL_LOGIC", "WORD_SEARCH", "SUDOKU", "ORB_LINES"),
             all.map { it.name },
         )
         assertEquals(listOf(3, 3, 2), categoryRows(all).map { it.size })
