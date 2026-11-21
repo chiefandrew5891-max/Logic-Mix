@@ -286,7 +286,7 @@ private fun LetterGrid(
         val sizePx = with(density) { maxWidth.toPx() }
         val cellPx = sizePx / level.size
         val style = remember(cellPx) {
-            TextStyle(fontSize = with(density) { (cellPx * 0.46f).toSp() }, fontWeight = FontWeight.Bold)
+            TextStyle(fontFamily = MaterialTheme.typography.titleLarge.fontFamily, fontSize = with(density) { (cellPx * 0.46f).toSp() }, fontWeight = FontWeight.Bold)
         }
         val layouts = remember(level.id, style) { level.letters.map { measurer.measure(it.toString(), style) } }
 
