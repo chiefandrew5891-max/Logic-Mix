@@ -285,8 +285,9 @@ private fun LetterGrid(
     BoxWithConstraints(Modifier.fillMaxWidth().aspectRatio(1f).semantics { contentDescription = description }) {
         val sizePx = with(density) { maxWidth.toPx() }
         val cellPx = sizePx / level.size
-        val style = remember(cellPx) {
-            TextStyle(fontFamily = MaterialTheme.typography.titleLarge.fontFamily, fontSize = with(density) { (cellPx * 0.46f).toSp() }, fontWeight = FontWeight.Bold)
+        val family = MaterialTheme.typography.titleLarge.fontFamily
+        val style = remember(cellPx, family) {
+            TextStyle(fontFamily = family, fontSize = with(density) { (cellPx * 0.46f).toSp() }, fontWeight = FontWeight.Bold)
         }
         val layouts = remember(level.id, style) { level.letters.map { measurer.measure(it.toString(), style) } }
 
