@@ -22,6 +22,8 @@ import io.github.chiefandrew5891max.logicmix.feature.gamestyle.StyleStep
 import io.github.chiefandrew5891max.logicmix.feature.home.PrimaryAction
 import io.github.chiefandrew5891max.logicmix.feature.home.StyleInfoScreen
 import io.github.chiefandrew5891max.logicmix.feature.home.titleRes
+import androidx.activity.compose.BackHandler
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -101,42 +103,48 @@ private fun LogicMixNavigation(navController: NavHostController, gameStyle: Game
     val openFromFlow: (StartTarget) -> Unit = { target ->
         navController.navigate(Routes.forTarget(target)) { popUpTo(Routes.HOME) }
     }
+    // Pops only when there is a screen to return to, so a double tap can never empty the stack.
+    val goBack: () -> Unit = {
+        if (navController.previousBackStackEntry != null && navController.popBackStack()) sfx.play(Sfx.MENU_CLOSE)
+    }
+    val current by navController.currentBackStackEntryAsState()
+    BackHandler(enabled = current?.destination?.route != Routes.HOME && navController.previousBackStackEntry != null, onBack = goBack)
     NavHost(navController = navController, startDestination = Routes.HOME) {
         composable(Routes.HOME) {
             HomeRoute(
                 onPlay = { mode ->
-                    sfx.play(Sfx.SCREEN_TRANSITION)
+                    sfx.play(Sfx.BUTTON_TAP)
                     navController.navigate(if (mode == GameMode.CAREER) Routes.GAME else Routes.COMING_SOON)
                 },
                 onRewards = { sfx.play(Sfx.BUTTON_TAP); navController.navigate(Routes.COMING_SOON) },
-                onSettings = { sfx.play(Sfx.MENU_OPEN); navController.navigate(Routes.SETTINGS) },
-                onCategory = { sfx.play(Sfx.CARD_SELECT); navController.navigate(Routes.forCategory(it)) },
+                onSettings = { sfx.play(Sfx.BUTTON_TAP); navController.navigate(Routes.SETTINGS) },
+                onCategory = { sfx.play(Sfx.BUTTON_TAP); navController.navigate(Routes.forCategory(it)) },
                 onPrimary = { state ->
-                    sfx.play(Sfx.SCREEN_TRANSITION)
+                    sfx.play(Sfx.BUTTON_TAP)
                     val target = StartTarget.resolve(state.primaryAction == PrimaryAction.CONTINUE, state.gameStyle, state.categories)
                     navController.navigate(Routes.forTarget(target))
                 },
             )
         }
         composable(Routes.GAME) {
-            GameRoute(onBack = { navController.popBackStack() })
+            GameRoute(onBack = goBack)
         }
         composable(Routes.WORD_SEARCH) {
-            WordSearchRoute(onBack = { navController.popBackStack() })
+            WordSearchRoute(onBack = goBack)
         }
         composable(Routes.SUDOKU) {
-            ComingSoonScreen(onBack = { navController.popBackStack() }, categoryTitle = GameCategory.SUDOKU.titleRes())
+            ComingSoonScreen(onBack = goBack, categoryTitle = GameCategory.SUDOKU.titleRes())
         }
         composable(Routes.CATEGORY_SOON, arguments = listOf(navArgument("category") { type = NavType.StringType })) { entry ->
             val category = GameCategory.entries.firstOrNull { it.name == entry.arguments?.getString("category") }
-            ComingSoonScreen(onBack = { navController.popBackStack() }, categoryTitle = category?.titleRes())
+            ComingSoonScreen(onBack = goBack, categoryTitle = category?.titleRes())
         }
         composable(Routes.COMING_SOON) {
-            ComingSoonScreen(onBack = { navController.popBackStack() })
+            ComingSoonScreen(onBack = goBack)
         }
         composable(Routes.GAME_STYLE, arguments = listOf(navArgument("start") { type = NavType.StringType })) { entry ->
             val start = StyleStep.entries.firstOrNull { it.name == entry.arguments?.getString("start") } ?: StyleStep.STYLE
-            GameStyleRoute(start = start, onFinished = openFromFlow, onBack = { navController.popBackStack() })
+            GameStyleRoute(start = start, onFinished = openFromFlow, onBack = goBack)
         }
         composable(Routes.STYLE_INFO, arguments = listOf(navArgument("style") { type = NavType.StringType })) { entry ->
             val style = GameStyle.fromStored(entry.arguments?.getString("style")) ?: GameStyle.ARCADE
@@ -148,7 +156,7 @@ private fun LogicMixNavigation(navController: NavHostController, gameStyle: Game
         }
         composable(Routes.SETTINGS) {
             SettingsScreen(
-                onBack = { sfx.play(Sfx.MENU_CLOSE); navController.popBackStack() },
+                onBack = goBack,
                 onGameStyleStep = { navController.navigate(Routes.gameStyle(it)) },
             )
         }

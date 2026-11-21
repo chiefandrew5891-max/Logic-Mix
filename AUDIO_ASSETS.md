@@ -16,7 +16,7 @@ the numeric order of the names; the playlist then loops.
 
 ## Sound effects
 
-Put the 33 WAV files directly into `app/src/main/assets/sfx/` (no subfolders) with the exact names below.
+Put the 34 WAV files directly into `app/src/main/assets/sfx/` (no subfolders) with the exact names below.
 `SoundEffectsController` (`core/audio/SoundEffectsController.kt`, SoundPool, loaded once at startup) plays them over the
 music without touching it. It follows the existing Settings: effects switch and effects volume (independent of music),
 no sound while the app is in the background. A missing/broken file is logged (tag `SoundEffects`) and skipped.
@@ -27,12 +27,12 @@ Status: **wired** = hooked to a real event; **pending** = the game event does no
 
 | File | Event | Where | Status |
 |---|---|---|---|
-| sfx_button_tap | button press | MainActivity (Rewards) | wired |
-| sfx_menu_open | open Settings | MainActivity | wired |
-| sfx_menu_close | close Settings | MainActivity | wired |
-| sfx_screen_transition | Play / Continue | MainActivity | wired |
+| sfx_button_tap | the single sound for every card/tab tap: Rewards, Daily, Career, Endless, categories, Continue, Settings | MainActivity | wired |
+| sfx_menu_open | unused (Settings now uses button_tap) | - | unused |
+| sfx_menu_close | the single Back sound (arrow, system Back, gesture); only when a screen was actually left | MainActivity.goBack | wired |
+| sfx_screen_transition | unused | - | unused |
 | sfx_toggle | settings switches | SettingsViewModel | wired |
-| sfx_card_select | category card | MainActivity | wired |
+| sfx_card_select | unused (categories use button_tap) | - | unused |
 | sfx_correct | right answer (Number Sequences) | GameViewModel.submit | wired |
 | sfx_wrong | wrong answer | GameViewModel.submit | wired |
 | sfx_matchstick_pickup / _move / _place | matchsticks | - | pending (no Matchsticks game) |
@@ -50,6 +50,7 @@ Status: **wired** = hooked to a real event; **pending** = the game event does no
 | sfx_hint | hint used | GameViewModel, WordSearchViewModel | wired |
 | sfx_timer_warning, sfx_game_over | - | - | pending (no timer/fail state) |
 | sfx_letter_input / _delete | crossword | - | pending (no crossword) |
+| sfx_number_delete | each digit actually removed (also while holding backspace; empty field is silent) | GameViewModel.onInput | wired |
 | sfx_number_input | each digit typed in the answer field (Number Sequences); no button_tap on the same press | GameViewModel.onInput | wired |
 
 ## Format

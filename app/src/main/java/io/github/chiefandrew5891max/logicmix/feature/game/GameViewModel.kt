@@ -85,6 +85,7 @@ class GameViewModel @Inject constructor(
         val accepted = text.take(MAX_INPUT)
         // One click per digit actually added; deleting or rejected input stays silent.
         if (accepted.length > before.input.length && accepted.last().isDigit()) sfx.play(Sfx.NUMBER_INPUT)
+        else if (accepted.length < before.input.length) sfx.play(Sfx.NUMBER_DELETE)
         _state.update { if (it.solved) it else it.copy(input = accepted, feedback = Feedback.NONE) }
     }
 
