@@ -177,6 +177,122 @@ private fun TopBar(onSettings: () -> Unit, music: MusicPanelState, onPrevious: (
     }
 }
 
+@Composable
+private fun PlayerCard(state: HomeUiState) {
+    val colors = LogicMixTokens.colors
+    CardSurface(Modifier.fillMaxWidth(), LogicMixTokens.radii.large) {
+        Row(Modifier.padding(LogicMixTokens.spacing), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS)) {
+                Text(
+                    text = stringResource(R.string.home_level, state.level),
+                    style = LogicMixTokens.typography.titleLarge,
+                    color = colors.gold,
+                )
+                XpBar(state.xpFraction)
+                Text(
+                    text = state.xpForNextLevel?.let { stringResource(R.string.home_xp_progress, state.xpIntoLevel, it) }
+                        ?: stringResource(R.string.home_xp_max),
+                    style = LogicMixTokens.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Column(
+                Modifier.padding(start = LogicMixTokens.spacing),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                LogicMixIcon(R.drawable.ic_streak, colors.gold, size = 28.dp)
+                Text(
+                    text = state.streak.toString(),
+                    style = LogicMixTokens.typography.headlineMedium,
+                    color = colors.gold,
+                )
+                Text(
+                    text = stringResource(R.string.home_streak),
+                    style = LogicMixTokens.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun XpBar(fraction: Float) {
+    val colors = LogicMixTokens.colors
+    val shape = RoundedCornerShape(50)
+    Box(Modifier.fillMaxWidth().height(12.dp).clip(shape).background(colors.xpTrack)) {
+        if (fraction > 0f) {
+            Box(Modifier.fillMaxWidth(fraction).height(12.dp).clip(shape).background(colors.xpFill))
+        }
+    }
+}
+
+@Composable
+private fun PrimaryButton(label: String, onClick: () -> Unit) {
+    val colors = LogicMixTokens.colors
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = LogicMixTokens.buttonHeight)
+            .clip(LogicMixTokens.radii.extraLarge)
+            .background(colors.primaryActionBrush)
+            .clickable(role = Role.Button, onClick = onClick)
+            .padding(horizontal = LogicMixTokens.spacingL, vertical = LogicMixTokens.spacingM),
+        contentAlignment = Alignment.Center,
+    ) {
+        Row(horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS), verticalAlignment = Alignment.CenterVertically) {
+            LogicMixIcon(R.drawable.ic_play, colors.onGold, size = 28.dp)
+            Text(
+                text = label.uppercase(),
+                style = LogicMixTokens.typography.headlineMedium,
+                color = colors.onGold,
+                textAlign = TextAlign.Center,
+            )
+        }
+    }
+}
+
+// Paired cards: equal width via weight(1f) and equal height via IntrinsicSize.Min + fillMaxHeight() on children.
+@Composable
+private fun EqualHeightRow(content: @Composable RowScope.() -> Unit) {
+    Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM), content = content)
+}
+
+@Composable
+private fun FeatureCard(
+    @DrawableRes icon: Int,
+    art: String,
+    title: String,
+    subtitle: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    gold: Boolean = false,
+) {
+    val brush = if (gold) LogicMixTokens.colors.rewardBrush else LogicMixTokens.colors.cardBrush
+    CardSurface(modifier.clickable(role = Role.Button, onClick = onClick), LogicMixTokens.radii.large, brush) {
+        Column(Modifier.fillMaxSize().padding(LogicMixTokens.spacingM), verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingXs)) {
+            CardArt(art, icon, if (gold) LogicMixTokens.colors.gold else MaterialTheme.colorScheme.secondary)
+            Text(title, style = LogicMixTokens.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+            Text(subtitle, style = LogicMixTokens.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }
+}
+
+@Composable
+private fun ModeCard(@DrawableRes icon: Int, art: String, title: String, subtitle: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    CardSurface(modifier.clickable(role = Role.Button, onClick = onClick), LogicMixTokens.radii.large) {
+        Column(
+            Modifier.fillMaxSize().padding(LogicMixTokens.spacingM),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingXs),
+        ) {
+            CardArt(art, icon, MaterialTheme.colorScheme.primary)
+            Text(title, style = LogicMixTokens.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface, textAlign = TextAlign.Center)
+            Text(subtitle, style = LogicMixTokens.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
+        }
+    }
+}
+
 /** The 3D PNG from res/drawable-nodpi when it exists (untinted, proportions kept); otherwise the old tinted vector. */
 @Composable
 private fun CardArt(art: String, @DrawableRes fallback: Int, tint: Color) {
