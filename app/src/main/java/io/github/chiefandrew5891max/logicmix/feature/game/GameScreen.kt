@@ -8,6 +8,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -49,13 +50,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import io.github.chiefandrew5891max.logicmix.R
+import io.github.chiefandrew5891max.logicmix.core.designsystem.FitLabel
+import io.github.chiefandrew5891max.logicmix.core.designsystem.GameHeader
 import io.github.chiefandrew5891max.logicmix.core.designsystem.LogicMixIcon
+import io.github.chiefandrew5891max.logicmix.core.designsystem.rememberButtonFit
 import io.github.chiefandrew5891max.logicmix.core.designsystem.LogicMixTokens
 
 @Composable
 fun GameRoute(onBack: () -> Unit, viewModel: GameViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsState()
-    GameScreen(state, onBack, viewModel::onInput, viewModel::submit, viewModel::useHint, viewModel::next)
+    GameScreen(state, onBack, viewModel::onInput, viewModel::submit, viewModel::useHint, viewModel::next, viewModel::restart)
 }
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -67,6 +71,7 @@ fun GameScreen(
     onSubmit: () -> Unit,
     onHint: () -> Unit,
     onNext: () -> Unit,
+    onRestart: () -> Unit = {},
 ) {
     val colors = LogicMixTokens.colors
     Box(Modifier.fillMaxSize().background(colors.backgroundBrush).safeDrawingPadding().imePadding()) {
@@ -79,7 +84,7 @@ fun GameScreen(
                 .align(Alignment.TopCenter),
             verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacing),
         ) {
-            Header(state, onBack)
+            Header(state, onBack, onRestart)
             when {
                 state.loading -> Box(Modifier.fillMaxWidth().padding(LogicMixTokens.spacingL), Alignment.Center) { CircularProgressIndicator() }
                 state.finished || state.puzzle == null -> FinishedCard(onBack)
@@ -140,32 +145,15 @@ fun GameScreen(
 }
 
 @Composable
-private fun Header(state: GameUiState, onBack: () -> Unit) {
-    val colors = LogicMixTokens.colors
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM)) {
-        Box(
-            Modifier
-                .size(LogicMixTokens.minTouchTarget)
-                .clip(LogicMixTokens.radii.medium)
-                .background(colors.cardBrush)
-                .border(BorderStroke(1.dp, colors.cardBorder), LogicMixTokens.radii.medium)
-                .clickable(role = Role.Button, onClick = onBack),
-            contentAlignment = Alignment.Center,
-        ) {
-            LogicMixIcon(R.drawable.ic_back, MaterialTheme.colorScheme.onSurface, contentDescription = stringResource(R.string.back))
-        }
-        Column(Modifier.weight(1f)) {
-            Text(stringResource(R.string.game_title), style = LogicMixTokens.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
-            val puzzle = state.puzzle
-            if (puzzle != null) {
-                Text(
-                    stringResource(R.string.game_task_info, state.number, state.total, puzzle.difficulty),
-                    style = LogicMixTokens.typography.labelMedium,
-                    color = colors.gold,
-                )
-            }
-        }
-    }
+private fun Header(state: GameUiState, onBack: () -> Unit, onRestart: () -> Unit) {
+    val puzzle = state.puzzle
+    GameHeader(
+        title = stringResource(R.string.game_title),
+        onBack = onBack,
+        subtitle = puzzle?.let { stringResource(R.string.game_task_info, state.number, state.total, it.difficulty) },
+        onRestart = onRestart,
+        restartEnabled = puzzle != null && !state.solved,
+    )
 }
 
 @Composable
@@ -243,21 +231,26 @@ internal fun ActionButton(label: String, onClick: () -> Unit, filled: Boolean, e
     val shape = LogicMixTokens.radii.extraLarge
     val background: Brush = if (filled) colors.primaryActionBrush else colors.cardBrush
     val content = if (filled) colors.onGold else MaterialTheme.colorScheme.onSurface
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .heightIn(min = LogicMixTokens.buttonHeight)
-            .clip(shape)
-            .background(background)
-            .border(BorderStroke(if (filled) 0.dp else 1.dp, colors.cardBorder), shape)
-            .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
-            .padding(horizontal = LogicMixTokens.spacingL, vertical = LogicMixTokens.spacingM),
-        horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS, Alignment.CenterHorizontally),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        val tint = if (enabled) content else content.copy(alpha = 0.4f)
-        if (icon != null) LogicMixIcon(icon, tint)
-        Text(label, style = LogicMixTokens.typography.titleMedium, color = tint, textAlign = TextAlign.Center)
+    val style = LogicMixTokens.typography.titleMedium
+    BoxWithConstraints(Modifier.fillMaxWidth()) {
+        val iconSpace = if (icon != null) 24.dp + LogicMixTokens.spacingS else 0.dp
+        val fit = rememberButtonFit(listOf(label), style, maxWidth - iconSpace, LogicMixTokens.spacingL)
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .heightIn(min = LogicMixTokens.buttonHeight)
+                .clip(shape)
+                .background(background)
+                .border(BorderStroke(if (filled) 0.dp else 1.dp, colors.cardBorder), shape)
+                .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
+                .padding(horizontal = fit.padding.dp, vertical = LogicMixTokens.spacingM),
+            horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS, Alignment.CenterHorizontally),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            val tint = if (enabled) content else content.copy(alpha = 0.4f)
+            if (icon != null) LogicMixIcon(icon, tint)
+            FitLabel(label, fit, style, tint)
+        }
     }
 }
 

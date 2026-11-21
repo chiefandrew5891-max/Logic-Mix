@@ -221,6 +221,22 @@ class WordSearchViewModel @Inject constructor(
         if (length == 1) sfx.play(Sfx.LETTER_SELECT) else if (length > 1) sfx.playTrace(length - 1)
     }
 
+    /** Starts the current level over: found words are cleared, the hint counter stays. */
+    fun restart() {
+        viewModelScope.launch {
+            mutex.withLock {
+                val s = _state.value
+                val level = s.level ?: return@withLock
+                if (s.completed) return@withLock
+                sfx.play(Sfx.BUTTON_TAP)
+                store.resetProgress(level)
+                _state.update {
+                    it.copy(mainFound = emptySet(), extraFound = emptySet(), hintCell = null, feedback = WordFeedback.NONE, flash = emptyList(), extraXp = 0)
+                }
+            }
+        }
+    }
+
     fun next() {
         viewModelScope.launch {
             mutex.withLock {

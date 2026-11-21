@@ -63,6 +63,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import io.github.chiefandrew5891max.logicmix.R
+import io.github.chiefandrew5891max.logicmix.core.designsystem.GameHeader
 import io.github.chiefandrew5891max.logicmix.core.designsystem.LogicMixIcon
 import io.github.chiefandrew5891max.logicmix.core.designsystem.LogicMixTokens
 import io.github.chiefandrew5891max.logicmix.domain.wordsearch.Cell
@@ -78,7 +79,7 @@ fun WordSearchRoute(onBack: () -> Unit, viewModel: WordSearchViewModel = hiltVie
     val state by viewModel.state.collectAsState()
     // The language changed to one without word search: progress is already saved, so just leave.
     LaunchedEffect(state.available) { if (!state.available) onBack() }
-    WordSearchScreen(state, onBack, viewModel::submit, viewModel::useHint, viewModel::next, viewModel::onTrace)
+    WordSearchScreen(state, onBack, viewModel::submit, viewModel::useHint, viewModel::next, viewModel::onTrace, viewModel::restart)
 }
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -90,6 +91,7 @@ fun WordSearchScreen(
     onHint: () -> Unit,
     onNext: () -> Unit,
     onTrace: (Int) -> Unit = {},
+    onRestart: () -> Unit = {},
 ) {
     val colors = LogicMixTokens.colors
     Box(Modifier.fillMaxSize().background(colors.backgroundBrush).safeDrawingPadding()) {
@@ -102,7 +104,7 @@ fun WordSearchScreen(
                 .align(Alignment.TopCenter),
             verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacing),
         ) {
-            Header(state, onBack)
+            Header(state, onBack, onRestart)
             val level = state.level
             when {
                 state.loading -> Box(Modifier.fillMaxWidth().padding(LogicMixTokens.spacingL), Alignment.Center) { CircularProgressIndicator() }
@@ -175,32 +177,15 @@ fun WordSearchScreen(
 }
 
 @Composable
-private fun Header(state: WordSearchUiState, onBack: () -> Unit) {
-    val colors = LogicMixTokens.colors
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM)) {
-        Box(
-            Modifier
-                .size(LogicMixTokens.minTouchTarget)
-                .clip(LogicMixTokens.radii.medium)
-                .background(colors.cardBrush)
-                .border(BorderStroke(1.dp, colors.cardBorder), LogicMixTokens.radii.medium)
-                .clickable(role = Role.Button, onClick = onBack),
-            contentAlignment = Alignment.Center,
-        ) {
-            LogicMixIcon(R.drawable.ic_back, MaterialTheme.colorScheme.onSurface, contentDescription = stringResource(R.string.back))
-        }
-        Column(Modifier.weight(1f)) {
-            Text(stringResource(R.string.ws_title), style = LogicMixTokens.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
-            val level = state.level
-            if (level != null) {
-                Text(
-                    stringResource(R.string.ws_level_info, state.levelNumber, state.totalLevels, level.difficulty),
-                    style = LogicMixTokens.typography.labelMedium,
-                    color = colors.gold,
-                )
-            }
-        }
-    }
+private fun Header(state: WordSearchUiState, onBack: () -> Unit, onRestart: () -> Unit) {
+    val level = state.level
+    GameHeader(
+        title = stringResource(R.string.ws_title),
+        onBack = onBack,
+        subtitle = level?.let { stringResource(R.string.ws_level_info, state.levelNumber, state.totalLevels, it.difficulty) },
+        onRestart = onRestart,
+        restartEnabled = level != null && !state.completed && !state.loading,
+    )
 }
 
 @Composable

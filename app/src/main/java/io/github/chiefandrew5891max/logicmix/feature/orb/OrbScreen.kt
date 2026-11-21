@@ -31,7 +31,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import io.github.chiefandrew5891max.logicmix.R
 import io.github.chiefandrew5891max.logicmix.core.designsystem.GameHeader
-import io.github.chiefandrew5891max.logicmix.core.designsystem.GameToolButton
+import io.github.chiefandrew5891max.logicmix.core.designsystem.GameTool
+import io.github.chiefandrew5891max.logicmix.core.designsystem.GameToolRow
 import io.github.chiefandrew5891max.logicmix.core.designsystem.GoldStar
 import io.github.chiefandrew5891max.logicmix.core.designsystem.GoldTrophy
 import io.github.chiefandrew5891max.logicmix.core.designsystem.LogicMixTokens
@@ -47,7 +48,6 @@ fun OrbRoute(onBack: () -> Unit, viewModel: OrbViewModel = hiltViewModel()) {
 private fun OrbScreen(state: OrbUiState, onBack: () -> Unit, vm: OrbViewModel) {
     val colors = LogicMixTokens.colors
     val game = state.game
-    var confirmNew by remember { mutableStateOf(false) }
     Box(Modifier.fillMaxSize().background(colors.backgroundBrush).safeDrawingPadding()) {
         Column(
             Modifier
@@ -58,7 +58,7 @@ private fun OrbScreen(state: OrbUiState, onBack: () -> Unit, vm: OrbViewModel) {
                 .align(Alignment.TopCenter),
             verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM),
         ) {
-            GameHeader(stringResource(R.string.orb_title), onBack)
+            GameHeader(stringResource(R.string.orb_title), onBack, onRestart = vm::newGame, restartEnabled = !state.busy)
             if (game != null) {
                 InfoPanel(game.score, maxOf(state.best, game.score), game.next)
                 OrbBoard(state, vm::tap)
@@ -83,11 +83,12 @@ private fun OrbScreen(state: OrbUiState, onBack: () -> Unit, vm: OrbViewModel) {
                 if (state.noHint) {
                     Text(stringResource(R.string.orb_no_hint), color = MaterialTheme.colorScheme.onBackground, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
                 }
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS)) {
-                    GameToolButton(stringResource(R.string.orb_undo), vm::undo, Modifier.weight(1f), enabled = game.canUndo && !state.busy)
-                    GameToolButton(stringResource(R.string.orb_hint), vm::hint, Modifier.weight(1f), enabled = !game.over && !state.busy)
-                    GameToolButton(stringResource(R.string.orb_new), { if (game.over) vm.newGame() else confirmNew = true }, Modifier.weight(1f), enabled = !state.busy)
-                }
+                GameToolRow(
+                    listOf(
+                        GameTool(stringResource(R.string.orb_undo), vm::undo, game.canUndo && !state.busy),
+                        GameTool(stringResource(R.string.orb_hint), vm::hint, !game.over && !state.busy),
+                    ),
+                )
                 Text(
                     stringResource(R.string.orb_rules),
                     style = LogicMixTokens.typography.labelMedium,
@@ -97,15 +98,6 @@ private fun OrbScreen(state: OrbUiState, onBack: () -> Unit, vm: OrbViewModel) {
                 )
             }
         }
-    }
-    if (confirmNew) {
-        AlertDialog(
-            onDismissRequest = { confirmNew = false },
-            title = { Text(stringResource(R.string.orb_new_title)) },
-            text = { Text(stringResource(R.string.orb_new_body)) },
-            confirmButton = { TextButton({ confirmNew = false; vm.newGame() }) { Text(stringResource(R.string.orb_new)) } },
-            dismissButton = { TextButton({ confirmNew = false }) { Text(stringResource(R.string.sudoku_cancel)) } },
-        )
     }
 }
 

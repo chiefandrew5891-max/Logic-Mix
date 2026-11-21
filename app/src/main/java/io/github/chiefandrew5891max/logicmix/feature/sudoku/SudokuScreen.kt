@@ -52,6 +52,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import io.github.chiefandrew5891max.logicmix.R
+import io.github.chiefandrew5891max.logicmix.core.designsystem.GameHeader
+import io.github.chiefandrew5891max.logicmix.core.designsystem.GameTool
+import io.github.chiefandrew5891max.logicmix.core.designsystem.GameToolRow
 import io.github.chiefandrew5891max.logicmix.core.designsystem.LogicMixIcon
 import io.github.chiefandrew5891max.logicmix.core.designsystem.LogicMixTokens
 import io.github.chiefandrew5891max.logicmix.domain.sudoku.SudokuDifficulty
@@ -76,7 +79,6 @@ fun SudokuRoute(onBack: () -> Unit, viewModel: SudokuViewModel = hiltViewModel()
 @Composable
 private fun SudokuScreen(state: SudokuUiState, onBack: () -> Unit, vm: SudokuViewModel) {
     val colors = LogicMixTokens.colors
-    var confirmReset by remember { mutableStateOf(false) }
     Box(Modifier.fillMaxSize().background(colors.backgroundBrush).safeDrawingPadding()) {
         Column(
             Modifier
@@ -87,7 +89,7 @@ private fun SudokuScreen(state: SudokuUiState, onBack: () -> Unit, vm: SudokuVie
                 .align(Alignment.TopCenter),
             verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM),
         ) {
-            Header(state, onBack)
+            Header(state, onBack, vm::reset)
             val game = state.game
             when {
                 state.phase == SudokuPhase.LOADING ->
@@ -121,16 +123,15 @@ private fun SudokuScreen(state: SudokuUiState, onBack: () -> Unit, vm: SudokuVie
                         }
                         ActionButton(stringResource(R.string.sudoku_new), vm::newGame, filled = true)
                     } else {
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS)) {
-                            Tool(R.string.sudoku_undo, vm::undo, game.canUndo, Modifier.weight(1f))
-                            Tool(R.string.sudoku_redo, vm::redo, game.canRedo, Modifier.weight(1f))
-                            Tool(R.string.sudoku_erase, vm::erase, true, Modifier.weight(1f))
-                            Tool(R.string.sudoku_hint, vm::hint, true, Modifier.weight(1f))
-                        }
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS)) {
-                            Tool(R.string.sudoku_notes, vm::toggleNotes, true, Modifier.weight(1f), selected = state.notesMode)
-                            Tool(R.string.sudoku_reset, { confirmReset = true }, true, Modifier.weight(1f))
-                        }
+                        GameToolRow(
+                            listOf(
+                                GameTool(stringResource(R.string.sudoku_undo), vm::undo, game.canUndo),
+                                GameTool(stringResource(R.string.sudoku_redo), vm::redo, game.canRedo),
+                                GameTool(stringResource(R.string.sudoku_erase), vm::erase),
+                                GameTool(stringResource(R.string.sudoku_hint), vm::hint),
+                            ),
+                        )
+                        GameToolRow(listOf(GameTool(stringResource(R.string.sudoku_notes), vm::toggleNotes, selected = state.notesMode)))
                         NumberPad(vm::input)
                         Text(
                             stringResource(R.string.sudoku_hints_used, game.hintsUsed),
@@ -143,15 +144,6 @@ private fun SudokuScreen(state: SudokuUiState, onBack: () -> Unit, vm: SudokuVie
                 }
             }
         }
-    }
-    if (confirmReset) {
-        AlertDialog(
-            onDismissRequest = { confirmReset = false },
-            title = { Text(stringResource(R.string.sudoku_reset_title)) },
-            text = { Text(stringResource(R.string.sudoku_reset_body)) },
-            confirmButton = { TextButton({ confirmReset = false; vm.reset() }) { Text(stringResource(R.string.sudoku_reset_confirm)) } },
-            dismissButton = { TextButton({ confirmReset = false }) { Text(stringResource(R.string.sudoku_cancel)) } },
-        )
     }
 }
 
@@ -174,48 +166,19 @@ internal object SudokuBoardGeometry {
 private fun formatTime(sec: Long) = "%d:%02d".format(sec / 60, sec % 60)
 
 @Composable
-private fun Header(state: SudokuUiState, onBack: () -> Unit) {
-    val colors = LogicMixTokens.colors
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM)) {
-        Box(
-            Modifier
-                .size(LogicMixTokens.minTouchTarget)
-                .clip(LogicMixTokens.radii.medium)
-                .background(colors.cardBrush)
-                .border(BorderStroke(1.dp, colors.cardBorder), LogicMixTokens.radii.medium)
-                .clickable(role = Role.Button, onClick = onBack),
-            contentAlignment = Alignment.Center,
-        ) {
-            LogicMixIcon(R.drawable.ic_back, MaterialTheme.colorScheme.onSurface, contentDescription = stringResource(R.string.back))
-        }
-        Column(Modifier.weight(1f)) {
-            Text(stringResource(R.string.sudoku_title), style = LogicMixTokens.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
-            state.difficulty?.let { Text(stringResource(it.label()), style = LogicMixTokens.typography.labelMedium, color = colors.gold) }
-        }
-        if (state.game != null) {
-            Text(formatTime(state.elapsedSec), style = LogicMixTokens.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
-        }
-    }
-}
-
-@Composable
-private fun Tool(label: Int, onClick: () -> Unit, enabled: Boolean, modifier: Modifier, selected: Boolean = false) {
-    val colors = LogicMixTokens.colors
-    val shape = LogicMixTokens.radii.medium
-    val tint = MaterialTheme.colorScheme.onSurface.copy(alpha = if (enabled) 1f else 0.4f)
-    Box(
-        modifier
-            .heightIn(min = LogicMixTokens.minTouchTarget)
-            .clip(shape)
-            .background(if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.35f) else Color.Transparent)
-            .background(colors.cardBrush.takeIf { !selected } ?: androidx.compose.ui.graphics.SolidColor(Color.Transparent))
-            .border(BorderStroke(if (selected) 2.dp else 1.dp, if (selected) MaterialTheme.colorScheme.primary else colors.cardBorder), shape)
-            .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
-            .padding(horizontal = 4.dp, vertical = 8.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(stringResource(label), style = LogicMixTokens.typography.labelMedium, color = tint, textAlign = TextAlign.Center, maxLines = 2)
-    }
+private fun Header(state: SudokuUiState, onBack: () -> Unit, onRestart: () -> Unit) {
+    GameHeader(
+        title = stringResource(R.string.sudoku_title),
+        onBack = onBack,
+        subtitle = state.difficulty?.let { stringResource(it.label()) },
+        onRestart = onRestart,
+        restartEnabled = state.game != null && !state.solved,
+        trailing = {
+            if (state.game != null) {
+                Text(formatTime(state.elapsedSec), style = LogicMixTokens.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
+            }
+        },
+    )
 }
 
 @Composable

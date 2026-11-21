@@ -81,7 +81,7 @@ class MatchstickViewModel @Inject constructor(
 
     fun reset() {
         val game = _state.value.game ?: return
-        if (game.solved || game.movesUsed == 0) return
+        if (game.solved) return
         sfx.play(Sfx.BUTTON_TAP)
         _state.update { it.copy(game = game.reset(), hint = null, noHint = false) }
     }

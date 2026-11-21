@@ -84,6 +84,14 @@ class WordSearchStore internal constructor(private val store: DataStore<Preferen
         }
     }
 
+    /** Clears the found words of an unfinished level. Hints used, start time and awarded XP are kept, so a restart cannot re-earn rewards. */
+    suspend fun resetProgress(level: WordSearchLevel) {
+        store.edit {
+            it.remove(stringSetPreferencesKey(key(level.language, level.index, "main")))
+            it.remove(stringSetPreferencesKey(key(level.language, level.index, "extra")))
+        }
+    }
+
     suspend fun setHintsUsed(level: WordSearchLevel, hints: Int) {
         store.edit { it[intPreferencesKey(key(level.language, level.index, "hints"))] = hints.coerceAtLeast(0) }
     }

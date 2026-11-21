@@ -1,6 +1,9 @@
 package io.github.chiefandrew5891max.logicmix.core.designsystem
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -44,6 +47,11 @@ private fun DrawScope.starPath(center: Offset, outer: Float, inner: Float): Path
 
 @Composable
 fun GoldStar(modifier: Modifier = Modifier, size: Dp = 24.dp) {
+    val art = rememberDrawableId("icon_bonus_star")
+    if (art != 0) {
+        Image(painterResource(art), null, modifier.size(size), contentScale = ContentScale.Fit)
+        return
+    }
     Canvas(modifier.size(size)) {
         val c = Offset(this.size.width / 2, this.size.height * 0.54f)
         val outer = this.size.minDimension * 0.5f
@@ -57,6 +65,11 @@ fun GoldStar(modifier: Modifier = Modifier, size: Dp = 24.dp) {
 
 @Composable
 fun GoldTrophy(modifier: Modifier = Modifier, size: Dp = 24.dp) {
+    val art = rememberDrawableId("icon_rewards_trophy")
+    if (art != 0) {
+        Image(painterResource(art), null, modifier.size(size), contentScale = ContentScale.Fit)
+        return
+    }
     Canvas(modifier.size(size)) {
         val w = this.size.width
         val h = this.size.height

@@ -82,3 +82,7 @@ Add files, rebuild, open the app: music starts. Toggle the switch and move the s
 
 ## Orb Lines
 Uses existing effects (WRONG blocked, HINT, GAME_OVER, XP_GAIN, LEVEL_UP, BUTTON_TAP). Dedicated effects: ORB_SELECT, ORB_MOVE, ORB_SPAWN, ORB_POP (sfx_orb_*.wav; must be placed in assets/sfx).
+
+## Плеер на главном экране
+
+Стартовый трек выбирается случайно (последний проигранный избегается). Previous/Next переключают трек в единственном ExoPlayer, Play/Pause = глобальная настройка музыки. Новые `music_*` в `res/raw` подхватываются автоматически.

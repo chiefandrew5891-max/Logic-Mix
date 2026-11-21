@@ -158,4 +158,13 @@
     <string name="orb_final_score">Score final : %1$d</string>
     <string name="orb_no_hint">Aucun coup ne complète une ligne pour l\'instant.</string>
     <string name="orb_rules">Déplacez une bille par un chemin libre. Alignez 5 billes ou plus de la même couleur.</string>
+    <string name="restart">Recommencer</string>
+    <string name="restart_title">Recommencer ?</string>
+    <string name="restart_body">Votre progression actuelle sera réinitialisée.</string>
+    <string name="restart_confirm">Recommencer</string>
+    <string name="restart_cancel">Annuler</string>
+    <string name="music_previous">Piste précédente</string>
+    <string name="music_play">Lecture</string>
+    <string name="music_pause">Pause</string>
+    <string name="music_next">Piste suivante</string>
 </resources>

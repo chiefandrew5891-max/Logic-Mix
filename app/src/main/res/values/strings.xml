@@ -158,4 +158,13 @@
     <string name="orb_final_score">Final score: %1$d</string>
     <string name="orb_no_hint">No move completes a line right now.</string>
     <string name="orb_rules">Move a ball along a free path. Line up 5 or more of the same color.</string>
+    <string name="restart">Restart</string>
+    <string name="restart_title">Restart?</string>
+    <string name="restart_body">Your current progress will be reset.</string>
+    <string name="restart_confirm">Restart</string>
+    <string name="restart_cancel">Cancel</string>
+    <string name="music_previous">Previous track</string>
+    <string name="music_play">Play</string>
+    <string name="music_pause">Pause</string>
+    <string name="music_next">Next track</string>
 </resources>

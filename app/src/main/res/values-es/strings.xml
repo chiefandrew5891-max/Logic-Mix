@@ -158,4 +158,13 @@
     <string name="orb_final_score">Puntuación final: %1$d</string>
     <string name="orb_no_hint">Ahora no hay jugada que complete una línea.</string>
     <string name="orb_rules">Mueve una bola por un camino libre. Alinea 5 o más del mismo color.</string>
+    <string name="restart">Reiniciar</string>
+    <string name="restart_title">¿Reiniciar?</string>
+    <string name="restart_body">Tu progreso actual se restablecerá.</string>
+    <string name="restart_confirm">Reiniciar</string>
+    <string name="restart_cancel">Cancelar</string>
+    <string name="music_previous">Pista anterior</string>
+    <string name="music_play">Reproducir</string>
+    <string name="music_pause">Pausa</string>
+    <string name="music_next">Pista siguiente</string>
 </resources>

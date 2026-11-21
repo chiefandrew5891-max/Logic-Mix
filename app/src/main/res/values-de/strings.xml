@@ -158,4 +158,13 @@
     <string name="orb_final_score">Endstand: %1$d</string>
     <string name="orb_no_hint">Aktuell vervollständigt kein Zug eine Reihe.</string>
     <string name="orb_rules">Bewege eine Kugel über einen freien Weg. Bilde Reihen aus 5 oder mehr gleichen Farben.</string>
+    <string name="restart">Neu starten</string>
+    <string name="restart_title">Neu starten?</string>
+    <string name="restart_body">Dein aktueller Fortschritt wird zurückgesetzt.</string>
+    <string name="restart_confirm">Neu starten</string>
+    <string name="restart_cancel">Abbrechen</string>
+    <string name="music_previous">Vorheriger Titel</string>
+    <string name="music_play">Abspielen</string>
+    <string name="music_pause">Pause</string>
+    <string name="music_next">Nächster Titel</string>
 </resources>

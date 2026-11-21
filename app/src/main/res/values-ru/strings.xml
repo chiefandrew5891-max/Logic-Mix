@@ -158,4 +158,13 @@
     <string name="orb_final_score">Итоговый счёт: %1$d</string>
     <string name="orb_no_hint">Сейчас нет хода, собирающего линию.</string>
     <string name="orb_rules">Двигайте шарик по свободному пути. Соберите 5 и более одного цвета.</string>
+    <string name="restart">Начать заново</string>
+    <string name="restart_title">Начать заново?</string>
+    <string name="restart_body">Текущий прогресс будет сброшен.</string>
+    <string name="restart_confirm">Начать заново</string>
+    <string name="restart_cancel">Отмена</string>
+    <string name="music_previous">Предыдущий трек</string>
+    <string name="music_play">Воспроизвести</string>
+    <string name="music_pause">Пауза</string>
+    <string name="music_next">Следующий трек</string>
 </resources>

@@ -11,6 +11,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import io.github.chiefandrew5891max.logicmix.core.designsystem.rememberDrawableId
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -35,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -61,7 +63,14 @@ fun HomeRoute(
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsState()
-    HomeScreen(state, onPlay, onRewards, onSettings, onWordSearch, onCategory, { onPrimary(state) })
+    val music by viewModel.music.collectAsState()
+    HomeScreen(
+        state, onPlay, onRewards, onSettings, onWordSearch, onCategory, { onPrimary(state) },
+        music = music,
+        onPreviousTrack = viewModel::previousTrack,
+        onTogglePlayback = viewModel::togglePlayback,
+        onNextTrack = viewModel::nextTrack,
+    )
 }
 
 @Composable
@@ -73,6 +82,10 @@ fun HomeScreen(
     onWordSearch: () -> Unit = {},
     onCategory: (GameCategory) -> Unit = {},
     onPrimary: () -> Unit = { onPlay(GameMode.CAREER) },
+    music: MusicPanelState = MusicPanelState(),
+    onPreviousTrack: () -> Unit = {},
+    onTogglePlayback: () -> Unit = {},
+    onNextTrack: () -> Unit = {},
 ) {
     val colors = LogicMixTokens.colors
     Box(Modifier.fillMaxSize().background(colors.backgroundBrush)) {
@@ -86,7 +99,7 @@ fun HomeScreen(
                 .align(Alignment.TopCenter),
             verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacing),
         ) {
-            TopBar(onSettings)
+            TopBar(onSettings, music, onPreviousTrack, onTogglePlayback, onNextTrack)
             PlayerCard(state)
             PrimaryButton(
                 label = stringResource(
@@ -97,6 +110,7 @@ fun HomeScreen(
             EqualHeightRow {
                 FeatureCard(
                     icon = R.drawable.ic_daily,
+                    art = "icon_daily_challenge",
                     title = stringResource(R.string.home_daily_title),
                     subtitle = stringResource(R.string.home_daily_subtitle),
                     onClick = { onPlay(GameMode.DAILY) },
@@ -104,6 +118,7 @@ fun HomeScreen(
                 )
                 FeatureCard(
                     icon = R.drawable.ic_rewards,
+                    art = "icon_rewards_trophy",
                     title = stringResource(R.string.home_rewards_title),
                     subtitle = stringResource(R.string.home_rewards_subtitle),
                     onClick = onRewards,
@@ -114,11 +129,11 @@ fun HomeScreen(
             SectionTitle(stringResource(R.string.home_modes_title))
             EqualHeightRow {
                 ModeCard(
-                    R.drawable.ic_career, stringResource(R.string.mode_career), stringResource(R.string.mode_career_subtitle),
+                    R.drawable.ic_career, "icon_career", stringResource(R.string.mode_career), stringResource(R.string.mode_career_subtitle),
                     { onPlay(GameMode.CAREER) }, Modifier.weight(1f).fillMaxHeight(),
                 )
                 ModeCard(
-                    R.drawable.ic_endless, stringResource(R.string.mode_endless), stringResource(R.string.mode_endless_subtitle),
+                    R.drawable.ic_endless, "icon_endless_mode", stringResource(R.string.mode_endless), stringResource(R.string.mode_endless_subtitle),
                     { onPlay(GameMode.ENDLESS) }, Modifier.weight(1f).fillMaxHeight(),
                 )
             }
@@ -128,28 +143,16 @@ fun HomeScreen(
     }
 }
 
+private val MUSIC_BUTTON = 40.dp
+private val MUSIC_GAP = 4.dp
+private val MUSIC_WIDTH = MUSIC_BUTTON * 3 + MUSIC_GAP * 2
+// Below this width the wordmark would have to shrink, so the music controls move to their own row.
+private val SIDE_BY_SIDE_MIN = 376.dp
+
 @Composable
-private fun TopBar(onSettings: () -> Unit) {
+private fun TopBar(onSettings: () -> Unit, music: MusicPanelState, onPrevious: () -> Unit, onToggle: () -> Unit, onNext: () -> Unit) {
     val settingsLabel = stringResource(R.string.settings)
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        val logoId = rememberDrawableId("logo_logic_mix_main")
-        if (logoId != 0) {
-            // The wordmark PNG replaces the text title; the app name stays available to accessibility services.
-            Image(
-                painter = painterResource(logoId),
-                contentDescription = stringResource(R.string.app_name),
-                contentScale = ContentScale.Fit,
-                alignment = Alignment.CenterStart,
-                modifier = Modifier.weight(1f).heightIn(max = 88.dp),
-            )
-        } else {
-            Text(
-                text = stringResource(R.string.home_title),
-                style = LogicMixTokens.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.weight(1f),
-            )
-        }
+    val settingsButton = @Composable {
         Box(
             modifier = Modifier
                 .size(LogicMixTokens.minTouchTarget)
@@ -162,6 +165,76 @@ private fun TopBar(onSettings: () -> Unit) {
         ) {
             LogicMixSettingsIcon(size = 28.dp)
         }
+    }
+    BoxWithConstraints(Modifier.fillMaxWidth()) {
+        val sideBySide = maxWidth >= SIDE_BY_SIDE_MIN
+        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(MUSIC_GAP)) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Logo(Modifier.weight(1f))
+                if (sideBySide) {
+                    Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(MUSIC_GAP)) {
+                        settingsButton()
+                        MusicControls(music, onPrevious, onToggle, onNext)
+                    }
+                } else {
+                    settingsButton()
+                }
+            }
+            if (!sideBySide) MusicControls(music, onPrevious, onToggle, onNext)
+        }
+    }
+}
+
+@Composable
+private fun Logo(modifier: Modifier) {
+    val logoId = rememberDrawableId("logo_logic_mix_main")
+    if (logoId != 0) {
+        // The wordmark PNG replaces the text title; the app name stays available to accessibility services.
+        Image(
+            painter = painterResource(logoId),
+            contentDescription = stringResource(R.string.app_name),
+            contentScale = ContentScale.Fit,
+            alignment = Alignment.CenterStart,
+            modifier = modifier.heightIn(max = 88.dp),
+        )
+    } else {
+        Text(
+            text = stringResource(R.string.home_title),
+            style = LogicMixTokens.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = modifier,
+        )
+    }
+}
+
+/** Previous | Play/Pause | Next. Play/Pause is the global music switch, so settings and player stay consistent. */
+@Composable
+private fun MusicControls(music: MusicPanelState, onPrevious: () -> Unit, onToggle: () -> Unit, onNext: () -> Unit) {
+    Row(horizontalArrangement = Arrangement.spacedBy(MUSIC_GAP)) {
+        MusicButton(R.drawable.ic_music_prev, stringResource(R.string.music_previous), music.available, onPrevious)
+        MusicButton(
+            if (music.playing) R.drawable.ic_music_pause else R.drawable.ic_play,
+            stringResource(if (music.playing) R.string.music_pause else R.string.music_play),
+            music.available,
+            onToggle,
+        )
+        MusicButton(R.drawable.ic_music_next, stringResource(R.string.music_next), music.available, onNext)
+    }
+}
+
+@Composable
+private fun MusicButton(@DrawableRes icon: Int, description: String, enabled: Boolean, onClick: () -> Unit) {
+    val shape = LogicMixTokens.radii.small
+    Box(
+        Modifier
+            .size(MUSIC_BUTTON)
+            .clip(shape)
+            .background(LogicMixTokens.colors.cardBrush)
+            .border(BorderStroke(1.dp, LogicMixTokens.colors.cardBorder), shape)
+            .clickable(enabled = enabled, role = Role.Button, onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        LogicMixIcon(icon, MaterialTheme.colorScheme.onSurface.copy(alpha = if (enabled) 1f else 0.4f), contentDescription = description, size = 20.dp)
     }
 }
 
@@ -249,6 +322,7 @@ private fun EqualHeightRow(content: @Composable RowScope.() -> Unit) {
 @Composable
 private fun FeatureCard(
     @DrawableRes icon: Int,
+    art: String,
     title: String,
     subtitle: String,
     onClick: () -> Unit,
@@ -258,7 +332,7 @@ private fun FeatureCard(
     val brush = if (gold) LogicMixTokens.colors.rewardBrush else LogicMixTokens.colors.cardBrush
     CardSurface(modifier.clickable(role = Role.Button, onClick = onClick), LogicMixTokens.radii.large, brush) {
         Column(Modifier.fillMaxSize().padding(LogicMixTokens.spacingM), verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingXs)) {
-            LogicMixIcon(icon, if (gold) LogicMixTokens.colors.gold else MaterialTheme.colorScheme.secondary, size = 32.dp)
+            CardArt(art, icon, if (gold) LogicMixTokens.colors.gold else MaterialTheme.colorScheme.secondary)
             Text(title, style = LogicMixTokens.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
             Text(subtitle, style = LogicMixTokens.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
@@ -266,17 +340,28 @@ private fun FeatureCard(
 }
 
 @Composable
-private fun ModeCard(@DrawableRes icon: Int, title: String, subtitle: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun ModeCard(@DrawableRes icon: Int, art: String, title: String, subtitle: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     CardSurface(modifier.clickable(role = Role.Button, onClick = onClick), LogicMixTokens.radii.large) {
         Column(
             Modifier.fillMaxSize().padding(LogicMixTokens.spacingM),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingXs),
         ) {
-            LogicMixIcon(icon, MaterialTheme.colorScheme.primary, size = 32.dp)
+            CardArt(art, icon, MaterialTheme.colorScheme.primary)
             Text(title, style = LogicMixTokens.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface, textAlign = TextAlign.Center)
             Text(subtitle, style = LogicMixTokens.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
         }
+    }
+}
+
+/** The 3D PNG from res/drawable-nodpi when it exists (untinted, proportions kept); otherwise the old tinted vector. */
+@Composable
+private fun CardArt(art: String, @DrawableRes fallback: Int, tint: Color) {
+    val id = rememberDrawableId(art)
+    if (id != 0) {
+        Image(painterResource(id), contentDescription = null, contentScale = ContentScale.Fit, modifier = Modifier.size(40.dp))
+    } else {
+        LogicMixIcon(fallback, tint, size = 32.dp)
     }
 }
 

@@ -158,4 +158,13 @@
     <string name="orb_final_score">Punteggio finale: %1$d</string>
     <string name="orb_no_hint">Nessuna mossa completa una linea ora.</string>
     <string name="orb_rules">Sposta una sfera su un percorso libero. Allinea 5 o più dello stesso colore.</string>
+    <string name="restart">Ricomincia</string>
+    <string name="restart_title">Ricominciare?</string>
+    <string name="restart_body">I progressi attuali verranno azzerati.</string>
+    <string name="restart_confirm">Ricomincia</string>
+    <string name="restart_cancel">Annulla</string>
+    <string name="music_previous">Brano precedente</string>
+    <string name="music_play">Riproduci</string>
+    <string name="music_pause">Pausa</string>
+    <string name="music_next">Brano successivo</string>
 </resources>

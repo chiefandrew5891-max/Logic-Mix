@@ -47,6 +47,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import io.github.chiefandrew5891max.logicmix.R
+import io.github.chiefandrew5891max.logicmix.core.designsystem.GameHeader
+import io.github.chiefandrew5891max.logicmix.core.designsystem.GameTool
+import io.github.chiefandrew5891max.logicmix.core.designsystem.GameToolRow
 import io.github.chiefandrew5891max.logicmix.core.designsystem.LogicMixIcon
 import io.github.chiefandrew5891max.logicmix.core.designsystem.LogicMixTokens
 import io.github.chiefandrew5891max.logicmix.domain.matchstick.MatchGame
@@ -155,29 +158,13 @@ private fun MatchstickScreen(state: MatchUiState, onBack: () -> Unit, vm: Matchs
                 .align(Alignment.TopCenter),
             verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM),
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM)) {
-                Box(
-                    Modifier
-                        .size(LogicMixTokens.minTouchTarget)
-                        .clip(LogicMixTokens.radii.medium)
-                        .background(colors.cardBrush)
-                        .border(BorderStroke(1.dp, colors.cardBorder), LogicMixTokens.radii.medium)
-                        .clickable(role = Role.Button, onClick = onBack),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    LogicMixIcon(R.drawable.ic_back, MaterialTheme.colorScheme.onSurface, contentDescription = stringResource(R.string.back))
-                }
-                Column(Modifier.weight(1f)) {
-                    Text(stringResource(R.string.match_title), style = LogicMixTokens.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
-                    if (game != null) {
-                        Text(
-                            stringResource(R.string.match_level, game.puzzle.index + 1, MatchPuzzles.COUNT),
-                            style = LogicMixTokens.typography.labelMedium,
-                            color = colors.gold,
-                        )
-                    }
-                }
-            }
+            GameHeader(
+                title = stringResource(R.string.match_title),
+                onBack = onBack,
+                subtitle = game?.let { stringResource(R.string.match_level, it.puzzle.index + 1, MatchPuzzles.COUNT) },
+                onRestart = vm::reset,
+                restartEnabled = game != null && !game.solved,
+            )
             if (state.allDone) {
                 Card { Text(stringResource(R.string.match_all_done), color = MaterialTheme.colorScheme.onSurface, textAlign = TextAlign.Center) }
             }
@@ -213,37 +200,15 @@ private fun MatchstickScreen(state: MatchUiState, onBack: () -> Unit, vm: Matchs
                     if (state.noHint) {
                         Text(stringResource(R.string.match_no_hint), color = MaterialTheme.colorScheme.onBackground, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
                     }
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS)) {
-                        Tool(R.string.match_undo, vm::undo, game.canUndo, Modifier.weight(1f))
-                        Tool(R.string.match_reset, vm::reset, game.movesUsed > 0, Modifier.weight(1f))
-                        Tool(R.string.match_hint, vm::hint, true, Modifier.weight(1f))
-                    }
+                    GameToolRow(
+                        listOf(
+                            GameTool(stringResource(R.string.match_undo), vm::undo, game.canUndo),
+                            GameTool(stringResource(R.string.match_hint), vm::hint),
+                        ),
+                    )
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun Tool(label: Int, onClick: () -> Unit, enabled: Boolean, modifier: Modifier) {
-    val colors = LogicMixTokens.colors
-    val shape = LogicMixTokens.radii.medium
-    Box(
-        modifier
-            .heightIn(min = LogicMixTokens.minTouchTarget)
-            .clip(shape)
-            .background(colors.cardBrush)
-            .border(BorderStroke(1.dp, colors.cardBorder), shape)
-            .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
-            .padding(horizontal = 8.dp, vertical = 8.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            stringResource(label),
-            style = LogicMixTokens.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = if (enabled) 1f else 0.4f),
-            textAlign = TextAlign.Center,
-        )
     }
 }
 

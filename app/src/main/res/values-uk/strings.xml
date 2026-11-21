@@ -158,4 +158,13 @@
     <string name="orb_final_score">Підсумковий рахунок: %1$d</string>
     <string name="orb_no_hint">Зараз немає ходу, що збирає лінію.</string>
     <string name="orb_rules">Рухайте кульку вільним шляхом. Зберіть 5 і більше одного кольору.</string>
+    <string name="restart">Почати заново</string>
+    <string name="restart_title">Почати заново?</string>
+    <string name="restart_body">Поточний прогрес буде скинуто.</string>
+    <string name="restart_confirm">Почати заново</string>
+    <string name="restart_cancel">Скасувати</string>
+    <string name="music_previous">Попередній трек</string>
+    <string name="music_play">Відтворити</string>
+    <string name="music_pause">Пауза</string>
+    <string name="music_next">Наступний трек</string>
 </resources>

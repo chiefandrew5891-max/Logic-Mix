@@ -46,3 +46,20 @@ git push origin <your-branch>
 
 ## Reward icons
 `GoldStar` and `GoldTrophy` (core/designsystem/RewardIcons.kt) are programmatic placeholders; final artwork should be provided as transparent PNG/WebP (`reward_gold_star`, `reward_gold_trophy`).
+
+## 3D-иконки главного экрана (`app/src/main/res/drawable-nodpi/`)
+
+PNG с прозрачным фоном. Если файла нет, показывается прежняя векторная иконка; код менять не нужно.
+
+| Файл | Где используется |
+|---|---|
+| `icon_daily_challenge.png` | карточка «Ежедневные испытания» |
+| `icon_rewards_trophy.png` | карточка «Награды», `GoldTrophy` |
+| `icon_career.png` | карточка «Карьера» |
+| `icon_endless_mode.png` | карточка «Бесконечный режим» |
+| `icon_bonus_star.png` | `GoldStar` (XP/бонусы) |
+
+## Правила для новых игр
+
+- Экран обязан использовать `GameHeader(onRestart = ...)` — Restart с подтверждением.
+- Подписи кнопок — через `GameToolRow` / `rememberButtonFit` / `FitLabel` (без переноса внутри слов).

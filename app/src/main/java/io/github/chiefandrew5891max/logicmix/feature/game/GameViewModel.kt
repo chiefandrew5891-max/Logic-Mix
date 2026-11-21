@@ -132,6 +132,13 @@ class GameViewModel @Inject constructor(
         if (_state.value.solved) load()
     }
 
+    /** Clears this attempt's input and feedback. The hint counter is kept so a restart cannot win back the no-hint bonus. */
+    fun restart() {
+        if (_state.value.solved || _state.value.puzzle == null) return
+        sfx.play(Sfx.BUTTON_TAP)
+        _state.update { it.copy(input = "", feedback = Feedback.NONE) }
+    }
+
     private fun record(puzzle: NumberSequencePuzzle, s: GameUiState, outcome: AttemptOutcome) {
         viewModelScope.launch {
             progress.recordAttempt(profileId, puzzle.id, GameMode.CAREER, outcome, s.startedAt, System.currentTimeMillis(), s.hintsUsed)

@@ -158,4 +158,13 @@
     <string name="orb_final_score">最终得分：%1$d</string>
     <string name="orb_no_hint">目前没有能连成一线的移动。</string>
     <string name="orb_rules">沿空路径移动小球，连成5个或更多同色。</string>
+    <string name="restart">重新开始</string>
+    <string name="restart_title">重新开始？</string>
+    <string name="restart_body">当前进度将被重置。</string>
+    <string name="restart_confirm">重新开始</string>
+    <string name="restart_cancel">取消</string>
+    <string name="music_previous">上一首</string>
+    <string name="music_play">播放</string>
+    <string name="music_pause">暂停</string>
+    <string name="music_next">下一首</string>
 </resources>
