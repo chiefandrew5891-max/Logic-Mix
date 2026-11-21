@@ -28,7 +28,7 @@ data class CrosswordPuzzle(
     fun numberOf(entry: CrosswordEntry): Int = numbers.getValue(entry.row * size + entry.col)
 
     val solution: Map<Int, Char> by lazy {
-        buildMap { entries.forEach { e -> cells(e).forEachIndexed { i, c -> put(c, e.answer[i]) } } }
+        buildMap { this@CrosswordPuzzle.entries.forEach { e -> cells(e).forEachIndexed { i, c -> put(c, e.answer[i]) } } }
     }
 
     fun entriesAt(cell: Int): List<CrosswordEntry> = entries.filter { cell in cells(it) }
