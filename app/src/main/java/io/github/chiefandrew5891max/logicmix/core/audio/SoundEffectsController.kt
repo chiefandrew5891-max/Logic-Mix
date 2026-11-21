@@ -3,7 +3,11 @@ package io.github.chiefandrew5891max.logicmix.core.audio
 import android.content.Context
 import android.media.AudioAttributes
 import android.media.SoundPool
+import android.os.Build
 import android.os.SystemClock
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import android.util.Log
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -27,7 +31,7 @@ import kotlinx.coroutines.launch
 class SoundEffectsController @Inject constructor(
     @ApplicationContext private val context: Context,
     private val settings: SettingsRepository,
-) {
+) : UiFeedback {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val gate = SfxGate()
     private val soundIds = java.util.concurrent.ConcurrentHashMap<Sfx, Int>()
@@ -75,18 +79,49 @@ class SoundEffectsController @Inject constructor(
         pool = sp
     }
 
-    fun play(sfx: Sfx, rate: Float = 1f) {
+    override fun tap() = play(Sfx.BUTTON_TAP)
+    override fun back() = play(Sfx.MENU_CLOSE)
+
+    /** [force] plays even when effects are switched off (the confirmation click of the switch itself). */
+    fun play(sfx: Sfx, rate: Float = 1f, force: Boolean = false) {
+        if (!ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) return
+        if (!gate.allow(sfx, SystemClock.elapsedRealtime())) return
+        vibrate(sfx)
         val sp = pool ?: return
         val id = soundIds[sfx] ?: return
-        if (!audio.effectsEnabled || audio.effectsVolume <= 0f) return
-        if (!ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) return
+        if (!(audio.effectsEnabled || force) || audio.effectsVolume <= 0f) return
         if (!synchronized(ready) { id in ready }) return
-        if (!gate.allow(sfx, SystemClock.elapsedRealtime())) return
         try {
-            val v = audio.effectsVolume
+            val v = volumeGain(audio.effectsVolume)
             sp.play(id, v, v, sfx.priority.ordinal, 0, rate.coerceIn(SfxPitch.MIN_RATE, SfxPitch.MAX_RATE))
         } catch (e: RuntimeException) {
             Log.w(TAG, "Effect playback failed: ${sfx.file}", e)
+        }
+    }
+
+    private val vibrator: Vibrator? by lazy {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            (context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? VibratorManager)?.defaultVibrator
+        } else {
+            @Suppress("DEPRECATION") context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+        }
+    }
+
+    /** Haptics follow only the vibration switch, independent of sound settings. */
+    private fun vibrate(sfx: Sfx) {
+        if (!audio.vibrationEnabled) return
+        val ms = when (sfx) {
+            Sfx.WRONG, Sfx.WORD_INVALID -> 40L
+            else -> when (sfx.priority) {
+                SfxPriority.UI -> 15L
+                SfxPriority.MAJOR -> 60L
+                SfxPriority.GAME -> return
+            }
+        }
+        try {
+            vibrator?.takeIf { it.hasVibrator() }?.vibrate(VibrationEffect.createOneShot(ms, VibrationEffect.DEFAULT_AMPLITUDE))
+        } catch (e: RuntimeException) {
+            Log.w(TAG, "Vibration failed", e)
         }
     }
 

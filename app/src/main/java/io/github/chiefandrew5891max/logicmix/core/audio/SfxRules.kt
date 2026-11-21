@@ -4,7 +4,7 @@ import kotlin.math.pow
 
 enum class SfxPriority { UI, GAME, MAJOR }
 
-/** All 34 effects; [file] is the exact name in assets/sfx. [minGapMs] drops accidental double triggers. */
+/** All 38 effects; [file] is the exact name in assets/sfx. [minGapMs] drops accidental double triggers. */
 enum class Sfx(val file: String, val priority: SfxPriority = SfxPriority.GAME, val minGapMs: Long = 30) {
     BUTTON_TAP("sfx_button_tap.wav", SfxPriority.UI),
     MENU_OPEN("sfx_menu_open.wav", SfxPriority.UI),
@@ -36,6 +36,10 @@ enum class Sfx(val file: String, val priority: SfxPriority = SfxPriority.GAME, v
     REWARD("sfx_reward.wav", SfxPriority.MAJOR),
     TIMER_WARNING("sfx_timer_warning.wav", minGapMs = 1000),
     GAME_OVER("sfx_game_over.wav", SfxPriority.MAJOR),
+    ORB_SELECT("sfx_orb_select.wav"),
+    ORB_MOVE("sfx_orb_move.wav"),
+    ORB_SPAWN("sfx_orb_spawn.wav", minGapMs = 120),
+    ORB_POP("sfx_orb_pop.wav"),
     LETTER_INPUT("sfx_letter_input.wav", minGapMs = 15),
     LETTER_DELETE("sfx_letter_delete.wav", minGapMs = 15),
     NUMBER_INPUT("sfx_number_input.wav", minGapMs = 15),

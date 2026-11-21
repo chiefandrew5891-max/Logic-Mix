@@ -28,8 +28,38 @@ class MusicPlaylistTest {
     }
 
     @Test fun volumeIsClampedToPlayerRange() {
-        assertEquals(0.8f, musicPlayerVolume(0.8f), 0f)
+        assertEquals(0.64f, musicPlayerVolume(0.8f), 0.0001f)
         assertEquals(1f, musicPlayerVolume(2f), 0f)
+        assertEquals(0.25f, musicPlayerVolume(0.5f), 0.0001f)
+        assertTrue(musicPlayerVolume(0.01f) < 0.001f)
         assertEquals(0f, musicPlayerVolume(-1f), 0f)
+    }
+
+    @Test fun navigationWrapsAround() {
+        assertEquals(0, MusicNavigation.next(2, 3))
+        assertEquals(2, MusicNavigation.previous(0, 3))
+        assertEquals(1, MusicNavigation.next(0, 3))
+        assertEquals(0, MusicNavigation.previous(1, 3))
+    }
+
+    @Test fun startTrackIsRandomButNeverTheLastPlayedOne() {
+        val names = listOf("music_01", "music_02", "music_03")
+        val random = kotlin.random.Random(7)
+        val starts = (1..200).map { MusicNavigation.startIndex(names, "music_02", random) }
+        assertTrue(1 !in starts)
+        assertEquals(setOf(0, 2), starts.toSet())
+    }
+
+    @Test fun startTrackWithoutHistoryCoversEveryTrackAndSingleTrackIsAllowed() {
+        val random = kotlin.random.Random(3)
+        val names = listOf("music_01", "music_02", "music_03")
+        assertEquals(setOf(0, 1, 2), (1..200).map { MusicNavigation.startIndex(names, null, random) }.toSet())
+        assertEquals(0, MusicNavigation.startIndex(listOf("music_01"), "music_01", random))
+        assertEquals(0, MusicNavigation.startIndex(emptyList(), null, random))
+    }
+
+    @Test fun entriesKeepNamesForPersistence() {
+        val ids = mapOf("music_01" to 11, "music_04" to 14)
+        assertEquals(listOf("music_01", "music_04"), MusicPlaylist.resolveEntries { ids[it] ?: 0 }.map { it.name })
     }
 }

@@ -1,5 +1,6 @@
 package io.github.chiefandrew5891max.logicmix.feature.gamestyle
 
+import io.github.chiefandrew5891max.logicmix.core.audio.withBack
 import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
@@ -189,7 +190,7 @@ internal fun BackButton(onClick: () -> Unit) {
                 .clip(LogicMixTokens.radii.medium)
                 .background(LogicMixTokens.colors.cardBrush)
                 .border(BorderStroke(1.dp, LogicMixTokens.colors.cardBorder), LogicMixTokens.radii.medium)
-                .clickable(role = Role.Button, onClick = onClick),
+                .clickable(role = Role.Button, onClick = withBack(onClick)),
             contentAlignment = Alignment.Center,
         ) {
             LogicMixIcon(R.drawable.ic_back, MaterialTheme.colorScheme.onSurface, contentDescription = stringResource(R.string.back))

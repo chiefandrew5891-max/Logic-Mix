@@ -1,5 +1,6 @@
 package io.github.chiefandrew5891max.logicmix
 
+import io.github.chiefandrew5891max.logicmix.core.audio.LocalUiFeedback
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
@@ -23,6 +24,7 @@ import io.github.chiefandrew5891max.logicmix.feature.home.PrimaryAction
 import io.github.chiefandrew5891max.logicmix.feature.home.StyleInfoScreen
 import io.github.chiefandrew5891max.logicmix.feature.home.titleRes
 import androidx.activity.compose.BackHandler
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -38,6 +40,9 @@ import io.github.chiefandrew5891max.logicmix.core.designsystem.LogicMixTheme
 import io.github.chiefandrew5891max.logicmix.domain.game.GameMode
 import io.github.chiefandrew5891max.logicmix.feature.game.GameRoute
 import io.github.chiefandrew5891max.logicmix.feature.home.ComingSoonScreen
+import io.github.chiefandrew5891max.logicmix.feature.matchstick.MatchstickRoute
+import io.github.chiefandrew5891max.logicmix.feature.orb.OrbRoute
+import io.github.chiefandrew5891max.logicmix.feature.sudoku.SudokuRoute
 import io.github.chiefandrew5891max.logicmix.feature.home.HomeRoute
 import io.github.chiefandrew5891max.logicmix.feature.settings.SettingsScreen
 import io.github.chiefandrew5891max.logicmix.feature.wordsearch.WordSearchRoute
@@ -55,7 +60,9 @@ class MainActivity : AppCompatActivity() {
             LaunchedEffect(language) { language?.let { LocaleApplier.apply(it) } }
             LogicMixTheme(themeMode) {
                 val gameStyle by settings.gameStyle.collectAsState(initial = null)
-                LogicMixNavigation(rememberNavController(), gameStyle, sfx)
+                CompositionLocalProvider(LocalUiFeedback provides sfx) {
+                    LogicMixNavigation(rememberNavController(), gameStyle, sfx)
+                }
             }
         }
     }
@@ -68,6 +75,8 @@ object Routes {
     const val GAME = "game"
     const val WORD_SEARCH = "word_search"
     const val SUDOKU = "sudoku"
+    const val MATCHSTICKS = "matchsticks"
+    const val ORB_LINES = "orb_lines"
     const val CATEGORY_SOON = "category_soon/{category}"
     const val GAME_STYLE = "game_style/{start}"
     const val STYLE_INFO = "style_info/{style}"
@@ -80,6 +89,8 @@ object Routes {
         GameCategory.NUMBER_SEQUENCE -> GAME
         GameCategory.WORD_SEARCH -> WORD_SEARCH
         GameCategory.SUDOKU -> SUDOKU
+        GameCategory.MATCHSTICK -> MATCHSTICKS
+        GameCategory.ORB_LINES -> ORB_LINES
         else -> "category_soon/${category.name}"
     }
 
@@ -133,7 +144,13 @@ private fun LogicMixNavigation(navController: NavHostController, gameStyle: Game
             WordSearchRoute(onBack = goBack)
         }
         composable(Routes.SUDOKU) {
-            ComingSoonScreen(onBack = goBack, categoryTitle = GameCategory.SUDOKU.titleRes())
+            SudokuRoute(onBack = goBack)
+        }
+        composable(Routes.ORB_LINES) {
+            OrbRoute(onBack = goBack)
+        }
+        composable(Routes.MATCHSTICKS) {
+            MatchstickRoute(onBack = goBack)
         }
         composable(Routes.CATEGORY_SOON, arguments = listOf(navArgument("category") { type = NavType.StringType })) { entry ->
             val category = GameCategory.entries.firstOrNull { it.name == entry.arguments?.getString("category") }

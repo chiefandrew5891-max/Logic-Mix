@@ -1,5 +1,6 @@
 package io.github.chiefandrew5891max.logicmix.core.designsystem
 
+import io.github.chiefandrew5891max.logicmix.core.audio.withTap
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -144,8 +145,7 @@ fun TitleCapsule(text: String, modifier: Modifier = Modifier, highlighted: Boole
 }
 
 /**
- * Category card: illustration on top (fixed square, aspect preserved), flexible themed space, title capsule
- * pinned to the bottom. Use with weight(1f).fillMaxHeight() inside an IntrinsicSize.Min row to equalise heights.
+ * Category card in the Career/Endless style (card gradient, teal border): illustration on top, plain title below. Use with weight(1f).fillMaxHeight() inside an IntrinsicSize.Min row to equalise heights.
  */
 @Composable
 fun CategoryCard(
@@ -157,18 +157,27 @@ fun CategoryCard(
     role: Role = Role.Button,
 ) {
     val shape = RoundedCornerShape(20.dp)
+    val colors = LogicMixTokens.colors
+    val borderWidth = if (selected == true) 3.dp else 2.dp
     Column(
         modifier
-            .neonFrame(shape, emphasis = selected == true)
+            .clip(shape)
+            .background(colors.cardBrush)
+            .border(BorderStroke(borderWidth, colors.cardBorder), shape)
             .then(if (selected != null) Modifier.semantics { this.selected = selected } else Modifier)
-            .clickable(role = role, onClick = onClick)
+            .clickable(role = role, onClick = withTap(onClick))
             .padding(LogicMixTokens.spacingS),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         AssetImage(category.imageName, Modifier.fillMaxWidth().aspectRatio(1f))
         Spacer(Modifier.height(LogicMixTokens.spacingS))
         Spacer(Modifier.weight(1f))
-        TitleCapsule(title, highlighted = selected == true)
+        Text(
+            title,
+            style = LogicMixTokens.typography.titleMedium,
+            color = if (selected == true) colors.gold else MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Center,
+        )
     }
 }
 
@@ -187,7 +196,7 @@ fun GameStyleCard(
             .fillMaxWidth()
             .neonFrame(RoundedCornerShape(20.dp), emphasis = selected)
             .semantics { this.selected = selected }
-            .clickable(role = Role.RadioButton, onClick = onClick)
+            .clickable(role = Role.RadioButton, onClick = withTap(onClick))
             .padding(LogicMixTokens.spacingM),
         horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM),
         verticalAlignment = Alignment.CenterVertically,

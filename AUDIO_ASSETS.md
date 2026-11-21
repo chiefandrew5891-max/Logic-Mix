@@ -35,7 +35,8 @@ Status: **wired** = hooked to a real event; **pending** = the game event does no
 | sfx_card_select | unused (categories use button_tap) | - | unused |
 | sfx_correct | right answer (Number Sequences) | GameViewModel.submit | wired |
 | sfx_wrong | wrong answer | GameViewModel.submit | wired |
-| sfx_matchstick_pickup / _move / _place | matchsticks | - | pending (no Matchsticks game) |
+| sfx_matchstick_pickup / _move / _place | grab, new target while dragging (rate-limited), valid drop; plus sfx_correct / level_complete / xp_gain on win, sfx_wrong when moves run out, sfx_hint | MatchstickViewModel | wired |
+| Sudoku sounds | number_input / number_delete / wrong (conflict) / hint / level_complete / xp_gain; undo, redo, reset use button_tap | SudokuViewModel | wired |
 | sfx_letter_select | first letter of a swipe | WordSearchViewModel.onTrace | wired |
 | sfx_word_trace_base | next letters of a swipe; pitch rises along a major scale up to +12 semitones, resets per gesture | WordSearchViewModel.onTrace | wired |
 | sfx_word_found | main or extra word | WordSearchViewModel.submit | wired |
@@ -78,3 +79,18 @@ AAC in an M4A container (`.m4a`), played with AndroidX Media3 ExoPlayer. Keep fi
 
 Add files, rebuild, open the app: music starts. Toggle the switch and move the slider; press Home (pauses) and return
 (resumes); start a call or another player (music yields).
+
+## Orb Lines
+Uses existing effects (WRONG blocked, HINT, GAME_OVER, XP_GAIN, LEVEL_UP, BUTTON_TAP). Dedicated effects: ORB_SELECT, ORB_MOVE, ORB_SPAWN, ORB_POP (sfx_orb_*.wav; must be placed in assets/sfx).
+
+## Плеер на главном экране
+
+Стартовый трек выбирается случайно (последний проигранный избегается). Previous/Next переключают трек в единственном ExoPlayer, Play/Pause = глобальная настройка музыки. Новые `music_*` в `res/raw` подхватываются автоматически.
+
+## Правило для всех экранов: два стандартных UI-звука
+
+- Нажатие на любую карточку/кнопку/пункт — `Sfx.BUTTON_TAP` (+ лёгкая вибрация).
+- Закрытие, отмена, выход с экрана — `Sfx.MENU_CLOSE`.
+- В Compose: `withTap { ... }` / `withBack { ... }` (`core/audio/UiFeedback.kt`) или `LocalUiFeedback.current.tap()/back()`. Дубли в пределах 120 мс отсекает `SfxGate`.
+- Громкость ползунков переводится через `volumeGain` (квадратичная кривая): 50% ≈ −12 дБ, 1% почти не слышно.
+- Вибрация зависит только от своего переключателя (разрешение `VIBRATE`).

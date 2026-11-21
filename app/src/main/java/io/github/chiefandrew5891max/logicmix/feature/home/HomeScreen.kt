@@ -1,5 +1,6 @@
 package io.github.chiefandrew5891max.logicmix.feature.home
 
+import io.github.chiefandrew5891max.logicmix.core.audio.withTap
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -10,7 +11,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import io.github.chiefandrew5891max.logicmix.core.designsystem.rememberDrawableId
+import io.github.chiefandrew5891max.logicmix.core.designsystem.LogicMixPlayerHeader
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -35,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -61,7 +65,14 @@ fun HomeRoute(
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsState()
-    HomeScreen(state, onPlay, onRewards, onSettings, onWordSearch, onCategory, { onPrimary(state) })
+    val music by viewModel.music.collectAsState()
+    HomeScreen(
+        state, onPlay, onRewards, onSettings, onWordSearch, onCategory, { onPrimary(state) },
+        music = music,
+        onPreviousTrack = viewModel::previousTrack,
+        onTogglePlayback = viewModel::togglePlayback,
+        onNextTrack = viewModel::nextTrack,
+    )
 }
 
 @Composable
@@ -73,6 +84,10 @@ fun HomeScreen(
     onWordSearch: () -> Unit = {},
     onCategory: (GameCategory) -> Unit = {},
     onPrimary: () -> Unit = { onPlay(GameMode.CAREER) },
+    music: MusicPanelState = MusicPanelState(),
+    onPreviousTrack: () -> Unit = {},
+    onTogglePlayback: () -> Unit = {},
+    onNextTrack: () -> Unit = {},
 ) {
     val colors = LogicMixTokens.colors
     Box(Modifier.fillMaxSize().background(colors.backgroundBrush)) {
@@ -86,7 +101,7 @@ fun HomeScreen(
                 .align(Alignment.TopCenter),
             verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacing),
         ) {
-            TopBar(onSettings)
+            TopBar(onSettings, music, onPreviousTrack, onTogglePlayback, onNextTrack)
             PlayerCard(state)
             PrimaryButton(
                 label = stringResource(
@@ -97,6 +112,7 @@ fun HomeScreen(
             EqualHeightRow {
                 FeatureCard(
                     icon = R.drawable.ic_daily,
+                    art = "icon_daily_challenge",
                     title = stringResource(R.string.home_daily_title),
                     subtitle = stringResource(R.string.home_daily_subtitle),
                     onClick = { onPlay(GameMode.DAILY) },
@@ -104,6 +120,7 @@ fun HomeScreen(
                 )
                 FeatureCard(
                     icon = R.drawable.ic_rewards,
+                    art = "icon_rewards_trophy",
                     title = stringResource(R.string.home_rewards_title),
                     subtitle = stringResource(R.string.home_rewards_subtitle),
                     onClick = onRewards,
@@ -114,11 +131,11 @@ fun HomeScreen(
             SectionTitle(stringResource(R.string.home_modes_title))
             EqualHeightRow {
                 ModeCard(
-                    R.drawable.ic_career, stringResource(R.string.mode_career), stringResource(R.string.mode_career_subtitle),
+                    R.drawable.ic_career, "icon_career", stringResource(R.string.mode_career), stringResource(R.string.mode_career_subtitle),
                     { onPlay(GameMode.CAREER) }, Modifier.weight(1f).fillMaxHeight(),
                 )
                 ModeCard(
-                    R.drawable.ic_endless, stringResource(R.string.mode_endless), stringResource(R.string.mode_endless_subtitle),
+                    R.drawable.ic_endless, "icon_endless_mode", stringResource(R.string.mode_endless), stringResource(R.string.mode_endless_subtitle),
                     { onPlay(GameMode.ENDLESS) }, Modifier.weight(1f).fillMaxHeight(),
                 )
             }
@@ -129,40 +146,20 @@ fun HomeScreen(
 }
 
 @Composable
-private fun TopBar(onSettings: () -> Unit) {
-    val settingsLabel = stringResource(R.string.settings)
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        val logoId = rememberDrawableId("logo_logic_mix_main")
-        if (logoId != 0) {
-            // The wordmark PNG replaces the text title; the app name stays available to accessibility services.
-            Image(
-                painter = painterResource(logoId),
-                contentDescription = stringResource(R.string.app_name),
-                contentScale = ContentScale.Fit,
-                alignment = Alignment.CenterStart,
-                modifier = Modifier.weight(1f).heightIn(max = 88.dp),
-            )
-        } else {
-            Text(
-                text = stringResource(R.string.home_title),
-                style = LogicMixTokens.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.weight(1f),
-            )
-        }
-        Box(
-            modifier = Modifier
-                .size(LogicMixTokens.minTouchTarget)
-                .clip(LogicMixTokens.radii.medium)
-                .background(LogicMixTokens.colors.cardBrush)
-                .border(BorderStroke(1.dp, LogicMixTokens.colors.cardBorder), LogicMixTokens.radii.medium)
-                .semantics { contentDescription = settingsLabel }
-                .clickable(role = Role.Button, onClickLabel = settingsLabel, onClick = onSettings),
-            contentAlignment = Alignment.Center,
-        ) {
-            LogicMixSettingsIcon(size = 28.dp)
-        }
-    }
+private fun TopBar(onSettings: () -> Unit, music: MusicPanelState, onPrevious: () -> Unit, onToggle: () -> Unit, onNext: () -> Unit) {
+    LogicMixPlayerHeader(
+        playing = music.playing,
+        available = music.available,
+        onPrevious = onPrevious,
+        onTogglePlayback = onToggle,
+        onNext = onNext,
+        previousLabel = stringResource(R.string.music_previous),
+        playPauseLabel = stringResource(if (music.playing) R.string.music_pause else R.string.music_play),
+        nextLabel = stringResource(R.string.music_next),
+        logoLabel = stringResource(R.string.app_name),
+        onSettings = onSettings,
+        settingsLabel = stringResource(R.string.settings),
+    )
 }
 
 @Composable
@@ -188,7 +185,12 @@ private fun PlayerCard(state: HomeUiState) {
                 Modifier.padding(start = LogicMixTokens.spacing),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                LogicMixIcon(R.drawable.ic_streak, colors.gold, size = 28.dp)
+                val fire = rememberDrawableId("icon_streak_fire")
+                if (fire != 0) {
+                    Image(painterResource(fire), null, contentScale = ContentScale.Fit, modifier = Modifier.size(32.dp))
+                } else {
+                    LogicMixIcon(R.drawable.ic_streak, colors.gold, size = 28.dp)
+                }
                 Text(
                     text = state.streak.toString(),
                     style = LogicMixTokens.typography.headlineMedium,
@@ -249,6 +251,7 @@ private fun EqualHeightRow(content: @Composable RowScope.() -> Unit) {
 @Composable
 private fun FeatureCard(
     @DrawableRes icon: Int,
+    art: String,
     title: String,
     subtitle: String,
     onClick: () -> Unit,
@@ -258,7 +261,7 @@ private fun FeatureCard(
     val brush = if (gold) LogicMixTokens.colors.rewardBrush else LogicMixTokens.colors.cardBrush
     CardSurface(modifier.clickable(role = Role.Button, onClick = onClick), LogicMixTokens.radii.large, brush) {
         Column(Modifier.fillMaxSize().padding(LogicMixTokens.spacingM), verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingXs)) {
-            LogicMixIcon(icon, if (gold) LogicMixTokens.colors.gold else MaterialTheme.colorScheme.secondary, size = 32.dp)
+            CardArt(art, icon, if (gold) LogicMixTokens.colors.gold else MaterialTheme.colorScheme.secondary)
             Text(title, style = LogicMixTokens.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
             Text(subtitle, style = LogicMixTokens.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
@@ -266,16 +269,30 @@ private fun FeatureCard(
 }
 
 @Composable
-private fun ModeCard(@DrawableRes icon: Int, title: String, subtitle: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun ModeCard(@DrawableRes icon: Int, art: String, title: String, subtitle: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     CardSurface(modifier.clickable(role = Role.Button, onClick = onClick), LogicMixTokens.radii.large) {
         Column(
             Modifier.fillMaxSize().padding(LogicMixTokens.spacingM),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingXs),
         ) {
-            LogicMixIcon(icon, MaterialTheme.colorScheme.primary, size = 32.dp)
+            CardArt(art, icon, MaterialTheme.colorScheme.primary)
             Text(title, style = LogicMixTokens.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface, textAlign = TextAlign.Center)
             Text(subtitle, style = LogicMixTokens.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
+        }
+    }
+}
+
+/** The 3D PNG from res/drawable-nodpi when it exists (untinted, proportions kept); otherwise the old tinted vector. */
+@Composable
+private fun CardArt(art: String, @DrawableRes fallback: Int, tint: Color) {
+    val id = rememberDrawableId(art)
+    // Centered across the whole card width, not the text column.
+    Box(Modifier.fillMaxWidth().height(52.dp), contentAlignment = Alignment.Center) {
+        if (id != 0) {
+            Image(painterResource(id), contentDescription = null, contentScale = ContentScale.Fit, modifier = Modifier.size(52.dp))
+        } else {
+            LogicMixIcon(fallback, tint, size = 32.dp)
         }
     }
 }
@@ -291,6 +308,9 @@ private fun SectionTitle(text: String) {
     )
 }
 
+/** Shared by the progress block and the four feature/mode cards (was 1dp). */
+private val CARD_BORDER = 2.dp
+
 @Composable
 private fun CardSurface(
     modifier: Modifier = Modifier,
@@ -302,6 +322,6 @@ private fun CardSurface(
         modifier
             .clip(shape)
             .background(brush)
-            .border(BorderStroke(1.dp, LogicMixTokens.colors.cardBorder), shape),
+            .border(BorderStroke(CARD_BORDER, LogicMixTokens.colors.cardBorder), shape),
     ) { content() }
 }
