@@ -60,11 +60,12 @@ private val Wood = Color(0xFFE2B66B)
 private val WoodDark = Color(0xFFB98A45)
 private val Head = Color(0xFFD9433B)
 
-private class Stick(val center: Offset, val horizontal: Boolean)
+internal class Stick(val center: Offset, val horizontal: Boolean)
 
 /** Pixel layout of the 23 slots for a canvas of the given width; also the source of the canvas height. */
-private class Layout(width: Float) {
-    val w = width / 6.8f
+internal class Layout(val width: Float) {
+    // 5 cells + 4 gaps = 6.8 w; the extra 0.7 w is a symmetric margin that keeps edge sticks, heads and shadows inside.
+    val w = width / 7.5f
     val gap = w * 0.45f
     val h = w * 1.9f
     val top = w * 0.35f
@@ -72,6 +73,15 @@ private class Layout(width: Float) {
     val length = w * 0.8f
     val thick = w * 0.17f
     private val left = (width - (5 * w + 4 * gap)) / 2f
+
+    /** Horizontal and vertical extent of a stick including the drag-lift scale, for bounds checks. */
+    fun extent(s: Stick, scale: Float = 1f): Pair<ClosedFloatingPointRange<Float>, ClosedFloatingPointRange<Float>> {
+        val halfLong = length * scale / 2
+        val halfShort = thick * scale / 2
+        val hx = if (s.horizontal) halfLong else halfShort
+        val hy = if (s.horizontal) halfShort else halfLong
+        return (s.center.x - hx)..(s.center.x + hx) to (s.center.y - hy)..(s.center.y + hy)
+    }
 
     private fun cellX(k: Int) = left + k * (w + gap)
 

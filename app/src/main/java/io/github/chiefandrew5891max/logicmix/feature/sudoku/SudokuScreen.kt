@@ -34,7 +34,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
@@ -152,6 +155,22 @@ private fun SudokuScreen(state: SudokuUiState, onBack: () -> Unit, vm: SudokuVie
     }
 }
 
+/** Board constants shared by drawing and tests: the square is split into nine equal cells; the frame sits inside it. */
+internal object SudokuBoardGeometry {
+    val CORNER = 16.dp
+    val FRAME = 3.dp
+    val BLOCK_LINE = 2.dp
+    val CELL_LINE = 1.dp
+
+    fun cell(side: Float) = side / 9f
+
+    fun cellAt(x: Float, y: Float, side: Float): Int {
+        val c = (x / cell(side)).toInt().coerceIn(0, 8)
+        val r = (y / cell(side)).toInt().coerceIn(0, 8)
+        return r * 9 + c
+    }
+}
+
 private fun formatTime(sec: Long) = "%d:%02d".format(sec / 60, sec % 60)
 
 @Composable
@@ -226,6 +245,7 @@ private fun Board(game: SudokuGame, selected: Int?, onSelect: (Int) -> Unit, ena
     val scheme = MaterialTheme.colorScheme
     val colors = LogicMixTokens.colors
     val measurer = rememberTextMeasurer()
+    val family = MaterialTheme.typography.titleLarge.fontFamily
     val density = LocalDensity.current
     val conflicts = game.conflicts
     val selectedValue = selected?.let { game.values[it] } ?: 0
@@ -238,25 +258,23 @@ private fun Board(game: SudokuGame, selected: Int?, onSelect: (Int) -> Unit, ena
     val typed = scheme.secondary
     val thin = scheme.onSurface.copy(alpha = 0.25f)
     val thick = colors.cardBorder.copy(alpha = 1f)
+    val frameColor = scheme.secondary
     Canvas(
         Modifier
             .fillMaxWidth()
             .aspectRatio(1f)
-            .clip(LogicMixTokens.radii.medium)
+            .clip(RoundedCornerShape(SudokuBoardGeometry.CORNER))
             .background(cellBg)
             .pointerInput(enabled) {
                 if (!enabled) return@pointerInput
                 detectTapGestures { o ->
-                    val cell = size.width / 9f
-                    val c = (o.x / cell).toInt().coerceIn(0, 8)
-                    val r = (o.y / cell).toInt().coerceIn(0, 8)
-                    onSelect(r * 9 + c)
+                    onSelect(SudokuBoardGeometry.cellAt(o.x, o.y, size.width.toFloat()))
                 }
             },
     ) {
         val cell = size.width / 9f
-        val bigStyle = TextStyle(fontSize = with(density) { (cell * 0.58f).toSp() }, fontWeight = FontWeight.Bold)
-        val noteStyle = TextStyle(fontSize = with(density) { (cell * 0.24f).toSp() })
+        val bigStyle = TextStyle(fontFamily = family, fontSize = with(density) { (cell * 0.58f).toSp() }, fontWeight = FontWeight.Bold)
+        val noteStyle = TextStyle(fontFamily = family, fontSize = with(density) { (cell * 0.24f).toSp() }, fontWeight = FontWeight.SemiBold)
         for (i in 0 until SudokuGeometry.CELLS) {
             val r = SudokuGeometry.row(i)
             val c = SudokuGeometry.col(i)
@@ -283,12 +301,21 @@ private fun Board(game: SudokuGame, selected: Int?, onSelect: (Int) -> Unit, ena
                 }
             }
         }
-        for (k in 0..9) {
+        for (k in 1..8) {
             val big = k % 3 == 0
-            val w = if (big) 3.dp.toPx() else 1.dp.toPx()
+            val w = if (big) SudokuBoardGeometry.BLOCK_LINE.toPx() else SudokuBoardGeometry.CELL_LINE.toPx()
             val color = if (big) thick else thin
             drawRect(color, Offset(k * cell - w / 2f, 0f), Size(w, size.height))
             drawRect(color, Offset(0f, k * cell - w / 2f), Size(size.width, w))
         }
+        // Outer frame is stroked fully inside the canvas so the clip never trims it, and drawn last to cover line ends.
+        val frame = SudokuBoardGeometry.FRAME.toPx()
+        drawRoundRect(
+            frameColor,
+            topLeft = Offset(frame / 2f, frame / 2f),
+            size = Size(size.width - frame, size.height - frame),
+            cornerRadius = CornerRadius(SudokuBoardGeometry.CORNER.toPx() - frame / 2f),
+            style = Stroke(frame),
+        )
     }
 }
