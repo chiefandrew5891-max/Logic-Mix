@@ -1,5 +1,6 @@
 package io.github.chiefandrew5891max.logicmix.feature.home
 
+import io.github.chiefandrew5891max.logicmix.core.audio.withTap
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -231,7 +232,7 @@ private fun MusicButton(@DrawableRes icon: Int, description: String, enabled: Bo
             .clip(shape)
             .background(LogicMixTokens.colors.cardBrush)
             .border(BorderStroke(1.dp, LogicMixTokens.colors.cardBorder), shape)
-            .clickable(enabled = enabled, role = Role.Button, onClick = onClick),
+            .clickable(enabled = enabled, role = Role.Button, onClick = withTap(onClick)),
         contentAlignment = Alignment.Center,
     ) {
         LogicMixIcon(icon, MaterialTheme.colorScheme.onSurface.copy(alpha = if (enabled) 1f else 0.4f), contentDescription = description, size = 20.dp)

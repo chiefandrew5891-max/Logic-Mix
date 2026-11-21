@@ -28,8 +28,10 @@ class MusicPlaylistTest {
     }
 
     @Test fun volumeIsClampedToPlayerRange() {
-        assertEquals(0.8f, musicPlayerVolume(0.8f), 0f)
+        assertEquals(0.64f, musicPlayerVolume(0.8f), 0.0001f)
         assertEquals(1f, musicPlayerVolume(2f), 0f)
+        assertEquals(0.25f, musicPlayerVolume(0.5f), 0.0001f)
+        assertTrue(musicPlayerVolume(0.01f) < 0.001f)
         assertEquals(0f, musicPlayerVolume(-1f), 0f)
     }
 

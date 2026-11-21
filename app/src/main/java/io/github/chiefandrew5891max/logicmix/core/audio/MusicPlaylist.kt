@@ -47,4 +47,4 @@ fun shouldPlayMusic(enabled: Boolean, inForeground: Boolean, trackCount: Int): B
     enabled && inForeground && trackCount > 0
 
 /** Music and effects have independent volume paths; this is the single place the music one is mapped. */
-fun musicPlayerVolume(settingsVolume: Float): Float = settingsVolume.coerceIn(0f, 1f)
+fun musicPlayerVolume(settingsVolume: Float): Float = volumeGain(settingsVolume)

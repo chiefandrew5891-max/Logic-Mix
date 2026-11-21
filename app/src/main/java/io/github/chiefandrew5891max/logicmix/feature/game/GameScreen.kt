@@ -1,5 +1,6 @@
 package io.github.chiefandrew5891max.logicmix.feature.game
 
+import io.github.chiefandrew5891max.logicmix.core.audio.withTap
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.BorderStroke
@@ -242,7 +243,7 @@ internal fun ActionButton(label: String, onClick: () -> Unit, filled: Boolean, e
                 .clip(shape)
                 .background(background)
                 .border(BorderStroke(if (filled) 0.dp else 1.dp, colors.cardBorder), shape)
-                .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
+                .clickable(enabled = enabled, role = Role.Button, onClick = withTap(onClick))
                 .padding(horizontal = fit.padding.dp, vertical = LogicMixTokens.spacingM),
             horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS, Alignment.CenterHorizontally),
             verticalAlignment = Alignment.CenterVertically,

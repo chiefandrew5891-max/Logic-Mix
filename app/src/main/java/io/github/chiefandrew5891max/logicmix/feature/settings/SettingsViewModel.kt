@@ -26,13 +26,21 @@ class SettingsViewModel @Inject constructor(
     private fun launch(block: suspend () -> Unit) { viewModelScope.launch { block() } }
 
     fun setMusicEnabled(v: Boolean) = launch { sfx.play(Sfx.TOGGLE); repository.setMusicEnabled(v) }
-    // Turning effects off is silent; turning them on confirms with the click once the setting is saved.
-    fun setEffectsEnabled(v: Boolean) = launch { repository.setEffectsEnabled(v); if (v) sfx.play(Sfx.TOGGLE) }
+    // The click is heard both when switching effects off (forced) and on (after the setting is saved).
+    fun setEffectsEnabled(v: Boolean) = launch {
+        if (!v) sfx.play(Sfx.TOGGLE, force = true)
+        repository.setEffectsEnabled(v)
+        if (v) sfx.play(Sfx.TOGGLE)
+    }
     fun setMusicVolume(v: Float) = launch { repository.setMusicVolume(v) }
     fun setEffectsVolume(v: Float) = launch { repository.setEffectsVolume(v) }
-    fun setVibrationEnabled(v: Boolean) = launch { sfx.play(Sfx.TOGGLE); repository.setVibrationEnabled(v) }
-    fun setThemeMode(m: ThemeMode) = launch { repository.setThemeMode(m) }
-    fun setLanguage(l: AppLanguage) = launch { repository.setLanguage(l) }
+    fun setVibrationEnabled(v: Boolean) = launch {
+        if (!v) sfx.play(Sfx.TOGGLE)
+        repository.setVibrationEnabled(v)
+        if (v) sfx.play(Sfx.TOGGLE)
+    }
+    fun setThemeMode(m: ThemeMode) = launch { sfx.play(Sfx.BUTTON_TAP); repository.setThemeMode(m) }
+    fun setLanguage(l: AppLanguage) = launch { sfx.play(Sfx.BUTTON_TAP); repository.setLanguage(l) }
     fun selectArcade() = launch { repository.confirmGameStyle(GameStyle.ARCADE) }
 }
 

@@ -1,5 +1,6 @@
 package io.github.chiefandrew5891max.logicmix
 
+import io.github.chiefandrew5891max.logicmix.core.audio.LocalUiFeedback
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
@@ -23,6 +24,7 @@ import io.github.chiefandrew5891max.logicmix.feature.home.PrimaryAction
 import io.github.chiefandrew5891max.logicmix.feature.home.StyleInfoScreen
 import io.github.chiefandrew5891max.logicmix.feature.home.titleRes
 import androidx.activity.compose.BackHandler
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -58,7 +60,9 @@ class MainActivity : AppCompatActivity() {
             LaunchedEffect(language) { language?.let { LocaleApplier.apply(it) } }
             LogicMixTheme(themeMode) {
                 val gameStyle by settings.gameStyle.collectAsState(initial = null)
-                LogicMixNavigation(rememberNavController(), gameStyle, sfx)
+                CompositionLocalProvider(LocalUiFeedback provides sfx) {
+                    LogicMixNavigation(rememberNavController(), gameStyle, sfx)
+                }
             }
         }
     }

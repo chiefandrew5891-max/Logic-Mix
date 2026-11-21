@@ -1,5 +1,6 @@
 package io.github.chiefandrew5891max.logicmix.feature.settings
 
+import io.github.chiefandrew5891max.logicmix.core.audio.withTap
 import androidx.annotation.DrawableRes
 import androidx.compose.material3.OutlinedButton
 import io.github.chiefandrew5891max.logicmix.core.designsystem.GameStyleCard
@@ -205,10 +206,10 @@ private fun GameStyleSection(prefs: GameStylePrefs, onArcade: () -> Unit, onStep
                 },
             )
         }
-        OutlinedButton({ onStep(StyleStep.TRAINER) }, Modifier.fillMaxWidth().heightIn(min = LogicMixTokens.minTouchTarget)) {
+        OutlinedButton(withTap { onStep(StyleStep.TRAINER) }, Modifier.fillMaxWidth().heightIn(min = LogicMixTokens.minTouchTarget)) {
             Text(stringResource(R.string.settings_trainer_edit))
         }
-        OutlinedButton({ onStep(StyleStep.CATEGORY) }, Modifier.fillMaxWidth().heightIn(min = LogicMixTokens.minTouchTarget)) {
+        OutlinedButton(withTap { onStep(StyleStep.CATEGORY) }, Modifier.fillMaxWidth().heightIn(min = LogicMixTokens.minTouchTarget)) {
             Text(stringResource(R.string.settings_category_edit))
         }
     }
@@ -325,7 +326,7 @@ internal fun LanguageAccordion(selected: AppLanguage, onSelect: (AppLanguage) ->
             Modifier
                 .fillMaxWidth()
                 .heightIn(min = 56.dp)
-                .clickable(role = Role.DropdownList) { expanded = !expanded }
+                .clickable(role = Role.DropdownList, onClick = withTap { expanded = !expanded })
                 .padding(horizontal = LogicMixTokens.spacingM, vertical = LogicMixTokens.spacingS),
             verticalAlignment = Alignment.CenterVertically,
         ) {

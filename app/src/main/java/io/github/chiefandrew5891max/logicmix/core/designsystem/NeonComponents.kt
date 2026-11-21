@@ -1,5 +1,6 @@
 package io.github.chiefandrew5891max.logicmix.core.designsystem
 
+import io.github.chiefandrew5891max.logicmix.core.audio.withTap
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -161,7 +162,7 @@ fun CategoryCard(
         modifier
             .neonFrame(shape, emphasis = selected == true)
             .then(if (selected != null) Modifier.semantics { this.selected = selected } else Modifier)
-            .clickable(role = role, onClick = onClick)
+            .clickable(role = role, onClick = withTap(onClick))
             .padding(LogicMixTokens.spacingS),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -187,7 +188,7 @@ fun GameStyleCard(
             .fillMaxWidth()
             .neonFrame(RoundedCornerShape(20.dp), emphasis = selected)
             .semantics { this.selected = selected }
-            .clickable(role = Role.RadioButton, onClick = onClick)
+            .clickable(role = Role.RadioButton, onClick = withTap(onClick))
             .padding(LogicMixTokens.spacingM),
         horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM),
         verticalAlignment = Alignment.CenterVertically,

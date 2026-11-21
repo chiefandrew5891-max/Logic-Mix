@@ -1,5 +1,7 @@
 package io.github.chiefandrew5891max.logicmix.core.designsystem
 
+import io.github.chiefandrew5891max.logicmix.core.audio.withTap
+import io.github.chiefandrew5891max.logicmix.core.audio.withBack
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -93,7 +95,7 @@ fun GameHeader(
     trailing: @Composable RowScope.() -> Unit = {},
 ) {
     Row(modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM)) {
-        HeaderIconButton(R.drawable.ic_back, stringResource(R.string.back), onBack)
+        HeaderIconButton(R.drawable.ic_back, stringResource(R.string.back), onBack, isBack = true)
         Column(Modifier.weight(1f)) {
             Text(title, style = LogicMixTokens.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground, maxLines = 1)
             if (subtitle != null) Text(subtitle, style = LogicMixTokens.typography.labelMedium, color = LogicMixTokens.colors.gold)
@@ -104,7 +106,7 @@ fun GameHeader(
 }
 
 @Composable
-private fun HeaderIconButton(icon: Int, description: String, onClick: () -> Unit, enabled: Boolean = true) {
+private fun HeaderIconButton(icon: Int, description: String, onClick: () -> Unit, enabled: Boolean = true, isBack: Boolean = false) {
     val colors = LogicMixTokens.colors
     val shape = LogicMixTokens.radii.medium
     Box(
@@ -113,7 +115,7 @@ private fun HeaderIconButton(icon: Int, description: String, onClick: () -> Unit
             .clip(shape)
             .background(colors.cardBrush)
             .border(BorderStroke(1.dp, colors.cardBorder), shape)
-            .clickable(enabled = enabled, role = Role.Button, onClick = onClick),
+            .clickable(enabled = enabled, role = Role.Button, onClick = if (isBack) withBack(onClick) else withTap(onClick)),
         contentAlignment = Alignment.Center,
     ) {
         LogicMixIcon(icon, MaterialTheme.colorScheme.onSurface.copy(alpha = if (enabled) 1f else 0.4f), contentDescription = description)
@@ -130,8 +132,8 @@ fun RestartButton(onConfirm: () -> Unit, enabled: Boolean = true) {
             onDismissRequest = { asking = false },
             title = { Text(stringResource(R.string.restart_title)) },
             text = { Text(stringResource(R.string.restart_body)) },
-            confirmButton = { TextButton({ asking = false; onConfirm() }) { Text(stringResource(R.string.restart_confirm)) } },
-            dismissButton = { TextButton({ asking = false }) { Text(stringResource(R.string.restart_cancel)) } },
+            confirmButton = { TextButton(withTap { asking = false; onConfirm() }) { Text(stringResource(R.string.restart_confirm)) } },
+            dismissButton = { TextButton(withBack { asking = false }) { Text(stringResource(R.string.restart_cancel)) } },
         )
     }
 }
@@ -163,7 +165,7 @@ private fun ToolButton(tool: GameTool, fit: ButtonFit, style: TextStyle, modifie
             .clip(shape)
             .then(if (tool.selected) Modifier.background(primary.copy(alpha = 0.35f)) else Modifier.background(colors.cardBrush))
             .border(BorderStroke(if (tool.selected) 2.dp else 1.dp, if (tool.selected) primary else colors.cardBorder), shape)
-            .clickable(enabled = tool.enabled, role = Role.Button, onClick = tool.onClick)
+            .clickable(enabled = tool.enabled, role = Role.Button, onClick = withTap(tool.onClick))
             .padding(horizontal = fit.padding.dp, vertical = 8.dp),
         contentAlignment = Alignment.Center,
     ) {
