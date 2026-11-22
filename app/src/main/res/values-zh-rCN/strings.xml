@@ -232,4 +232,6 @@
     <string name="nl_prompt_hidden_relation">找出隐藏规律并应用</string>
     <string name="nl_prompt_attention">仔细数一数并计算</string>
     <string name="nl_prompt_mixed">代入数值并计算</string>
+    <string name="cw_zoom_fit">适应屏幕</string>
+    <string name="cw_zoom_reset">重置缩放</string>
 </resources>

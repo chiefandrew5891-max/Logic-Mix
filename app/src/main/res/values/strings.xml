@@ -232,4 +232,6 @@
     <string name="nl_prompt_hidden_relation">Find the hidden rule and apply it</string>
     <string name="nl_prompt_attention">Count carefully and compute the result</string>
     <string name="nl_prompt_mixed">Substitute the values and evaluate</string>
+    <string name="cw_zoom_fit">Fit grid</string>
+    <string name="cw_zoom_reset">Reset zoom</string>
 </resources>

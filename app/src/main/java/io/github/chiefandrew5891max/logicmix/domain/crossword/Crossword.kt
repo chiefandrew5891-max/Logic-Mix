@@ -17,6 +17,8 @@ data class CrosswordPuzzle(
     val size: Int,
     val difficulty: Int,
     val entries: List<CrosswordEntry>,
+    val seed: Long = 0L,
+    val dictionary: String = BUILTIN_DICTIONARY,
 ) {
     fun cells(entry: CrosswordEntry): List<Int> = List(entry.length) { entry.cell(it, size) }
 
@@ -36,6 +38,9 @@ data class CrosswordPuzzle(
     /** Empty means the grid is a consistent crossword with no accidental words. */
     fun problems(): List<String> {
         val out = mutableListOf<String>()
+        if (entries.size > MAX_WORDS) out += "more than $MAX_WORDS words"
+        if (entries.map { it.answer }.toSet().size != entries.size) out += "duplicate word"
+        entries.filter { it.clue.revealsAnswer(it.answer) }.forEach { out += "${it.answer}: clue contains the answer" }
         val grid = HashMap<Int, Char>()
         for (e in entries) {
             if (e.answer.isEmpty() || e.clue.isBlank()) out += "${e.answer}: empty answer or clue"
@@ -77,6 +82,12 @@ data class CrosswordPuzzle(
         return out
     }
 
+    companion object {
+        /** Strict product invariant for every mode and difficulty. */
+        const val MAX_WORDS = 10
+        const val BUILTIN_DICTIONARY = "builtin-1"
+    }
+
     private fun connected(): Boolean {
         if (entries.isEmpty()) return false
         val seen = mutableSetOf(entries[0])
@@ -88,6 +99,10 @@ data class CrosswordPuzzle(
         return seen.size == entries.size
     }
 }
+
+/** True when the clue contains the answer as a whole word (so "кот" inside "которое" does not count). */
+fun String.revealsAnswer(answer: String): Boolean =
+    split(Regex("[^\\p{L}]+")).any { it.equals(answer, ignoreCase = true) }
 
 /** One attempt. Pure and immutable; selection lives here so cursor rules are unit-testable. */
 data class CrosswordGame(
@@ -195,12 +210,15 @@ data class CrosswordGame(
         letters.entries.joinToString(",") { "${it.key}:${it.value}" },
         revealed.joinToString(","),
         hintsUsed.toString(),
+        puzzle.dictionary,
     ).joinToString(";")
 
     companion object {
         fun restore(puzzle: CrosswordPuzzle, raw: String?): CrosswordGame {
             val parts = raw?.split(";") ?: return CrosswordGame(puzzle)
-            if (parts.size != 3) return CrosswordGame(puzzle)
+            // 3 parts = saved before dictionary versions existed; a different version means the words may have changed.
+            if (parts.size !in 3..4) return CrosswordGame(puzzle)
+            if (parts.size == 4 && parts[3] != puzzle.dictionary) return CrosswordGame(puzzle)
             val valid = puzzle.solution.keys
             val letters = parts[0].split(",").mapNotNull { s ->
                 val (k, v) = s.split(":").takeIf { it.size == 2 && it[1].length == 1 } ?: return@mapNotNull null

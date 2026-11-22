@@ -11,15 +11,17 @@ import io.github.chiefandrew5891max.logicmix.core.locale.effectiveLanguage
 import io.github.chiefandrew5891max.logicmix.domain.content.ContentLanguage
 import io.github.chiefandrew5891max.logicmix.domain.crossword.CrosswordEntry
 import io.github.chiefandrew5891max.logicmix.domain.crossword.CrosswordGame
-import io.github.chiefandrew5891max.logicmix.domain.crossword.CrosswordPacks
+import io.github.chiefandrew5891max.logicmix.domain.crossword.CrosswordCareer
 import io.github.chiefandrew5891max.logicmix.domain.crossword.CrosswordPuzzle
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 enum class CheckResult { NONE, MISTAKES, OK }
 
@@ -51,7 +53,7 @@ class CrosswordViewModel @Inject constructor(
         viewModelScope.launch {
             settings.effectiveLanguage().distinctUntilChanged().collect { language ->
                 val content = ContentLanguage.forInterface(language)
-                val puzzles = CrosswordPacks.forLanguage(content)
+                val puzzles = withContext(Dispatchers.Default) { CrosswordCareer.forLanguage(content) }
                 key = "$KEY_PREFIX${content.tag}"
                 _state.value = CrosswordUiState(loading = false, puzzles = puzzles.orEmpty(), language = content, unsupported = puzzles == null)
                 if (puzzles != null) open(games.store.levelIndex(key))

@@ -232,4 +232,6 @@
     <string name="nl_prompt_hidden_relation">Знайдіть приховане правило й застосуйте його</string>
     <string name="nl_prompt_attention">Уважно порахуйте результат</string>
     <string name="nl_prompt_mixed">Підставте значення й обчисліть</string>
+    <string name="cw_zoom_fit">Вмістити</string>
+    <string name="cw_zoom_reset">Скинути масштаб</string>
 </resources>

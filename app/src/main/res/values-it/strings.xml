@@ -232,4 +232,6 @@
     <string name="nl_prompt_hidden_relation">Trova la regola nascosta e applicala</string>
     <string name="nl_prompt_attention">Conta con attenzione e calcola</string>
     <string name="nl_prompt_mixed">Sostituisci i valori e calcola</string>
+    <string name="cw_zoom_fit">Adatta</string>
+    <string name="cw_zoom_reset">Reimposta zoom</string>
 </resources>
