@@ -5,6 +5,21 @@ import kotlin.random.Random
 enum class NeonEffect { SoftFlicker, Surge, Malfunction }
 
 /** Where the letters of `logo_logic_mix_player.png` are, in normalized image coordinates, and how to find their pixels. */
+/** Rectangle in which an image of imageW x imageH is painted by ContentScale.Fit + Alignment.Center. */
+data class FitRect(val left: Float, val top: Float, val width: Float, val height: Float) {
+    fun mapX(nx: Float) = left + nx * width
+    fun mapY(ny: Float) = top + ny * height
+
+    companion object {
+        fun fit(containerW: Float, containerH: Float, imageW: Float, imageH: Float): FitRect {
+            val scale = minOf(containerW / imageW, containerH / imageH)
+            val w = imageW * scale
+            val h = imageH * scale
+            return FitRect((containerW - w) / 2f, (containerH - h) / 2f, w, h)
+        }
+    }
+}
+
 object NeonSignGeometry {
     const val LOGIC_LEFT = 0.08f
     const val LOGIC_RIGHT = 0.58f

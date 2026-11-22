@@ -32,17 +32,19 @@ data class BulbLook(
     val haloRadius: Float, val haloAlpha: Float,
     val bodyRadius: Float, val bodyAlpha: Float,
     val coreRadius: Float, val coreAlpha: Float,
+    val specRadius: Float = 0.22f, val specAlpha: Float = 0f,
 ) {
     companion object {
-        /** Radii are multiples of the bulb radius. */
+        /** Radii are multiples of the bulb radius. The body is opaque enough to cover the grey bulb of the PNG. */
         fun of(brightness: Float): BulbLook {
             val b = brightness.coerceIn(0f, 1f)
             val s = GarlandEngine.smooth(b)
             return BulbLook(
-                glowRadius = 1.9f + 1.3f * b, glowAlpha = 0.30f * s,
-                haloRadius = 1.45f + 0.35f * b, haloAlpha = 0.65f * s,
-                bodyRadius = 0.95f + 0.1f * b, bodyAlpha = s,
-                coreRadius = 0.45f * (0.7f + 0.3f * b), coreAlpha = s,
+                glowRadius = 2.5f + 1.0f * b, glowAlpha = 0.55f * s,
+                haloRadius = 1.6f + 0.6f * b, haloAlpha = 0.8f * s,
+                bodyRadius = 1.05f + 0.1f * b, bodyAlpha = (1.8f * s).coerceAtMost(1f),
+                coreRadius = 0.6f * (0.7f + 0.3f * b), coreAlpha = (1.5f * s).coerceAtMost(1f),
+                specAlpha = 0.9f * s,
             )
         }
     }
@@ -215,7 +217,7 @@ class GarlandEngine(private val random: Random, private val count: Int = Garland
     private fun bump(d: Float) = smooth((1f - kotlin.math.abs(d) / WAVE_WIDTH).coerceIn(0f, 1f))
 
     companion object {
-        const val REST = 0.4f
+        const val REST = 0.25f
         const val WAVE_WIDTH = 0.2f
         const val SWEEP_SPEED = 0.33f
         const val BREATH_SECONDS = 4.5f

@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.ProcessLifecycleOwner
+import kotlin.math.roundToInt
 import kotlin.random.Random
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -36,7 +37,7 @@ private val LogicHalo = Color(0xFF2F8CFF)
 private val MixCore = Color(0xFFFFD36B)
 private val MixHalo = Color(0xFFFF8A1F)
 
-private class NeonBitmaps(val logicCore: ImageBitmap, val logicHalo: ImageBitmap, val mixCore: ImageBitmap, val mixHalo: ImageBitmap)
+private class NeonBitmaps(val srcW: Int, val srcH: Int, val logicCore: ImageBitmap, val logicHalo: ImageBitmap, val mixCore: ImageBitmap, val mixHalo: ImageBitmap)
 
 private fun ByteArray.toWhiteMask(w: Int, h: Int): ImageBitmap {
     val pixels = IntArray(w * h) { i -> ((this[i].toInt() * 2).coerceIn(0, 255) shl 24) or 0xFFFFFF }
@@ -69,12 +70,15 @@ fun LogicMixNeonOverlay(drawableId: Int, pulseTick: Int, modifier: Modifier = Mo
     }
     LaunchedEffect(drawableId) {
         bitmaps = withContext(Dispatchers.Default) {
+            val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            BitmapFactory.decodeResource(context.resources, drawableId, bounds)
             val options = BitmapFactory.Options().apply { inSampleSize = 4 }
             val src = BitmapFactory.decodeResource(context.resources, drawableId, options) ?: return@withContext null
             val px = IntArray(src.width * src.height)
             src.getPixels(px, 0, src.width, 0, 0, src.width, src.height)
             val m = NeonMasks.build(px, src.width, src.height)
             NeonBitmaps(
+                bounds.outWidth, bounds.outHeight,
                 m.logicCore.toWhiteMask(m.width, m.height), m.logicHalo.toWhiteMask(m.width, m.height),
                 m.mixCore.toWhiteMask(m.width, m.height), m.mixHalo.toWhiteMask(m.width, m.height),
             )
@@ -103,23 +107,28 @@ fun LogicMixNeonOverlay(drawableId: Int, pulseTick: Int, modifier: Modifier = Mo
     Canvas(modifier) {
         frame.longValue
         val b = bitmaps ?: return@Canvas
-        layer(b.logicHalo, LogicHalo, engine.logic * 0.55f)
-        layer(b.logicCore, LogicCore, engine.logic * 0.45f)
-        val split = size.width * NeonSignGeometry.TUBE_LEFT
+        // Same rectangle as Image(ContentScale.Fit): the masks are stretched from their own size onto it.
+        val rect = FitRect.fit(size.width, size.height, b.srcW.toFloat(), b.srcH.toFloat())
+        val split = rect.mapX(NeonSignGeometry.TUBE_LEFT)
+        layer(rect, b.logicHalo, LogicHalo, engine.logic * 0.55f)
+        layer(rect, b.logicCore, LogicCore, engine.logic * 0.45f)
         if (engine.tube == engine.mix) {
-            layer(b.mixHalo, MixHalo, engine.mix * 0.55f)
-            layer(b.mixCore, MixCore, engine.mix * 0.45f)
+            layer(rect, b.mixHalo, MixHalo, engine.mix * 0.55f)
+            layer(rect, b.mixCore, MixCore, engine.mix * 0.45f)
         } else {
-            clipRect(right = split) { layer(b.mixHalo, MixHalo, engine.mix * 0.55f); layer(b.mixCore, MixCore, engine.mix * 0.45f) }
-            clipRect(left = split) { layer(b.mixHalo, MixHalo, engine.tube * 0.55f); layer(b.mixCore, MixCore, engine.tube * 0.45f) }
+            clipRect(right = split) { layer(rect, b.mixHalo, MixHalo, engine.mix * 0.55f); layer(rect, b.mixCore, MixCore, engine.mix * 0.45f) }
+            clipRect(left = split) { layer(rect, b.mixHalo, MixHalo, engine.tube * 0.55f); layer(rect, b.mixCore, MixCore, engine.tube * 0.45f) }
         }
     }
 }
 
-private fun DrawScope.layer(image: ImageBitmap, color: Color, alpha: Float) {
+private fun DrawScope.layer(rect: FitRect, image: ImageBitmap, color: Color, alpha: Float) {
     if (alpha <= 0.004f) return
     drawImage(
-        image, IntOffset.Zero, IntSize(size.width.toInt(), size.height.toInt()),
+        image,
+        srcOffset = IntOffset.Zero, srcSize = IntSize(image.width, image.height),
+        dstOffset = IntOffset(rect.left.roundToInt(), rect.top.roundToInt()),
+        dstSize = IntSize(rect.width.roundToInt(), rect.height.roundToInt()),
         alpha = alpha.coerceIn(0f, 1f), colorFilter = ColorFilter.tint(color, BlendMode.SrcIn), blendMode = BlendMode.Plus,
     )
 }

@@ -22,10 +22,11 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.ProcessLifecycleOwner
 import kotlin.random.Random
 
-private val Amber = Color(0xFFFFA726)
-private val Gold = Color(0xFFFFC94D)
-private val SoftYellow = Color(0xFFFFE9A8)
-private val WarmWhite = Color(0xFFFFFBEA)
+private val Amber = Color(0xFFFF9D00)
+private val Gold = Color(0xFFFFC400)
+private val Yellow = Color(0xFFFFE84A)
+private val GlowAmber = Color(0xFFFFB000)
+private val WarmWhite = Color(0xFFFFF8D0)
 
 /**
  * Transparent, non-interactive light layer drawn over the bulbs already painted in the logo PNG.
@@ -85,13 +86,16 @@ fun LogicMixGarlandOverlay(
             val c = Offset(points[i].x * size.width, points[i].y * h)
             val glowR = radius * look.glowRadius
             drawCircle(
-                brush = Brush.radialGradient(listOf(Amber.copy(alpha = 0.5f), Color.Transparent), center = c, radius = glowR),
+                brush = Brush.radialGradient(
+                    0f to GlowAmber.copy(alpha = 0.7f), 0.4f to GlowAmber.copy(alpha = 0.3f), 1f to Color.Transparent,
+                    center = c, radius = glowR,
+                ),
                 radius = glowR, center = c, alpha = look.glowAlpha, blendMode = BlendMode.Plus,
             )
             val haloR = radius * look.haloRadius
             drawCircle(
                 brush = Brush.radialGradient(
-                    0f to Gold.copy(alpha = 0.9f), 0.55f to Gold.copy(alpha = 0.45f), 1f to Color.Transparent,
+                    0f to Gold, 0.5f to Amber.copy(alpha = 0.6f), 1f to Color.Transparent,
                     center = c, radius = haloR,
                 ),
                 radius = haloR, center = c, alpha = look.haloAlpha,
@@ -99,16 +103,19 @@ fun LogicMixGarlandOverlay(
             val bodyR = radius * look.bodyRadius
             drawCircle(
                 brush = Brush.radialGradient(
-                    0f to SoftYellow, 0.55f to Gold, 0.9f to Amber, 1f to Amber.copy(alpha = 0f),
+                    0f to WarmWhite, 0.35f to Yellow, 0.7f to Gold, 0.92f to Amber, 1f to Amber.copy(alpha = 0f),
                     center = c, radius = bodyR,
                 ),
                 radius = bodyR, center = c, alpha = look.bodyAlpha,
             )
             val coreR = radius * look.coreRadius
             drawCircle(
-                brush = Brush.radialGradient(listOf(WarmWhite, WarmWhite.copy(alpha = 0f)), center = c, radius = coreR),
+                brush = Brush.radialGradient(0f to Color.White, 0.6f to Color.White, 1f to Color.White.copy(alpha = 0f), center = c, radius = coreR),
                 radius = coreR, center = c, alpha = look.coreAlpha,
             )
+            val specR = radius * look.specRadius
+            val specC = Offset(c.x - radius * 0.3f, c.y - radius * 0.35f)
+            drawCircle(color = Color.White, radius = specR, center = specC, alpha = look.specAlpha)
         }
     }
 }

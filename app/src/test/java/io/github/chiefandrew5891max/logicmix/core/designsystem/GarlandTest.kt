@@ -164,4 +164,18 @@ class GarlandTest {
             prev = e.levels.copyOf()
         }
     }
+
+    @Test fun litBulbIsBrightWithWhiteCoreAndLocalHalo() {
+        val on = BulbLook.of(1f)
+        assertEquals(1f, on.bodyAlpha, 1e-6f)
+        assertEquals(1f, on.coreAlpha, 1e-6f)
+        assertTrue(on.specAlpha > 0.5f)
+        assertTrue(on.glowRadius in 2.5f..3.5f)
+        assertTrue(on.coreRadius < on.bodyRadius && on.bodyRadius < on.haloRadius && on.haloRadius < on.glowRadius)
+        val off = BulbLook.of(0f)
+        assertEquals(0f, off.glowAlpha + off.haloAlpha + off.bodyAlpha + off.coreAlpha + off.specAlpha, 0f)
+        for (i in 0..100) BulbLook.of(i / 100f).let {
+            listOf(it.glowAlpha, it.haloAlpha, it.bodyAlpha, it.coreAlpha, it.specAlpha).forEach { a -> assertTrue(a in 0f..1f) }
+        }
+    }
 }
