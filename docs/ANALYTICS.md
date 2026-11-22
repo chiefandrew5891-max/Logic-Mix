@@ -28,7 +28,7 @@
 
 ## DebugView
 ```
-adb shell setprop debug.firebase.analytics.app io.github.chiefandrew5891max.logicmix
+adb shell setprop debug.firebase.analytics.app com.akynex.logicmix
 ```
 Сначала включить «Анонимная аналитика» в Настройках (по умолчанию выключено).
 

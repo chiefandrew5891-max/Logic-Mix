@@ -20,11 +20,11 @@ val testAppId = "ca-app-pub-3940256099942544~3347511713"
 val testRewardedUnitId = "ca-app-pub-3940256099942544/5224354917"
 
 android {
-    namespace = "io.github.chiefandrew5891max.logicmix"
+    namespace = "com.akynex.logicmix"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "io.github.chiefandrew5891max.logicmix"
+        applicationId = "com.akynex.logicmix"
         minSdk = 26
         targetSdk = 36
         versionCode = 1

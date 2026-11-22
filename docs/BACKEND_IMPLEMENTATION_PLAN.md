@@ -45,7 +45,7 @@ Android-код остаётся в `app/`.
 9. `zh-CN` сохраняется: WORD_SEARCH и MINI_CROSSWORD скрываются только через `CategoryAvailability`; нельзя добавлять скрытие в обход него. Для WORD_LOGIC на zh — сообщение «нет заданий», без подмены на EN.
 10. Обновление пакета во время игры: применять только при следующем запуске/выходе в меню.
 
-## 5. Android-файлы, которые придётся менять (пути под `app/src/main/java/io/github/chiefandrew5891max/logicmix/`)
+## 5. Android-файлы, которые придётся менять (пути под `app/src/main/java/com/akynex/logicmix/`)
 
 - Сборка: `app/build.gradle.kts`, `gradle/libs.versions.toml`, `AndroidManifest.xml` (INTERNET, этап D/E).
 - Локаль (zh-CN сохраняется, ничего не удаляется): `domain/content/CategoryAvailability.kt` (единый механизм скрытия; проверить, что его используют все режимы), `domain/content/ContentLanguage.kt` и `WordLogicPacks.kt` (поведение при отсутствии пака), при необходимости `LetterKeyboard.kt`.

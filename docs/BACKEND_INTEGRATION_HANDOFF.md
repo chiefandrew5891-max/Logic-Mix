@@ -7,7 +7,7 @@
 
 **Легенда:** ✅ РЕАЛИЗОВАНО (проверено по коду) · 💡 ПРЕДЛАГАЕТСЯ (в коде этого нет).
 
-Корень кода: `app/src/main/java/io/github/chiefandrew5891max/logicmix/` (далее `…/`).
+Корень кода: `app/src/main/java/com/akynex/logicmix/` (далее `…/`).
 
 ---
 
