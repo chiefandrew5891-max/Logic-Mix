@@ -74,7 +74,7 @@ internal class Layout(val width: Float) {
     val top = w * 0.35f
     val height = h + top * 2
     val length = w * 0.8f
-    val thick = w * 0.17f
+    val thick = w * 0.12f
     private val left = (width - (5 * w + 4 * gap)) / 2f
 
     /** Horizontal and vertical extent of a stick including the drag-lift scale, for bounds checks. */
@@ -224,6 +224,7 @@ private fun Board(state: MatchUiState, game: MatchGame, vm: MatchstickViewModel)
     val teal = MaterialTheme.colorScheme.secondary
     val gold = LogicMixTokens.colors.gold
     val locked = game.solved
+    val dark = LogicMixTokens.colors.isDark
 
     fun targets(g: MatchGame, from: Int) = (0 until MatchSlots.COUNT).filter { g.canMove(from, it) }
 
@@ -233,7 +234,8 @@ private fun Board(state: MatchUiState, game: MatchGame, vm: MatchstickViewModel)
             .height(heightDp)
             .onSizeChanged { width = it.width.toFloat() }
             .clip(LogicMixTokens.radii.medium)
-            .background(Color(0xFF14264F))
+            .background(if (dark) Color(0xFF14264F) else Color(0xFFF7F5FF))
+            .then(if (dark) Modifier else Modifier.border(BorderStroke(1.5.dp, Color(0xFFD8C7F4)), LogicMixTokens.radii.medium))
             .pointerInput(locked) {
                 if (locked) return@pointerInput
                 detectDragGestures(
@@ -284,8 +286,8 @@ private fun Board(state: MatchUiState, game: MatchGame, vm: MatchstickViewModel)
             val tl = Offset(s.center.x - sz.width / 2, s.center.y - sz.height / 2)
             val color = when {
                 hot || hinted -> teal
-                i in ghosts -> Color.White.copy(alpha = 0.22f)
-                else -> Color.White.copy(alpha = 0.08f)
+                i in ghosts -> if (dark) Color.White.copy(alpha = 0.22f) else Color(0xFF6C3FE0).copy(alpha = 0.45f)
+                else -> if (dark) Color.White.copy(alpha = 0.08f) else Color(0xFF6C3FE0).copy(alpha = 0.22f)
             }
             drawRoundRect(color, tl, sz, CornerRadius(l.thick / 2), style = Stroke(if (hot || hinted) l.thick * 0.22f else l.thick * 0.1f))
         }

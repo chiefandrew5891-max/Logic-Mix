@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -107,12 +108,14 @@ private fun Grid(game: CrosswordGame, onCell: (Int) -> Unit) {
                         val index = r * size + c
                         val used = index in game.puzzle.solution
                         val shape = LogicMixTokens.radii.small
+                        // Light theme: opaque white base so the app gradient never shows through the cells.
+                        val base = if (colors.isDark) Color.Transparent else Color.White
                         val bg = when {
                             !used -> Color.Transparent
-                            index == game.selected -> colors.gold.copy(alpha = 0.55f)
-                            index in game.wrong -> MaterialTheme.colorScheme.error.copy(alpha = 0.45f)
-                            index in game.activeCells -> colors.gold.copy(alpha = 0.22f)
-                            else -> Color.White.copy(alpha = 0.08f)
+                            index == game.selected -> colors.gold.copy(alpha = 0.55f).compositeOver(base)
+                            index in game.wrong -> MaterialTheme.colorScheme.error.copy(alpha = 0.45f).compositeOver(base)
+                            index in game.activeCells -> colors.gold.copy(alpha = 0.22f).compositeOver(base)
+                            else -> if (colors.isDark) Color.White.copy(alpha = 0.08f) else Color.White
                         }
                         Box(
                             Modifier.size(cell).clip(shape).background(bg)
