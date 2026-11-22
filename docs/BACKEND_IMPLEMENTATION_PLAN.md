@@ -12,7 +12,7 @@
 | D | Android: `PuzzleSource`, кэш, `ContentSyncWorker`, переход `GameViewModel` на ID; миграции (Room — только отдельно и с тестами) | сборка и `./gradlew test` (нужен Android SDK) | да, миграция — отдельно |
 | E | После создания проекта владельцем: Storage, Firestore, Rules, App Check, `google-services.json` на стороне владельца | чек-лист `FIREBASE_SETUP_CHECKLIST.md` | да |
 | F | Сквозная проверка: публикация → загрузка → установка → игра → прогресс (staging → production) | чек-лист на устройстве | да |
-| G | Остальные категории и языки (uk, it, de, fr, es), Word Logic на 7 языках | пакеты по очереди en→ru→uk→it→de→fr→es | да |
+| G | Остальные категории и языки (uk, it, de, fr, es), Word Logic на uk, it, de, fr, es (zh-CN — после исследования адаптации) | пакеты по очереди en→ru→uk→it→de→fr→es | да |
 | H | Daily (экран, XP-интеграция), бонусы, автоматическое пополнение | см. архитектуру §1d | да |
 
 Следующий крупный этап — только после отдельного подтверждения владельца.
@@ -27,7 +27,7 @@ docs/
 ```
 Android-код остаётся в `app/`.
 
-## 3. Первый прототип RU + EN
+## 3. Первый прототип RU + EN (только ru и en)
 
 **Категория: числовые последовательности (NUMBER_SEQUENCE).** Обоснование (проверено): структура простая (`id`, `sequence: List<Int>`, `answer: Int`, `difficulty`, `hints`, `explanation`); выбор уровня уже по ID (`firstUnsolved(solvedIds)`, `byId`), прогресс в Room `solved_puzzles` — индексных сохранений нет; валидатор правил уже есть в `NumberSequenceEngine.validateDefinition` (≥3 числа, сложность 1..100).
 Оговорка (проверено): сейчас в клиенте у категории нет языкового текста — `prompt="next"` не показывается, подсказки — нейтральные формулы. Ru/en-различие в прототипе — текст `h` и `e` («Каждое число больше на 4» / «Each number grows by 4»).
@@ -56,13 +56,13 @@ Android-код остаётся в `app/`.
 6. Room v2, есть только `MIGRATION_1_2`; новая миграция — отдельно, с тестами, без `fallbackToDestructiveMigration`.
 7. Пак нельзя удалять, пока на него ссылается незавершённое состояние.
 8. Повторное начисление XP при смене ID — запрещена смена ID; смена смысла = новый ID.
-9. Удаление zh: `AppLanguage.fromStored` вернёт `SYSTEM` для неизвестного значения (проверено); per-app локаль AppCompat на устройстве — предположение.
+9. `zh-CN` сохраняется: WORD_SEARCH и MINI_CROSSWORD скрываются только через `CategoryAvailability`; нельзя добавлять скрытие в обход него. Для WORD_LOGIC на zh — сообщение «нет заданий», без подмены на EN.
 10. Обновление пакета во время игры: применять только при следующем запуске/выходе в меню.
 
 ## 5. Android-файлы, которые придётся менять (пути под `app/src/main/java/io/github/chiefandrew5891max/logicmix/`)
 
 - Сборка: `app/build.gradle.kts`, `gradle/libs.versions.toml`, `AndroidManifest.xml` (INTERNET, этап D/E).
-- Локаль (решение №1): `core/locale/AppLanguage.kt`, `domain/content/ContentLanguage.kt`, `domain/content/CategoryAvailability.kt`, `core/designsystem/LetterKeyboard.kt`, `feature/settings/SettingsScreen.kt`, `feature/gamestyle/GameStyleViewModel.kt` (комментарий), `res/xml/locales_config.xml`, `res/values-zh-rCN/`, `res/values/language_names.xml`, тесты (`SettingsRepositoryTest`, `LanguageAndThemeTest`, `CrosswordTest`, `WordSearchTest`, `WordLogicTest`, `HomeStateTest`, `CategoryGridTest`).
+- Локаль (zh-CN сохраняется, ничего не удаляется): `domain/content/CategoryAvailability.kt` (единый механизм скрытия; проверить, что его используют все режимы), `domain/content/ContentLanguage.kt` и `WordLogicPacks.kt` (поведение при отсутствии пака), при необходимости `LetterKeyboard.kt`.
 - Контент: `NumberSequencePack.kt`, `GameViewModel.kt`, `WordLogicPacks.kt` (убрать тихий EN-fallback), `CrosswordPacks.kt`, `VisualPacks.kt`, `CrosswordViewModel.kt`, `VisualViewModel.kt`, `WordLogicViewModel`, `CategoryStore.kt`.
 - Прогресс: `ProgressRepository.kt` (XP для DAILY), `core/database/*` (миграция), `WordSearchStore.kt`, `WordSearchEngine.kt`.
 - Новое: `PuzzleSource`, кэш пакетов, `ContentSyncWorker` (WorkManager), экран Daily, маршруты в `MainActivity.kt`.
