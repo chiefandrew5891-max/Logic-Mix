@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "io.github.chiefandrew5891max.logicmix"
+    namespace = "com.akynex.logicmix"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "io.github.chiefandrew5891max.logicmix"
+        applicationId = "com.akynex.logicmix"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
