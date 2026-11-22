@@ -223,4 +223,13 @@
     <string name="td_no_hint">Al momento non c’è nessuna catena disponibile.</string>
     <string name="td_rules">Collega 2 o più punti dello stesso colore. Chiudi un anello per eliminare tutto quel colore.</string>
     <string name="footer_rights">Tutti i diritti riservati.</string>
+    <string name="nl_prompt_order_ops">Calcola rispettando l\'ordine delle operazioni</string>
+    <string name="nl_prompt_parentheses">Calcola; prima le parentesi</string>
+    <string name="nl_prompt_missing_op">Scegli l\'operatore mancante</string>
+    <string name="nl_prompt_pyramid">Trova il numero nella piramide (ogni casella è la somma delle due sotto)</string>
+    <string name="nl_prompt_matrix">Trova il numero nella matrice</string>
+    <string name="nl_prompt_balance">Ogni simbolo nasconde un numero: trova la somma</string>
+    <string name="nl_prompt_hidden_relation">Trova la regola nascosta e applicala</string>
+    <string name="nl_prompt_attention">Conta con attenzione e calcola</string>
+    <string name="nl_prompt_mixed">Sostituisci i valori e calcola</string>
 </resources>

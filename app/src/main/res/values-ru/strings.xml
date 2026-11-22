@@ -223,4 +223,13 @@
     <string name="td_no_hint">Сейчас нет доступной цепочки.</string>
     <string name="td_rules">Соедините 2 и более точек одного цвета. Замкните контур — исчезнут все точки этого цвета.</string>
     <string name="footer_rights">Все права защищены.</string>
+    <string name="nl_prompt_order_ops">Вычислите с учётом порядка действий</string>
+    <string name="nl_prompt_parentheses">Вычислите; сначала скобки</string>
+    <string name="nl_prompt_missing_op">Выберите пропущенный знак</string>
+    <string name="nl_prompt_pyramid">Найдите число в пирамиде (каждая клетка — сумма двух нижних)</string>
+    <string name="nl_prompt_matrix">Найдите число в матрице</string>
+    <string name="nl_prompt_balance">Каждый символ скрывает число: найдите сумму</string>
+    <string name="nl_prompt_hidden_relation">Найдите скрытое правило и примените его</string>
+    <string name="nl_prompt_attention">Внимательно посчитайте результат</string>
+    <string name="nl_prompt_mixed">Подставьте значения и вычислите</string>
 </resources>

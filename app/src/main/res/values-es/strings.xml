@@ -223,4 +223,13 @@
     <string name="td_no_hint">Ahora no hay ninguna cadena disponible.</string>
     <string name="td_rules">Une 2 o más puntos del mismo color. Cierra un bucle para eliminar todo ese color.</string>
     <string name="footer_rights">Todos los derechos reservados.</string>
+    <string name="nl_prompt_order_ops">Calcula respetando el orden de las operaciones</string>
+    <string name="nl_prompt_parentheses">Calcula; primero los paréntesis</string>
+    <string name="nl_prompt_missing_op">Elige el operador que falta</string>
+    <string name="nl_prompt_pyramid">Halla el número de la pirámide (cada casilla es la suma de las dos de abajo)</string>
+    <string name="nl_prompt_matrix">Halla el número de la matriz</string>
+    <string name="nl_prompt_balance">Cada símbolo oculta un número: halla la suma</string>
+    <string name="nl_prompt_hidden_relation">Halla la regla oculta y aplícala</string>
+    <string name="nl_prompt_attention">Cuenta con atención y calcula</string>
+    <string name="nl_prompt_mixed">Sustituye los valores y calcula</string>
 </resources>

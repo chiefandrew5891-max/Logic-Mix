@@ -11,7 +11,7 @@ import io.github.chiefandrew5891max.logicmix.core.data.ProgressRepository
 import io.github.chiefandrew5891max.logicmix.domain.game.AttemptOutcome
 import io.github.chiefandrew5891max.logicmix.domain.game.GameMode
 import io.github.chiefandrew5891max.logicmix.domain.game.NumberSequenceEngine
-import io.github.chiefandrew5891max.logicmix.domain.game.NumberSequencePack
+import io.github.chiefandrew5891max.logicmix.domain.game.numlogic.NumberLogicCareer
 import io.github.chiefandrew5891max.logicmix.domain.game.NumberSequencePuzzle
 import io.github.chiefandrew5891max.logicmix.domain.game.SolveResult
 import javax.inject.Inject
@@ -29,7 +29,7 @@ data class GameUiState(
     val finished: Boolean = false,
     val puzzle: NumberSequencePuzzle? = null,
     val number: Int = 0,
-    val total: Int = NumberSequencePack.puzzles.size,
+    val total: Int = NumberLogicCareer.total,
     val hintsUsed: Int = 0,
     val input: String = "",
     val feedback: Feedback = Feedback.NONE,
@@ -61,8 +61,8 @@ class GameViewModel @Inject constructor(
             profiles.ensureProfile()
             progress.ensureProgress(profileId)
             val solved = progress.solvedPuzzleIds(profileId).toSet()
-            val resumed = sessions.session.first()?.puzzleId?.let(NumberSequencePack::byId)?.takeIf { it.id !in solved }
-            val puzzle = resumed ?: NumberSequencePack.firstUnsolved(solved)
+            val resumed = sessions.session.first()?.puzzleId?.let(NumberLogicCareer::byId)?.takeIf { it.id !in solved }
+            val puzzle = resumed ?: NumberLogicCareer.firstUnsolved(solved)
             if (puzzle == null) {
                 sessions.clear()
                 _state.value = GameUiState(loading = false, finished = true)
@@ -72,7 +72,7 @@ class GameViewModel @Inject constructor(
             _state.value = GameUiState(
                 loading = false,
                 puzzle = puzzle,
-                number = NumberSequencePack.puzzles.indexOf(puzzle) + 1,
+                number = NumberLogicCareer.indexOf(puzzle.id) + 1,
                 hintsUsed = session.hintsUsed.coerceAtMost(puzzle.hints.size),
                 startedAt = session.startedAt,
             )

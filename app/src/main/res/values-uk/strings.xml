@@ -223,4 +223,13 @@
     <string name="td_no_hint">Зараз немає доступного ланцюжка.</string>
     <string name="td_rules">З’єднайте 2 і більше точок одного кольору. Замкніть контур — зникнуть усі точки цього кольору.</string>
     <string name="footer_rights">Усі права захищені.</string>
+    <string name="nl_prompt_order_ops">Обчисліть за порядком дій</string>
+    <string name="nl_prompt_parentheses">Обчисліть; спочатку дужки</string>
+    <string name="nl_prompt_missing_op">Оберіть пропущений знак</string>
+    <string name="nl_prompt_pyramid">Знайдіть число в піраміді (кожна клітинка — сума двох нижніх)</string>
+    <string name="nl_prompt_matrix">Знайдіть число в матриці</string>
+    <string name="nl_prompt_balance">Кожен символ ховає число: знайдіть суму</string>
+    <string name="nl_prompt_hidden_relation">Знайдіть приховане правило й застосуйте його</string>
+    <string name="nl_prompt_attention">Уважно порахуйте результат</string>
+    <string name="nl_prompt_mixed">Підставте значення й обчисліть</string>
 </resources>

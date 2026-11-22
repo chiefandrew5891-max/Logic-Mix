@@ -3,6 +3,8 @@ package io.github.chiefandrew5891max.logicmix.feature.game
 import io.github.chiefandrew5891max.logicmix.core.audio.withTap
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import io.github.chiefandrew5891max.logicmix.domain.game.NumFamily
+import io.github.chiefandrew5891max.logicmix.domain.game.NumberSequencePuzzle
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -92,14 +94,28 @@ fun GameScreen(
                 else -> {
                     val puzzle = state.puzzle
                     Card {
-                        Text(stringResource(R.string.game_find_next), style = LogicMixTokens.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(promptRes(puzzle.family)), style = LogicMixTokens.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         FlowRow(
                             horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS, Alignment.CenterHorizontally),
                             verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS),
                             modifier = Modifier.fillMaxWidth(),
                         ) {
-                            puzzle.sequence.forEach { NumberChip(it.toString(), false) }
-                            NumberChip(if (state.solved) puzzle.answer.toString() else "?", true)
+                            if (puzzle.rows.isEmpty()) {
+                                puzzle.sequence.forEach { NumberChip(it.toString(), false) }
+                                NumberChip(if (state.solved) puzzle.answer.toString() else "?", true)
+                            }
+                        }
+                        puzzle.rows.forEach { row ->
+                            FlowRow(
+                                horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS, Alignment.CenterHorizontally),
+                                verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS),
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                row.forEach { cell ->
+                                    val asked = cell == "?"
+                                    NumberChip(if (asked && state.solved) puzzle.answerText() else cell, asked)
+                                }
+                            }
                         }
                     }
                     if (state.shownHints.isNotEmpty()) {
@@ -113,7 +129,16 @@ fun GameScreen(
                             }
                         }
                     }
-                    if (!state.solved) {
+                    if (!state.solved && puzzle.choices.isNotEmpty()) {
+                        FlowRow(
+                            horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS, Alignment.CenterHorizontally),
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            puzzle.choices.forEachIndexed { i, label ->
+                                Box(Modifier.clickable { onInput(i.toString()); onSubmit() }) { NumberChip(label, false) }
+                            }
+                        }
+                    } else if (!state.solved) {
                         OutlinedTextField(
                             value = state.input,
                             onValueChange = onInput,
@@ -130,7 +155,9 @@ fun GameScreen(
                     if (state.solved) {
                         ActionButton(stringResource(R.string.game_next), onNext, filled = true)
                     } else {
-                        ActionButton(stringResource(R.string.game_submit), onSubmit, filled = true, enabled = state.canSubmit)
+                        if (puzzle.choices.isEmpty()) {
+                            ActionButton(stringResource(R.string.game_submit), onSubmit, filled = true, enabled = state.canSubmit)
+                        }
                         ActionButton(
                             stringResource(R.string.game_hint_button, state.hintsUsed, puzzle.hints.size),
                             onHint,
@@ -269,4 +296,19 @@ internal fun Card(content: @Composable () -> Unit) {
         verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) { content() }
+}
+
+private fun NumberSequencePuzzle.answerText() = if (choices.isNotEmpty()) choices[answer] else answer.toString()
+
+private fun promptRes(family: NumFamily): Int = when (family) {
+    NumFamily.SEQUENCE -> R.string.game_find_next
+    NumFamily.ORDER_OPS -> R.string.nl_prompt_order_ops
+    NumFamily.PARENTHESES -> R.string.nl_prompt_parentheses
+    NumFamily.MISSING_OP -> R.string.nl_prompt_missing_op
+    NumFamily.PYRAMID -> R.string.nl_prompt_pyramid
+    NumFamily.MATRIX -> R.string.nl_prompt_matrix
+    NumFamily.BALANCE -> R.string.nl_prompt_balance
+    NumFamily.HIDDEN_RELATION -> R.string.nl_prompt_hidden_relation
+    NumFamily.ATTENTION -> R.string.nl_prompt_attention
+    NumFamily.MIXED -> R.string.nl_prompt_mixed
 }

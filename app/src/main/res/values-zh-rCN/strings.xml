@@ -223,4 +223,13 @@
     <string name="td_no_hint">目前没有可连接的链。</string>
     <string name="td_rules">连接 2 个或更多同色圆点。连成闭环可消除该颜色的所有圆点。</string>
     <string name="footer_rights">保留所有权利。</string>
+    <string name="nl_prompt_order_ops">按运算顺序计算</string>
+    <string name="nl_prompt_parentheses">先算括号再计算</string>
+    <string name="nl_prompt_missing_op">选择缺失的运算符</string>
+    <string name="nl_prompt_pyramid">找出金字塔中缺失的数（每格等于下面两格之和）</string>
+    <string name="nl_prompt_matrix">找出矩阵中缺失的数</string>
+    <string name="nl_prompt_balance">每个符号代表一个数：求出和</string>
+    <string name="nl_prompt_hidden_relation">找出隐藏规律并应用</string>
+    <string name="nl_prompt_attention">仔细数一数并计算</string>
+    <string name="nl_prompt_mixed">代入数值并计算</string>
 </resources>

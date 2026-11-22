@@ -223,4 +223,13 @@
     <string name="td_no_hint">Gerade ist keine Kette möglich.</string>
     <string name="td_rules">Verbinde 2 oder mehr Punkte einer Farbe. Schließe eine Schleife, um diese Farbe zu entfernen.</string>
     <string name="footer_rights">Alle Rechte vorbehalten.</string>
+    <string name="nl_prompt_order_ops">Rechne mit der Rangfolge der Operationen</string>
+    <string name="nl_prompt_parentheses">Rechne; zuerst Klammern</string>
+    <string name="nl_prompt_missing_op">Wähle den fehlenden Operator</string>
+    <string name="nl_prompt_pyramid">Finde die Zahl in der Pyramide (jedes Feld ist die Summe der zwei darunter)</string>
+    <string name="nl_prompt_matrix">Finde die Zahl in der Matrix</string>
+    <string name="nl_prompt_balance">Jedes Symbol verbirgt eine Zahl: finde die Summe</string>
+    <string name="nl_prompt_hidden_relation">Finde die verborgene Regel und wende sie an</string>
+    <string name="nl_prompt_attention">Zähle genau und berechne</string>
+    <string name="nl_prompt_mixed">Setze die Werte ein und rechne</string>
 </resources>

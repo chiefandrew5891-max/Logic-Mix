@@ -223,4 +223,13 @@
     <string name="td_no_hint">No chain is available right now.</string>
     <string name="td_rules">Connect 2 or more dots of one color. Close a loop to clear that color.</string>
     <string name="footer_rights">All rights reserved.</string>
+    <string name="nl_prompt_order_ops">Evaluate using the order of operations</string>
+    <string name="nl_prompt_parentheses">Evaluate; brackets first</string>
+    <string name="nl_prompt_missing_op">Pick the missing operator</string>
+    <string name="nl_prompt_pyramid">Find the missing number in the pyramid (each cell is the sum of the two below)</string>
+    <string name="nl_prompt_matrix">Find the missing number in the matrix</string>
+    <string name="nl_prompt_balance">Each symbol hides a number: find the unknown sum</string>
+    <string name="nl_prompt_hidden_relation">Find the hidden rule and apply it</string>
+    <string name="nl_prompt_attention">Count carefully and compute the result</string>
+    <string name="nl_prompt_mixed">Substitute the values and evaluate</string>
 </resources>

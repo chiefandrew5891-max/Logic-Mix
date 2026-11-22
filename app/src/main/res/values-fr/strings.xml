@@ -223,4 +223,13 @@
     <string name="td_no_hint">Aucune chaîne n’est disponible pour le moment.</string>
     <string name="td_rules">Reliez 2 points ou plus de la même couleur. Fermez une boucle pour retirer toute cette couleur.</string>
     <string name="footer_rights">Tous droits réservés.</string>
+    <string name="nl_prompt_order_ops">Calculez en respectant l\'ordre des opérations</string>
+    <string name="nl_prompt_parentheses">Calculez ; d\'abord les parenthèses</string>
+    <string name="nl_prompt_missing_op">Choisissez l\'opérateur manquant</string>
+    <string name="nl_prompt_pyramid">Trouvez le nombre de la pyramide (chaque case est la somme des deux du dessous)</string>
+    <string name="nl_prompt_matrix">Trouvez le nombre de la matrice</string>
+    <string name="nl_prompt_balance">Chaque symbole cache un nombre : trouvez la somme</string>
+    <string name="nl_prompt_hidden_relation">Trouvez la règle cachée et appliquez-la</string>
+    <string name="nl_prompt_attention">Comptez avec attention et calculez</string>
+    <string name="nl_prompt_mixed">Remplacez les valeurs et calculez</string>
 </resources>
