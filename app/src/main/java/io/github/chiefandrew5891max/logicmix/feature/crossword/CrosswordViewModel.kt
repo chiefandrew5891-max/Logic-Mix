@@ -17,7 +17,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -27,7 +27,7 @@ data class CrosswordUiState(
     val loading: Boolean = true,
     val puzzles: List<CrosswordPuzzle> = emptyList(),
     val language: ContentLanguage = ContentLanguage.EN,
-    val fallback: Boolean = false,
+    val unsupported: Boolean = false,
     val index: Int = 0,
     val game: CrosswordGame? = null,
     val check: CheckResult = CheckResult.NONE,
@@ -44,12 +44,18 @@ class CrosswordViewModel @Inject constructor(
     private val _state = MutableStateFlow(CrosswordUiState())
     val state: StateFlow<CrosswordUiState> = _state.asStateFlow()
     private var startedAt = System.currentTimeMillis()
+    private var key = KEY_PREFIX
 
     init {
+        // The interface language picks the whole pack; progress is stored per language so packs never mix.
         viewModelScope.launch {
-            val resolved = CrosswordPacks.resolve(ContentLanguage.forInterface(settings.effectiveLanguage().first()))
-            _state.value = CrosswordUiState(loading = false, puzzles = resolved.puzzles, language = resolved.language, fallback = resolved.isFallback)
-            open(games.store.levelIndex(KEY))
+            settings.effectiveLanguage().distinctUntilChanged().collect { language ->
+                val content = ContentLanguage.forInterface(language)
+                val puzzles = CrosswordPacks.forLanguage(content)
+                key = "$KEY_PREFIX${content.tag}"
+                _state.value = CrosswordUiState(loading = false, puzzles = puzzles.orEmpty(), language = content, unsupported = puzzles == null)
+                if (puzzles != null) open(games.store.levelIndex(key))
+            }
         }
     }
 
@@ -60,7 +66,7 @@ class CrosswordViewModel @Inject constructor(
             return
         }
         val puzzle = puzzles[index]
-        val game = CrosswordGame.restore(puzzle, games.store.state(KEY, puzzle.id))
+        val game = CrosswordGame.restore(puzzle, games.store.state(key, puzzle.id))
         startedAt = System.currentTimeMillis()
         _state.update { it.copy(index = index, game = game, allDone = false, xpAwarded = 0, check = CheckResult.NONE) }
     }
@@ -72,7 +78,7 @@ class CrosswordViewModel @Inject constructor(
         if (next == game && check == CheckResult.NONE) return
         sound?.let { sfx.play(it) }
         _state.update { it.copy(game = next, check = check) }
-        if (next.solved) finish(next) else viewModelScope.launch { games.store.saveState(KEY, next.puzzle.id, next.encode()) }
+        if (next.solved) finish(next) else viewModelScope.launch { games.store.saveState(key, next.puzzle.id, next.encode()) }
     }
 
     fun selectCell(cell: Int) = update(Sfx.CARD_SELECT) { it.select(cell) }
@@ -105,12 +111,12 @@ class CrosswordViewModel @Inject constructor(
         if (game.solved) return
         val next = game.restart()
         _state.update { it.copy(game = next, check = CheckResult.NONE) }
-        viewModelScope.launch { games.store.saveState(KEY, next.puzzle.id, next.encode()) }
+        viewModelScope.launch { games.store.saveState(key, next.puzzle.id, next.encode()) }
     }
 
     private fun finish(game: CrosswordGame) {
         viewModelScope.launch {
-            games.store.clearState(KEY, game.puzzle.id)
+            games.store.clearState(key, game.puzzle.id)
             val result = games.complete(game.puzzle.id, startedAt, game.hintsUsed)
             _state.update { it.copy(xpAwarded = result.xpAwarded) }
             sfx.play(Sfx.CORRECT)
@@ -122,17 +128,17 @@ class CrosswordViewModel @Inject constructor(
     fun next() {
         viewModelScope.launch {
             val index = _state.value.index + 1
-            games.store.setLevelIndex(KEY, index)
+            games.store.setLevelIndex(key, index)
             open(index)
         }
     }
 
     fun playAgain() {
         viewModelScope.launch {
-            games.store.setLevelIndex(KEY, 0)
+            games.store.setLevelIndex(key, 0)
             open(0)
         }
     }
 
-    private companion object { const val KEY = "mini_crossword" }
+    private companion object { const val KEY_PREFIX = "mini_crossword_" }
 }

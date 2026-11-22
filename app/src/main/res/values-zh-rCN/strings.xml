@@ -187,6 +187,7 @@
     <string name="cw_incorrect">有些字母不正确。</string>
     <string name="cw_check_ok">目前没有错误。</string>
     <string name="cw_pick_clue">点击格子或提示开始。</string>
+    <string name="cw_unsupported_language">迷你填字游戏暂不支持中文：需要基于汉字的网格和输入方式。</string>
     <string name="vl_prompt">哪个图块能完成这个规律？</string>
     <string name="vl_hint_shape">注意形状如何重复。</string>
     <string name="vl_hint_count">数一数每个格子里的形状。</string>

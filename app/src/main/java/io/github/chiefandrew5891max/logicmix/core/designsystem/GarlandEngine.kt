@@ -23,6 +23,31 @@ object GarlandGeometry {
     fun toPixels(width: Float, height: Float): List<Pair<Float, Float>> = bulbs.map { it.x * width to it.y * height }
 }
 
+/**
+ * How one bulb is painted for a brightness in 0..1. Every part is driven by the same value, so the core and the
+ * halo fade together; at 0 nothing is drawn and the unlit bulb of the PNG is all that remains.
+ */
+data class BulbLook(
+    val glowRadius: Float, val glowAlpha: Float,
+    val haloRadius: Float, val haloAlpha: Float,
+    val bodyRadius: Float, val bodyAlpha: Float,
+    val coreRadius: Float, val coreAlpha: Float,
+) {
+    companion object {
+        /** Radii are multiples of the bulb radius. */
+        fun of(brightness: Float): BulbLook {
+            val b = brightness.coerceIn(0f, 1f)
+            val s = GarlandEngine.smooth(b)
+            return BulbLook(
+                glowRadius = 1.9f + 1.3f * b, glowAlpha = 0.30f * s,
+                haloRadius = 1.45f + 0.35f * b, haloAlpha = 0.65f * s,
+                bodyRadius = 0.95f + 0.1f * b, bodyAlpha = s,
+                coreRadius = 0.45f * (0.7f + 0.3f * b), coreAlpha = s,
+            )
+        }
+    }
+}
+
 /** Picks the next mode at random: never the current one, and avoids the one before it when possible. */
 class GarlandScheduler(private val random: Random) {
     private var last: GarlandMode? = null
@@ -47,7 +72,8 @@ class GarlandScheduler(private val random: Random) {
 
 /**
  * Time-driven brightness model of the garland. No Android/Compose dependencies.
- * [levels] hold the extra glow of every bulb in 0..1; [REST] is the calm level used while paused or with animations off.
+ * [levels] hold the brightness of every bulb: 0 = off (only the unlit bulb of the PNG shows), 1 = fully lit.
+ * [REST] is the calm level used while paused or with animations off.
  */
 class GarlandEngine(private val random: Random, private val count: Int = GarlandGeometry.bulbs.size) {
     val levels = FloatArray(count) { REST }
@@ -124,7 +150,7 @@ class GarlandEngine(private val random: Random, private val count: Int = Garland
 
     private fun updateSparks(dt: Float) {
         val decay = exp(-dt * 3.2f)
-        val rise = (dt * 8f).coerceAtMost(1f)
+        val rise = (dt * 6f).coerceAtMost(1f)
         for (i in sparks.indices) {
             sparks[i] *= decay
             sparkShown[i] += (sparks[i] - sparkShown[i]) * rise
@@ -144,27 +170,27 @@ class GarlandEngine(private val random: Random, private val count: Int = Garland
 
     private fun modeLevel(m: GarlandMode, i: Int, t: Float, dir: Int): Float = when (m) {
         GarlandMode.SoftTwinkle ->
-            0.5f + 0.3f * sin(2f * PI.toFloat() * (rates[i] * t + phases[i]))
+            0.5f + 0.45f * sin(2f * PI.toFloat() * (rates[i] * t + phases[i]))
         GarlandMode.RunningLights -> sweep(position(i), t, 1)
         GarlandMode.ReverseChase -> sweep(position(i), t, -1)
         GarlandMode.BreathingGlow -> {
             val e = 0.5f - 0.5f * cos(2f * PI.toFloat() * t / BREATH_SECONDS)
-            0.2f + 0.7f * smooth(e)
+            0.08f + 0.87f * smooth(e)
         }
-        GarlandMode.RandomSparkle -> 0.2f + 0.8f * sparkShown[i]
+        GarlandMode.RandomSparkle -> 0.04f + 0.96f * sparkShown[i]
         GarlandMode.DoubleWave -> {
             val f = (t % DOUBLE_PERIOD) / DOUBLE_PERIOD
             val reach = -WAVE_WIDTH + minOf(f / 0.8f, 1f) * (0.5f + WAVE_WIDTH)
             val amp = 1f - smooth((f - 0.8f) / 0.2f)
             val p = position(i)
-            val waves = 0.25f + 0.65f * amp * maxOf(bump(p - reach), bump(p - (1f - reach)))
+            val waves = 0.05f + 0.9f * amp * maxOf(bump(p - reach), bump(p - (1f - reach)))
             if (i == (count - 1) / 2 || i == count / 2) maxOf(waves, centerGlow(t)) else waves
         }
         GarlandMode.GoldenCascade -> {
             val group = minOf(i * CASCADE_GROUPS / count, CASCADE_GROUPS - 1)
             val g = if (dir > 0) group.toFloat() else (CASCADE_GROUPS - 1 - group).toFloat()
             val head = (t % (CASCADE_PERIOD * (CASCADE_GROUPS + 2.4f))) / CASCADE_PERIOD - 1.2f
-            0.25f + 0.65f * smooth((1f - kotlin.math.abs(g - head) / 1.2f).coerceIn(0f, 1f))
+            0.05f + 0.9f * smooth((1f - kotlin.math.abs(g - head) / 1.2f).coerceIn(0f, 1f))
         }
     }
 
@@ -172,7 +198,7 @@ class GarlandEngine(private val random: Random, private val count: Int = Garland
         val period = (1f + 2f * WAVE_WIDTH) / SWEEP_SPEED
         val head = -WAVE_WIDTH + (t % period) * SWEEP_SPEED
         val pos = if (dir > 0) p else 1f - p
-        return 0.2f + 0.7f * bump(pos - head)
+        return 0.03f + 0.97f * bump(pos - head)
     }
 
     private fun centerGlow(t: Float): Float {
@@ -189,7 +215,7 @@ class GarlandEngine(private val random: Random, private val count: Int = Garland
     private fun bump(d: Float) = smooth((1f - kotlin.math.abs(d) / WAVE_WIDTH).coerceIn(0f, 1f))
 
     companion object {
-        const val REST = 0.5f
+        const val REST = 0.4f
         const val WAVE_WIDTH = 0.2f
         const val SWEEP_SPEED = 0.33f
         const val BREATH_SECONDS = 4.5f

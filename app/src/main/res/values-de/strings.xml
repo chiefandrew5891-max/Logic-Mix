@@ -187,6 +187,7 @@
     <string name="cw_incorrect">Einige Buchstaben sind falsch.</string>
     <string name="cw_check_ok">Bisher keine Fehler.</string>
     <string name="cw_pick_clue">Tippe auf ein Feld oder eine Frage.</string>
+    <string name="cw_unsupported_language">Mini-Kreuzworträtsel sind auf Chinesisch noch nicht verfügbar: Sie brauchen ein zeichenbasiertes Raster und eine passende Eingabe.</string>
     <string name="vl_prompt">Welches Feld vervollständigt das Muster?</string>
     <string name="vl_hint_shape">Achte darauf, wie sich die Formen wiederholen.</string>
     <string name="vl_hint_count">Zähle die Formen in jedem Feld.</string>

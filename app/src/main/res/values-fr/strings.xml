@@ -187,6 +187,7 @@
     <string name="cw_incorrect">Certaines lettres sont fausses.</string>
     <string name="cw_check_ok">Aucune erreur pour l’instant.</string>
     <string name="cw_pick_clue">Touchez une case ou une définition.</string>
+    <string name="cw_unsupported_language">Les mini mots croisés ne sont pas encore disponibles en chinois : ils nécessitent une grille et une saisie par caractères.</string>
     <string name="vl_prompt">Quelle tuile complète le motif ?</string>
     <string name="vl_hint_shape">Observez comment les formes se répètent.</string>
     <string name="vl_hint_count">Comptez les formes de chaque case.</string>

@@ -187,6 +187,7 @@
     <string name="cw_incorrect">Є неправильні літери.</string>
     <string name="cw_check_ok">Поки помилок немає.</string>
     <string name="cw_pick_clue">Натисніть клітинку або визначення.</string>
+    <string name="cw_unsupported_language">Міні-кросворди поки недоступні китайською: їм потрібні сітка та введення на ієрогліфах.</string>
     <string name="vl_prompt">Яка фігура завершує закономірність?</string>
     <string name="vl_hint_shape">Стежте, як повторюються фігури.</string>
     <string name="vl_hint_count">Порахуйте фігури в кожній клітинці.</string>

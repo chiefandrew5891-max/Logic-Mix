@@ -1,5 +1,6 @@
 package io.github.chiefandrew5891max.logicmix.domain.crossword
 
+import io.github.chiefandrew5891max.logicmix.core.designsystem.LetterLayouts
 import io.github.chiefandrew5891max.logicmix.domain.content.ContentLanguage
 import io.github.chiefandrew5891max.logicmix.domain.crossword.Direction.ACROSS
 import io.github.chiefandrew5891max.logicmix.domain.crossword.Direction.DOWN
@@ -10,7 +11,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class CrosswordTest {
-    private val ru = CrosswordPacks.resolve(ContentLanguage.RU).puzzles
+    private val ru = CrosswordPacks.forLanguage(ContentLanguage.RU)!!
 
     @Test fun everyShippedGridIsValid() {
         CrosswordPacks.all().forEach { assertEquals(it.id, emptyList<String>(), it.problems()) }
@@ -101,5 +102,60 @@ class CrosswordTest {
         val typed = g.copy(selected = cell).input('Я')
         assertEquals(p.solution[cell], typed.letters[cell])
         assertFalse(typed.letters.values.contains('Я'))
+    }
+
+    private val letterLanguages = ContentLanguage.entries.filter { it != ContentLanguage.ZH_CN }
+
+    @Test fun everyLetterLanguageHasAtLeastFivePuzzlesAndChineseHasNone() {
+        letterLanguages.forEach { lang ->
+            val list = CrosswordPacks.forLanguage(lang)
+            assertNotNull(lang.name, list)
+            assertTrue(lang.name, list!!.size >= 5)
+            assertTrue(lang.name, list.all { it.language == lang && it.id.startsWith("cw-${lang.tag}-") })
+        }
+        assertEquals(null, CrosswordPacks.forLanguage(ContentLanguage.ZH_CN))
+        assertTrue(LetterLayouts.forLanguage(ContentLanguage.ZH_CN).isEmpty())
+    }
+
+    @Test fun answersUseOnlyLettersOfTheirKeyboard() {
+        letterLanguages.forEach { lang ->
+            val keys = LetterLayouts.alphabet(lang)
+            CrosswordPacks.forLanguage(lang)!!.flatMap { it.entries }.forEach { e ->
+                assertTrue("${lang.name}: ${e.answer}", e.answer.all { it in keys } && e.answer.length >= 3)
+            }
+        }
+    }
+
+    @Test fun cluesAreWrittenInTheSameLanguage() {
+        val cyrillic = setOf(ContentLanguage.RU, ContentLanguage.UK)
+        letterLanguages.forEach { lang ->
+            CrosswordPacks.forLanguage(lang)!!.flatMap { it.entries }.forEach { e ->
+                val letters = e.clue.filter { it.isLetter() }
+                val script = if (lang in cyrillic) Character.UnicodeScript.CYRILLIC else Character.UnicodeScript.LATIN
+                assertTrue("${lang.name}: ${e.clue}", letters.all { Character.UnicodeScript.of(it.code) == script })
+                if (lang == ContentLanguage.UK) assertTrue(e.clue, letters.none { it in "ЫЭЪЁыэъё" })
+                if (lang == ContentLanguage.RU) assertTrue(e.clue, letters.none { it in "ІЇЄҐіїєґ" })
+                if (lang == ContentLanguage.EN) assertTrue(e.clue, letters.all { it.code < 128 })
+            }
+        }
+    }
+
+    @Test fun nationalLettersAreUsedWhereTheLanguageHasThem() {
+        fun letters(l: ContentLanguage) = CrosswordPacks.forLanguage(l)!!.flatMap { it.entries }.joinToString("") { it.answer }
+        assertTrue(letters(ContentLanguage.UK).any { it in "ІЇЄҐ" })
+        assertTrue(letters(ContentLanguage.ES).contains('Ñ'))
+        assertTrue(letters(ContentLanguage.DE).any { it in "ÄÖÜ" })
+        listOf('І', 'Ї', 'Є', 'Ґ').forEach { assertTrue(it in LetterLayouts.alphabet(ContentLanguage.UK)) }
+        assertTrue('Ё' in LetterLayouts.alphabet(ContentLanguage.RU))
+        assertTrue(listOf('І', 'Ї', 'Є', 'Ґ').none { it in LetterLayouts.alphabet(ContentLanguage.RU) })
+    }
+
+    @Test fun crossingCellsAgreeAndCoordinatesMatchEveryAnswer() {
+        CrosswordPacks.all().forEach { p ->
+            p.entries.forEach { e ->
+                p.cells(e).forEachIndexed { i, cell -> assertEquals("${p.id} ${e.answer}", e.answer[i], p.solution[cell]) }
+            }
+            assertTrue(p.id, p.entries.any { e -> p.cells(e).any { c -> p.entriesAt(c).size > 1 } })
+        }
     }
 }

@@ -187,6 +187,7 @@
     <string name="cw_incorrect">Hay letras incorrectas.</string>
     <string name="cw_check_ok">Sin errores por ahora.</string>
     <string name="cw_pick_clue">Toca una casilla o una definición.</string>
+    <string name="cw_unsupported_language">Los minicrucigramas aún no están disponibles en chino: necesitan una cuadrícula y una entrada basadas en caracteres.</string>
     <string name="vl_prompt">¿Qué ficha completa el patrón?</string>
     <string name="vl_hint_shape">Observa cómo se repiten las formas.</string>
     <string name="vl_hint_count">Cuenta las formas de cada casilla.</string>

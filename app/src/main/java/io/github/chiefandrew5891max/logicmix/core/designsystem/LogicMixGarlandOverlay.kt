@@ -25,7 +25,6 @@ import kotlin.random.Random
 private val Amber = Color(0xFFFFA726)
 private val Gold = Color(0xFFFFC94D)
 private val SoftYellow = Color(0xFFFFE9A8)
-private val Dim = Color(0xFF2A0B3D)
 private val WarmWhite = Color(0xFFFFFBEA)
 
 /**
@@ -81,34 +80,34 @@ fun LogicMixGarlandOverlay(
         val radius = GarlandGeometry.RADIUS * h
         val points = GarlandGeometry.bulbs
         for (i in points.indices) {
-            val level = engine.levels[i].coerceIn(0f, 1f)
+            val look = BulbLook.of(engine.levels[i])
+            if (look.bodyAlpha <= 0.002f) continue
             val c = Offset(points[i].x * size.width, points[i].y * h)
-            val dim = ((GarlandEngine.REST - level) / GarlandEngine.REST).coerceIn(0f, 1f) * 0.88f
-            if (dim > 0.01f) {
-                val darkR = radius * 2.1f
-                drawCircle(
-                    brush = Brush.radialGradient(
-                        0f to Dim, 0.6f to Dim, 1f to Color.Transparent, center = c, radius = darkR,
-                    ),
-                    radius = darkR, center = c, alpha = dim,
-                )
-            }
-            val lit = ((level - GarlandEngine.REST) / (1f - GarlandEngine.REST)).coerceIn(0f, 1f)
-            val haloR = radius * (2.2f + 1.6f * level)
+            val glowR = radius * look.glowRadius
+            drawCircle(
+                brush = Brush.radialGradient(listOf(Amber.copy(alpha = 0.5f), Color.Transparent), center = c, radius = glowR),
+                radius = glowR, center = c, alpha = look.glowAlpha, blendMode = BlendMode.Plus,
+            )
+            val haloR = radius * look.haloRadius
             drawCircle(
                 brush = Brush.radialGradient(
-                    listOf(Gold.copy(alpha = 0.55f), Amber.copy(alpha = 0.22f), Color.Transparent),
+                    0f to Gold.copy(alpha = 0.9f), 0.55f to Gold.copy(alpha = 0.45f), 1f to Color.Transparent,
                     center = c, radius = haloR,
                 ),
-                radius = haloR, center = c, alpha = lit, blendMode = BlendMode.Plus,
+                radius = haloR, center = c, alpha = look.haloAlpha,
             )
-            val coreR = radius * (0.75f + 0.35f * level)
+            val bodyR = radius * look.bodyRadius
             drawCircle(
                 brush = Brush.radialGradient(
-                    listOf(if (lit > 0.5f) WarmWhite else SoftYellow, Gold, Color.Transparent),
-                    center = c, radius = coreR,
+                    0f to SoftYellow, 0.55f to Gold, 0.9f to Amber, 1f to Amber.copy(alpha = 0f),
+                    center = c, radius = bodyR,
                 ),
-                radius = coreR, center = c, alpha = 0.2f + 0.8f * lit, blendMode = BlendMode.Plus,
+                radius = bodyR, center = c, alpha = look.bodyAlpha,
+            )
+            val coreR = radius * look.coreRadius
+            drawCircle(
+                brush = Brush.radialGradient(listOf(WarmWhite, WarmWhite.copy(alpha = 0f)), center = c, radius = coreR),
+                radius = coreR, center = c, alpha = look.coreAlpha,
             )
         }
     }

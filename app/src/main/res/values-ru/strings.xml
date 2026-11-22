@@ -187,6 +187,7 @@
     <string name="cw_incorrect">Есть неверные буквы.</string>
     <string name="cw_check_ok">Пока ошибок нет.</string>
     <string name="cw_pick_clue">Нажмите на клетку или определение.</string>
+    <string name="cw_unsupported_language">Мини-кроссворды пока недоступны на китайском: им нужны сетка и ввод на иероглифах.</string>
     <string name="vl_prompt">Какая фигура завершает закономерность?</string>
     <string name="vl_hint_shape">Следите, как повторяются фигуры.</string>
     <string name="vl_hint_count">Посчитайте фигуры в каждой клетке.</string>

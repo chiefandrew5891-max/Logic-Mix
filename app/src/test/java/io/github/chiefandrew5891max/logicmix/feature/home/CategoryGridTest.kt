@@ -20,11 +20,13 @@ class CategoryGridTest {
         assertEquals(listOf(3, 3, 3), categoryRows(all).map { it.size })
     }
 
-    @Test fun chineseHidesFillwordsAndOthersRemain() {
+    @Test fun chineseHidesLetterGamesAndOthersRemain() {
         val zh = CategoryAvailability.ordered(AppLanguage.CHINESE_SIMPLIFIED)
         assertTrue(GameCategory.WORD_SEARCH !in zh)
-        assertEquals(8, zh.size)
-        assertEquals(listOf(3, 3, 2), categoryRows(zh).map { it.size })
+        assertTrue(GameCategory.MINI_CROSSWORD !in zh)
+        assertEquals(7, zh.size)
+        assertEquals(listOf(3, 3, 1), categoryRows(zh).map { it.size })
+        assertTrue(GameCategory.MINI_CROSSWORD in CategoryAvailability.ordered(AppLanguage.UKRAINIAN))
         assertTrue(GameCategory.WORD_SEARCH in CategoryAvailability.ordered(AppLanguage.FRENCH))
     }
 

@@ -55,7 +55,10 @@ fun CrosswordRoute(onBack: () -> Unit, viewModel: CrosswordViewModel = hiltViewM
             onRestart = viewModel::restart,
             restartEnabled = game != null && !game.solved,
         )
-        if (state.fallback) InfoNote(stringResource(R.string.cat_fallback_notice))
+        if (state.unsupported) {
+            InfoNote(stringResource(R.string.cw_unsupported_language))
+            return@CategoryScaffold
+        }
         if (state.allDone) {
             Card {
                 Text(stringResource(R.string.game_all_done), style = LogicMixTokens.typography.headlineMedium, color = LogicMixTokens.colors.success, textAlign = TextAlign.Center)

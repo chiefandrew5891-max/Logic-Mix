@@ -26,12 +26,13 @@ enum class GameCategory {
 
 /**
  * Which UI languages a category is offered for. A hidden category has no entry point at all.
- * Chinese word search needs its own character-based mechanic, so it is off until that exists:
+ * Chinese word search and mini crosswords need their own character-based mechanics, so they are off until that exists:
  * remove CHINESE_SIMPLIFIED from the set below and add a ContentLanguage dictionary to enable it.
  */
 object CategoryAvailability {
     private val unavailable: Map<GameCategory, Set<AppLanguage>> = mapOf(
         GameCategory.WORD_SEARCH to setOf(AppLanguage.CHINESE_SIMPLIFIED),
+        GameCategory.MINI_CROSSWORD to setOf(AppLanguage.CHINESE_SIMPLIFIED),
     )
 
     fun isAvailable(category: GameCategory, language: AppLanguage): Boolean =

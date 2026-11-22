@@ -187,6 +187,7 @@
     <string name="cw_incorrect">Alcune lettere sono sbagliate.</string>
     <string name="cw_check_ok">Nessun errore finora.</string>
     <string name="cw_pick_clue">Tocca una casella o una definizione.</string>
+    <string name="cw_unsupported_language">I mini cruciverba non sono ancora disponibili in cinese: servono una griglia e un input basati sui caratteri.</string>
     <string name="vl_prompt">Quale tessera completa lo schema?</string>
     <string name="vl_hint_shape">Osserva come si ripetono le forme.</string>
     <string name="vl_hint_count">Conta le forme in ogni casella.</string>

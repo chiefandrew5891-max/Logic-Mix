@@ -187,6 +187,7 @@
     <string name="cw_incorrect">Some letters are wrong.</string>
     <string name="cw_check_ok">No mistakes so far.</string>
     <string name="cw_pick_clue">Tap a cell or a clue to start.</string>
+    <string name="cw_unsupported_language">Mini crosswords are not available in Chinese yet: they need a character-based grid and input.</string>
     <string name="vl_prompt">Which tile completes the pattern?</string>
     <string name="vl_hint_shape">Watch how the shapes repeat.</string>
     <string name="vl_hint_count">Count the shapes in each cell.</string>
