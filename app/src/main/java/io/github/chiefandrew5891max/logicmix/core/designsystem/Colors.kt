@@ -25,8 +25,8 @@ private object Palette {
     val Red700 = Color(0xFFC62840)
     val Green400 = Color(0xFF3DDC97)
     val Green700 = Color(0xFF138A5B)
-    val LightBg0 = Color(0xFFDCCAF7)
-    val LightBg24 = Color(0xFFEDE5FC)
+    val LightBg0 = Color(0xFFB99AE9)
+    val LightBg24 = Color(0xFFD8C7F4)
     val LightBg52 = Color(0xFFFFFFFF)
     val LightBg72 = Color(0xFFF4FFFF)
     val LightBg100 = Color(0xFFC8F5F2)
@@ -119,7 +119,7 @@ internal val LightLogicMixColors = LogicMixColors(
     glow = Palette.Violet600.copy(alpha = 0.18f),
     cardBorder = Palette.Violet600.copy(alpha = 0.25f),
     backgroundBrush = Brush.verticalGradient(
-        0f to Palette.LightBg0, 0.24f to Palette.LightBg24, 0.52f to Palette.LightBg52,
+        0f to Palette.LightBg0, 0.25f to Palette.LightBg24, 0.52f to Palette.LightBg52,
         0.72f to Palette.LightBg72, 1f to Palette.LightBg100,
     ),
     primaryActionBrush = Brush.verticalGradient(listOf(Palette.Gold300, Palette.Gold500)),
