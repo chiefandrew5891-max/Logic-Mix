@@ -163,7 +163,7 @@ class TwoDotsTest {
         assertEquals(setOf(0, 1, 2, 3), hint.path.toSet())
         assertTrue(TwoDotsRules.isValidChain(cells, hint.path))
         assertNull(TwoDotsRules.findHint(base()))
-        assertEquals(2, TwoDotsRules.findHint(base(34 to 4, 35 to 4))!!.path.size)
+        assertEquals(2, TwoDotsRules.findHint(base(1 to 0))!!.path.size)
     }
 
     @Test fun xpIsOncePerGameAndOnlyForClassic() {
