@@ -109,6 +109,7 @@ fun LogicMixPlayerHeader(
             Image(painterResource(logoId), logoLabel, Modifier.fillMaxWidth(), contentScale = ContentScale.Fit)
         }
         if (logoId != 0) {
+            LogicMixNeonOverlay(logoId, kickTick, Modifier.matchParentSize())
             LogicMixGarlandOverlay(playing, kickTick, kickForward, Modifier.matchParentSize())
         }
         val slots = listOf(
