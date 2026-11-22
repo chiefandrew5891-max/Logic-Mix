@@ -338,7 +338,7 @@ private fun BrandFooter() {
     BoxWithConstraints(Modifier.fillMaxWidth()) {
         val card = (maxWidth - LogicMixTokens.spacingS * (CATEGORY_COLUMNS - 1)) / CATEGORY_COLUMNS
         Column(
-            Modifier.fillMaxWidth().padding(top = card / 2).windowInsetsPadding(WindowInsets.navigationBars).padding(bottom = LogicMixTokens.spacingS),
+            Modifier.fillMaxWidth().padding(top = card / 4).windowInsetsPadding(WindowInsets.navigationBars).padding(bottom = LogicMixTokens.spacingXs),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text("© 2026 AKYneX studio™", color = muted.copy(alpha = 0.9f), fontSize = 12.sp, textAlign = TextAlign.Center)
