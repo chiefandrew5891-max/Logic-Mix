@@ -54,4 +54,15 @@ class CategoryGridTest {
         val zh = CategoryAvailability.available(AppLanguage.CHINESE_SIMPLIFIED)
         assertEquals(StartTarget.Default, StartTarget.resolve(false, fill, zh))
     }
+
+    @Test fun cardsAreSquareIconOnlyTilesWithAccessibleTitles() {
+        val card = java.io.File("src/main/java/io/github/chiefandrew5891max/logicmix/core/designsystem/NeonComponents.kt").readText()
+            .substringAfter("fun CategoryCard(").substringBefore("/** Wide card for a game style")
+        assertTrue(card.contains("aspectRatio(1f)") && card.contains("contentDescription = title") && card.contains("onLongClick"))
+        assertTrue(!card.contains("Text(\n                title") || card.contains("if (hint)"))
+        val grid = java.io.File("src/main/java/io/github/chiefandrew5891max/logicmix/feature/home/CategoryGrid.kt").readText()
+        assertTrue(!grid.contains("IntrinsicSize") && !grid.contains("fillMaxHeight"))
+        assertTrue(io.github.chiefandrew5891max.logicmix.core.designsystem.CATEGORY_ICON_FRACTION in 0.8f..0.85f)
+        assertTrue(io.github.chiefandrew5891max.logicmix.core.designsystem.CATEGORY_PRESS_SCALE in 0.96f..0.97f)
+    }
 }
