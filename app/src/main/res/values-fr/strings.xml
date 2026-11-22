@@ -350,4 +350,5 @@
     <string name="privacy_policy_view_online">Voir en ligne</string>
     <string name="privacy_policy_online_unavailable">La version en ligne n\'est pas encore disponible. Cette copie hors ligne est le texte actuel.</string>
     <string name="privacy_policy_draft">Brouillon : pas encore relu par l\'éditeur.</string>
+    <string name="victory_level_complete">Niveau terminé !</string>
 </resources>

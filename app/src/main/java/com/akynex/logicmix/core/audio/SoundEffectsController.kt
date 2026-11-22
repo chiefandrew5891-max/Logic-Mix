@@ -36,6 +36,7 @@ class SoundEffectsController @Inject constructor(
     private val gate = SfxGate()
     private val soundIds = java.util.concurrent.ConcurrentHashMap<Sfx, Int>()
     private val ready = HashSet<Int>()
+    private val streams = java.util.concurrent.ConcurrentHashMap<Sfx, Int>()
     @Volatile private var pool: SoundPool? = null
     private var started = false
 
@@ -93,10 +94,16 @@ class SoundEffectsController @Inject constructor(
         if (!synchronized(ready) { id in ready }) return
         try {
             val v = volumeGain(audio.effectsVolume)
-            sp.play(id, v, v, sfx.priority.ordinal, 0, rate.coerceIn(SfxPitch.MIN_RATE, SfxPitch.MAX_RATE))
+            val stream = sp.play(id, v, v, sfx.priority.ordinal, 0, rate.coerceIn(SfxPitch.MIN_RATE, SfxPitch.MAX_RATE))
+            if (stream != 0) streams[sfx] = stream
         } catch (e: RuntimeException) {
             Log.w(TAG, "Effect playback failed: ${sfx.file}", e)
         }
+    }
+
+    /** Cuts a long effect (e.g. a victory fanfare) when its screen is left. */
+    fun stop(sfx: Sfx) {
+        streams.remove(sfx)?.let { runCatching { pool?.stop(it) } }
     }
 
     private val vibrator: Vibrator? by lazy {

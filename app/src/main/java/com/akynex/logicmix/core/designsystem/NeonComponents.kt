@@ -34,6 +34,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -46,6 +47,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
@@ -53,6 +55,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawOutline
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -195,15 +198,31 @@ fun CategoryCard(
     val glow by animateFloatAsState(if (pressed) 1f else 0f, spec, label = "categoryBorder")
     var hint by remember { mutableStateOf(false) }
     LaunchedEffect(hint) { if (hint) { delay(CATEGORY_HINT_MS); hint = false } }
-    val borderWidth = if (selected == true) 3.dp else 2.dp
+    // Selection lists keep a constant 3 dp frame so cards never change size; only colour, halo and tick change.
+    val borderWidth = if (selected != null) 3.dp else 2.dp
+    val sel by animateFloatAsState(if (selected == true) 1f else 0f, if (animated) tween(180) else snap(), label = "categorySelected")
+    val frame = lerp(lerp(colors.cardBorder, Color.White, 0.4f * glow), colors.gold, sel)
     val tap = withTap(onClick)
     Box(
         modifier
             .aspectRatio(1f)
             .graphicsLayer { scaleX = scale; scaleY = scale }
+            .drawBehind {
+                if (sel > 0f) {
+                    val r = 20.dp.toPx()
+                    for (i in 1..4) {
+                        val w = i * 2.5.dp.toPx()
+                        drawRoundRect(
+                            colors.gold.copy(alpha = 0.16f * sel * (5 - i) / 4f),
+                            topLeft = Offset(-w / 2, -w / 2), size = Size(size.width + w, size.height + w),
+                            cornerRadius = CornerRadius(r + w / 2), style = Stroke(w),
+                        )
+                    }
+                }
+            }
             .clip(shape)
             .background(colors.cardBrush)
-            .border(BorderStroke(borderWidth, lerp(colors.cardBorder, Color.White, 0.4f * glow)), shape)
+            .border(BorderStroke(borderWidth, frame), shape)
             .semantics(mergeDescendants = true) {
                 contentDescription = title
                 if (selected != null) this.selected = selected
@@ -215,6 +234,15 @@ fun CategoryCard(
         contentAlignment = Alignment.Center,
     ) {
         AssetImage(category.imageName, Modifier.fillMaxSize(CATEGORY_ICON_FRACTION))
+        if (selected == true) {
+            Box(Modifier.align(Alignment.TopEnd).padding(6.dp).size(18.dp).clip(CircleShape).background(colors.gold), contentAlignment = Alignment.Center) {
+                Canvas(Modifier.size(10.dp)) {
+                    val w = size.width
+                    drawLine(Color.Black, Offset(w * 0.1f, w * 0.55f), Offset(w * 0.4f, w * 0.85f), strokeWidth = 2.dp.toPx(), cap = StrokeCap.Round)
+                    drawLine(Color.Black, Offset(w * 0.4f, w * 0.85f), Offset(w * 0.95f, w * 0.15f), strokeWidth = 2.dp.toPx(), cap = StrokeCap.Round)
+                }
+            }
+        }
         if (hint) {
             Popup(alignment = Alignment.TopCenter, onDismissRequest = { hint = false }) {
                 Text(

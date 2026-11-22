@@ -38,6 +38,8 @@ data class Celebration(
     val streak: Int,
     val achievements: List<ArcadeAchievement>,
     val skipped: Boolean = false,
+    /** Fixed when the stage is resolved, so rotation or recomposition never re-rolls the scene. */
+    val variant: VictoryVariant? = null,
 )
 
 data class ArcadeUiState(
@@ -68,6 +70,8 @@ class ArcadeViewModel @Inject constructor(
     val state: StateFlow<ArcadeUiState> = _state.asStateFlow()
     private var language: com.akynex.logicmix.core.locale.AppLanguage? = null
     private var firstSelection = true
+    private var lastVariant: VictoryVariant? = null
+    private var soundPlayedFor: String? = null
 
     init {
         viewModelScope.launch {
@@ -155,6 +159,7 @@ class ArcadeViewModel @Inject constructor(
         val celebration = Celebration(
             id = stage.id, award = award.total, bonus = award.bonus, level = result.run.level, levelUp = result.levelUp,
             streak = result.run.streak, achievements = result.achievements,
+            variant = VictoryPicker.next(lastVariant).also { lastVariant = it },
         )
         bridge.stage = null
         _state.update { it.copy(run = result.run, stats = result.stats, celebration = celebration) }
@@ -177,10 +182,15 @@ class ArcadeViewModel @Inject constructor(
         persist(skipped)
     }
 
-    /** Accents on top of the game's own completion sound; runs once per celebration id. */
+    /** The fanfare starts together with the animation; accents follow it. Runs once per celebration id (rotation-safe). */
     suspend fun playCelebrationSounds(c: Celebration) {
         if (c.skipped) return
-        delay(250)
+        synchronized(this) {
+            if (soundPlayedFor == c.id) return
+            soundPlayedFor = c.id
+        }
+        c.variant?.let { sfx.play(it.sfx) }
+        delay(1200)
         when {
             c.levelUp -> sfx.play(Sfx.LEVEL_UP)
             c.streak >= 3 -> sfx.play(Sfx.STREAK)
@@ -192,11 +202,14 @@ class ArcadeViewModel @Inject constructor(
         }
     }
 
+    private fun stopFanfares() = VictoryVariant.entries.forEach { sfx.stop(it.sfx) }
+
     /** Called when the celebration ends (timeout or tap); safe to call twice. */
     fun celebrationDone(id: String) {
         val s = _state.value
         val run = s.run ?: return
         if (s.celebration?.id != id) return
+        stopFanfares()
         val next = ArcadeEngine.advance(run)
         bridge.stage = next.current.takeIf { next.outcome == StageOutcome.NONE }
         _state.update { it.copy(run = next, celebration = null) }
@@ -221,6 +234,7 @@ class ArcadeViewModel @Inject constructor(
     }
 
     override fun onCleared() {
+        stopFanfares()
         bridge.stage = null
         bridge.onCompleted = null
         bridge.onExhausted = null

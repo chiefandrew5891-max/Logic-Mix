@@ -350,4 +350,5 @@
     <string name="privacy_policy_view_online">在线查看</string>
     <string name="privacy_policy_online_unavailable">在线版本暂不可用。此离线副本为当前文本。</string>
     <string name="privacy_policy_draft">草稿：尚未经发布者审核。</string>
+    <string name="victory_level_complete">关卡完成！</string>
 </resources>

@@ -350,4 +350,5 @@
     <string name="privacy_policy_view_online">Відкрити онлайн</string>
     <string name="privacy_policy_online_unavailable">Онлайн-версія поки недоступна. Ця офлайн-копія — актуальний текст.</string>
     <string name="privacy_policy_draft">Чернетка: ще не перевірена видавцем.</string>
+    <string name="victory_level_complete">Рівень пройдено!</string>
 </resources>

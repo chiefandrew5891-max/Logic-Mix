@@ -350,4 +350,5 @@
     <string name="privacy_policy_view_online">Ver en línea</string>
     <string name="privacy_policy_online_unavailable">La versión en línea aún no está disponible. Esta copia sin conexión es el texto actual.</string>
     <string name="privacy_policy_draft">Borrador: aún no revisado por el editor.</string>
+    <string name="victory_level_complete">¡Nivel superado!</string>
 </resources>

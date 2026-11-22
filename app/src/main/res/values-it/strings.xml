@@ -350,4 +350,5 @@
     <string name="privacy_policy_view_online">Apri online</string>
     <string name="privacy_policy_online_unavailable">La versione online non è ancora disponibile. Questa copia offline è il testo attuale.</string>
     <string name="privacy_policy_draft">Bozza: non ancora verificata dall\'editore.</string>
+    <string name="victory_level_complete">Livello completato!</string>
 </resources>
