@@ -72,8 +72,6 @@ fun VisualRoute(onBack: () -> Unit, viewModel: VisualViewModel = hiltViewModel()
             title = stringResource(R.string.category_visual_logic),
             onBack = onBack,
             subtitle = if (game != null || state.geo != null) stringResource(R.string.cat_level, state.index + 1, state.total) else null,
-            onRestart = viewModel::restart,
-            restartEnabled = (game != null && !game.solved) || (geoState != null && !geoState.solved),
         )
         if (state.allDone) {
             Card {

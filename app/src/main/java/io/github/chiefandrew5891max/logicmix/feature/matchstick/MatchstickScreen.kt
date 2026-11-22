@@ -162,8 +162,6 @@ private fun MatchstickScreen(state: MatchUiState, onBack: () -> Unit, vm: Matchs
                 title = stringResource(R.string.match_title),
                 onBack = onBack,
                 subtitle = game?.let { stringResource(R.string.match_level, it.puzzle.index + 1, MatchPuzzles.COUNT) },
-                onRestart = vm::reset,
-                restartEnabled = game != null && !game.solved,
             )
             if (state.allDone) {
                 Card { Text(stringResource(R.string.match_all_done), color = MaterialTheme.colorScheme.onSurface, textAlign = TextAlign.Center) }

@@ -46,8 +46,6 @@ fun WordLogicRoute(onBack: () -> Unit, viewModel: WordLogicViewModel = hiltViewM
             title = stringResource(R.string.category_word_logic),
             onBack = onBack,
             subtitle = if (game != null) stringResource(R.string.cat_level, state.index + 1, state.puzzles.size) else null,
-            onRestart = viewModel::restart,
-            restartEnabled = game != null && !game.solved,
         )
         if (state.fallback) InfoNote(stringResource(R.string.cat_fallback_notice))
         if (state.allDone) {

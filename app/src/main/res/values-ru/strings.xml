@@ -144,8 +144,8 @@
     <string name="match_no_hint">Подсказки нет.</string>
     <string name="match_next">Дальше</string>
     <string name="match_all_done">Вы решили все головоломки со спичками!</string>
-    <string name="category_orb_lines">Orb Lines</string>
-    <string name="orb_title">Orb Lines</string>
+    <string name="category_orb_lines">Линии</string>
+    <string name="orb_title">Линии</string>
     <string name="orb_score">Счёт</string>
     <string name="orb_best">Рекорд</string>
     <string name="orb_next">Далее</string>

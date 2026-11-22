@@ -179,8 +179,6 @@ private fun Header(state: GameUiState, onBack: () -> Unit, onRestart: () -> Unit
         title = stringResource(R.string.game_title),
         onBack = onBack,
         subtitle = puzzle?.let { stringResource(R.string.game_task_info, state.number, state.total, it.difficulty) },
-        onRestart = onRestart,
-        restartEnabled = puzzle != null && !state.solved,
     )
 }
 
