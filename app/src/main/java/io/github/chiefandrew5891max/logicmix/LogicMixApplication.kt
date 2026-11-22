@@ -4,6 +4,7 @@ import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 import io.github.chiefandrew5891max.logicmix.core.audio.MusicController
 import io.github.chiefandrew5891max.logicmix.core.audio.SoundEffectsController
+import io.github.chiefandrew5891max.logicmix.core.content.ContentSyncWorker
 import javax.inject.Inject
 
 @HiltAndroidApp
@@ -15,5 +16,6 @@ class LogicMixApplication : Application() {
         super.onCreate()
         music.start()
         effects.start()
+        ContentSyncWorker.schedule(this)
     }
 }

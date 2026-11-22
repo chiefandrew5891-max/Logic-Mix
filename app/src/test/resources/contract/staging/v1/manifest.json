@@ -1,0 +1,26 @@
+{
+ "channel": "staging",
+ "generatedAt": "2026-01-01T00:00:00Z",
+ "packs": [
+  {
+   "dataVersion": 1,
+   "language": "ru",
+   "minClientVersion": 1,
+   "packId": "wordsearch-ru",
+   "path": "packs/wordsearch-ru/1-98b5a44804bb.json.gz",
+   "rawSha256": "66effdaf21bcf602cea2bef4292c34508bcf260f81c5001ce82de36720143ee5",
+   "rawSize": 5471,
+   "schemaVersion": 1,
+   "sha256": "98b5a44804bbd082e3bb520f32c030b93000bff9daf670075a273f1c61429bf1",
+   "size": 1647,
+   "sources": [
+    "libreoffice",
+    "wordfreq"
+   ],
+   "status": "published",
+   "type": "wordsearch"
+  }
+ ],
+ "schema": 1,
+ "seq": 1
+}
