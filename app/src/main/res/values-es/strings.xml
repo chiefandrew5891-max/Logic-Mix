@@ -351,4 +351,10 @@
     <string name="privacy_policy_online_unavailable">La versión en línea aún no está disponible. Esta copia sin conexión es el texto actual.</string>
     <string name="privacy_policy_draft">Borrador: aún no revisado por el editor.</string>
     <string name="victory_level_complete">¡Nivel superado!</string>
+    <plurals name="arcade_goal_lines">
+        <item quantity="one">Forma %1$d línea — %2$d/%1$d</item>
+        <item quantity="many">Forma %1$d líneas — %2$d/%1$d</item>
+        <item quantity="other">Forma %1$d líneas — %2$d/%1$d</item>
+    </plurals>
+    <string name="arcade_goal_score">Objetivo: lograr %1$d puntos — %2$d/%1$d</string>
 </resources>

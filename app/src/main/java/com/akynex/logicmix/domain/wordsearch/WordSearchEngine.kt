@@ -29,17 +29,81 @@ data class WordSearchLevel(
     fun wordOf(path: List<Cell>): String = buildString { path.forEach { append(letterAt(it)) } }
 }
 
-/** Per-language word lists: [core] words may be placed by the generator; every word in [core] and extra is accepted as a bonus. */
-class WordDictionary(val language: ContentLanguage, val core: List<String>, extra: Collection<String>) {
-    private val all: Set<String> = (core + extra).toSet()
+/**
+ * Sorted bulk word list kept as one byte array (one byte per letter, alphabet index + 0x30, '\n' between words) so a
+ * million-word dictionary costs a few MB and needs no object per word. Lookup is a local binary search.
+ */
+class PackedWords(private val alphabet: String, private val data: ByteArray, private val offsets: IntArray) {
+    val size: Int get() = offsets.size - 1
 
-    /** Letters weighted by how often they occur in the language's own words. */
-    val fillerPool: String = core.joinToString("")
+    operator fun contains(word: String): Boolean {
+        val key = ByteArray(word.length)
+        for (i in word.indices) {
+            val ch = if (word[i] == 'Ё') 'Е' else word[i]
+            val idx = alphabet.indexOf(ch)
+            if (idx < 0) return false
+            key[i] = (0x30 + idx).toByte()
+        }
+        var lo = 0
+        var hi = size - 1
+        while (lo <= hi) {
+            val mid = (lo + hi) ushr 1
+            val c = compare(mid, key)
+            if (c == 0) return true
+            if (c < 0) lo = mid + 1 else hi = mid - 1
+        }
+        return false
+    }
 
-    operator fun contains(word: String): Boolean = word in all
+    private fun compare(entry: Int, key: ByteArray): Int {
+        val start = offsets[entry]
+        val len = offsets[entry + 1] - 1 - start
+        val n = minOf(len, key.size)
+        for (i in 0 until n) {
+            val d = data[start + i] - key[i]
+            if (d != 0) return d
+        }
+        return len - key.size
+    }
 
     companion object {
-        fun parse(language: ContentLanguage, text: String): WordDictionary {
+        /** [raw] is the decompressed file: the alphabet line, then the sorted packed words. */
+        fun parse(raw: ByteArray): PackedWords {
+            val headerEnd = raw.indexOf('\n'.code.toByte())
+            require(headerEnd > 0) { "missing alphabet line" }
+            val alphabet = raw.copyOfRange(0, headerEnd).toString(Charsets.UTF_8)
+            val data = raw.copyOfRange(headerEnd + 1, raw.size)
+            var count = 0
+            for (b in data) if (b == '\n'.code.toByte()) count++
+            if (data.isNotEmpty() && data.last() != '\n'.code.toByte()) count++
+            val body = if (data.isNotEmpty() && data.last() != '\n'.code.toByte()) data + '\n'.code.toByte() else data
+            val offsets = IntArray(count + 1)
+            var n = 1
+            for (i in body.indices) if (body[i] == '\n'.code.toByte()) offsets[n++] = i + 1
+            return PackedWords(alphabet, body, offsets)
+        }
+    }
+}
+
+/**
+ * Per-language word lists. [core] words may be placed by the generator. A bonus word is any core or [extra] word, or a
+ * word in the optional [bulk] dictionary; all checks are local.
+ */
+class WordDictionary(
+    val language: ContentLanguage,
+    val core: List<String>,
+    extra: Collection<String>,
+    private val bulk: PackedWords? = null,
+) {
+    private val all: Set<String> = (core + extra).toSet()
+
+    /** Number of distinct words known to the bonus check. */
+    val bonusWordCount: Int get() = all.size + (bulk?.size ?: 0)
+
+    operator fun contains(word: String): Boolean = word in all || (bulk?.contains(word) ?: false)
+
+    companion object {
+        fun parse(language: ContentLanguage, text: String, bulk: PackedWords? = null): WordDictionary {
             val core = mutableListOf<String>()
             val extra = mutableListOf<String>()
             var target = core
@@ -54,17 +118,24 @@ class WordDictionary(val language: ContentLanguage, val core: List<String>, extr
                     }
                 }
             }
-            return WordDictionary(language, core.distinct(), extra.distinct())
+            return WordDictionary(language, core.distinct(), extra.distinct(), bulk)
         }
     }
 }
 
 object WordDictionaries {
-    /** Bundled dictionary, or null when the language has no word-search content (e.g. Chinese). */
+    /**
+     * Bundled dictionary, or null when the language has no word-search content (e.g. Chinese). The optional
+     * `wordsearch/<tag>.words.gz` is the bulk bonus list; it is the slot a Firebase content pack can later replace.
+     */
     fun load(language: ContentLanguage): WordDictionary? {
-        val stream = WordDictionaries::class.java.classLoader?.getResourceAsStream("wordsearch/${language.tag}.txt")
+        val loader = WordDictionaries::class.java.classLoader ?: return null
+        val text = loader.getResourceAsStream("wordsearch/${language.tag}.txt")?.use { it.readBytes().toString(Charsets.UTF_8) }
             ?: return null
-        return stream.use { WordDictionary.parse(language, it.readBytes().toString(Charsets.UTF_8)) }
+        val bulk = loader.getResourceAsStream("wordsearch/${language.tag}.words.gz")?.use {
+            PackedWords.parse(java.util.zip.GZIPInputStream(it).readBytes())
+        }
+        return WordDictionary.parse(language, text, bulk)
     }
 }
 
@@ -137,16 +208,20 @@ object WordSearchVerifier {
             }
             p.path.forEach { if (!used.add(it)) problems += "cell reused: $it" }
         }
+        if (used.size != level.size * level.size) problems += "grid is not fully covered by main words"
         return problems
     }
 }
 
+/**
+ * Builds a "Hungarian crossword" style grid: the whole grid is tiled with non-overlapping orthogonal snake paths and every
+ * path carries one main word, so no cell holds a filler letter. Fails loudly instead of returning an unverified grid.
+ */
 object WordSearchGenerator {
-    private const val MAX_ATTEMPTS = 80
-    private const val STEP_BUDGET = 4000
+    private const val MAX_ATTEMPTS = 3000
     private val DIRECTIONS = listOf(Cell(-1, 0), Cell(1, 0), Cell(0, -1), Cell(0, 1))
 
-    /** Same arguments always give the same level. Fails loudly instead of returning an unverified grid. */
+    /** Same arguments always give the same level. [pool] holds the distinct words that may be used. */
     fun generate(
         id: String,
         language: ContentLanguage,
@@ -154,16 +229,14 @@ object WordSearchGenerator {
         size: Int,
         difficulty: Int,
         seed: Long,
-        words: List<String>,
-        fillerPool: String,
+        minLength: Int,
+        maxLength: Int,
+        pool: List<String>,
     ): WordSearchLevel {
-        require(words.isNotEmpty() && words.distinct().size == words.size) { "words must be unique" }
-        require(words.sumOf { it.length } * 10 <= size * size * 7) { "words do not fit a $size x $size grid" }
-        require(fillerPool.isNotEmpty()) { "fillerPool is empty" }
-        val ordered = words.sortedWith(compareByDescending<String> { it.length }.thenBy { it })
+        val byLength = pool.distinct().filter { it.length in minLength..maxLength }.sorted().groupBy { it.length }
         for (attempt in 0 until MAX_ATTEMPTS) {
             val rnd = Random(seed * 31 + attempt)
-            val level = tryBuild(id, language, index, size, difficulty, seed, ordered, fillerPool, rnd)
+            val level = tryBuild(id, language, index, size, difficulty, seed, byLength, rnd)
             if (level != null && WordSearchVerifier.errors(level).isEmpty()) return level
         }
         error("Could not generate level $id")
@@ -176,75 +249,91 @@ object WordSearchGenerator {
         size: Int,
         difficulty: Int,
         seed: Long,
-        words: List<String>,
-        fillerPool: String,
+        byLength: Map<Int, List<String>>,
         rnd: Random,
     ): WordSearchLevel? {
-        val occupied = Array(size) { BooleanArray(size) }
-        val letters = CharArray(size * size)
-        val placements = mutableListOf<Placement>()
-        for (word in words) {
-            val path = place(word, size, occupied, rnd) ?: return null
-            word.forEachIndexed { i, ch -> letters[path[i].row * size + path[i].col] = ch }
-            placements += Placement(word, path)
+        val remaining = HashMap<Int, Int>().apply { byLength.forEach { (len, words) -> put(len, words.size) } }
+        val taken = Array(size) { BooleanArray(size) }
+        val paths = mutableListOf<List<Cell>>()
+        var free = size * size
+        while (free > 0) {
+            val start = tightestFreeCell(size, taken, rnd)
+            val path = snake(start, size, taken, remaining, rnd) ?: return null
+            path.forEach { taken[it.row][it.col] = true }
+            remaining[path.size] = remaining.getValue(path.size) - 1
+            paths += path
+            free -= path.size
         }
-        for (i in letters.indices) {
-            if (!occupied[i / size][i % size]) letters[i] = fillerPool[rnd.nextInt(fillerPool.length)]
+        val chosen = HashMap<Int, MutableList<String>>()
+        byLength.forEach { (len, words) -> chosen[len] = words.toMutableList().also { Collections.shuffle(it, rnd) } }
+        val letters = CharArray(size * size)
+        val placements = paths.map { path ->
+            val word = chosen.getValue(path.size).removeAt(0)
+            word.forEachIndexed { i, ch -> letters[path[i].row * size + path[i].col] = ch }
+            Placement(word, path)
         }
         return WordSearchLevel(id, language, index, size, seed, difficulty, String(letters), placements)
     }
 
-    private fun place(word: String, size: Int, occupied: Array<BooleanArray>, rnd: Random): List<Cell>? {
-        val starts = ArrayList<Cell>()
-        for (r in 0 until size) for (c in 0 until size) if (!occupied[r][c]) starts += Cell(r, c)
-        Collections.shuffle(starts, rnd)
-        val budget = intArrayOf(STEP_BUDGET)
-        for (start in starts) {
-            val path = ArrayList<Cell>(word.length)
-            if (walk(start, word.length, size, occupied, path, rnd, budget)) return path
-            if (budget[0] <= 0) return null
+    private fun freeNeighbours(cell: Cell, size: Int, taken: Array<BooleanArray>): List<Cell> =
+        DIRECTIONS.map { Cell(cell.row + it.row, cell.col + it.col) }
+            .filter { it.row in 0 until size && it.col in 0 until size && !taken[it.row][it.col] }
+
+    // Starting in the most cramped corner keeps isolated cells from being left behind.
+    private fun tightestFreeCell(size: Int, taken: Array<BooleanArray>, rnd: Random): Cell {
+        var best = ArrayList<Cell>()
+        var bestDegree = Int.MAX_VALUE
+        for (r in 0 until size) for (c in 0 until size) {
+            if (taken[r][c]) continue
+            val degree = freeNeighbours(Cell(r, c), size, taken).size
+            if (degree < bestDegree) { bestDegree = degree; best = ArrayList() }
+            if (degree == bestDegree) best.add(Cell(r, c))
         }
-        return null
+        return best[rnd.nextInt(best.size)]
     }
 
-    // Depth-first random walk over free cells; on success the path cells stay marked as occupied.
-    private fun walk(
-        cell: Cell,
-        length: Int,
-        size: Int,
-        occupied: Array<BooleanArray>,
-        path: MutableList<Cell>,
-        rnd: Random,
-        budget: IntArray,
-    ): Boolean {
-        path.add(cell)
-        occupied[cell.row][cell.col] = true
-        if (path.size == length) return true
-        if (budget[0]-- > 0) {
-            val dirs = ArrayList(DIRECTIONS)
-            Collections.shuffle(dirs, rnd)
-            for (d in dirs) {
-                val next = Cell(cell.row + d.row, cell.col + d.col)
-                if (next.row !in 0 until size || next.col !in 0 until size || occupied[next.row][next.col]) continue
-                if (walk(next, length, size, occupied, path, rnd, budget)) return true
-            }
+    /** Grows a path from [start], stopping at a length that still has an unused word; null when stuck. */
+    private fun snake(start: Cell, size: Int, taken: Array<BooleanArray>, remaining: Map<Int, Int>, rnd: Random): List<Cell>? {
+        val maxLen = remaining.filterValues { it > 0 }.keys.maxOrNull() ?: return null
+        val path = arrayListOf(start)
+        val used = HashSet<Cell>().apply { add(start) }
+        val target = pickLength(remaining, rnd)
+        while (path.size < target) {
+            val options = freeNeighbours(path.last(), size, taken).filter { it !in used }
+            if (options.isEmpty()) break
+            // Prefer cells with few exits so the path hugs the borders and leaves tidy regions.
+            val scored = options.map { it to freeNeighbours(it, size, taken).count { n -> n !in used } }
+            val low = scored.minOf { it.second }
+            val pickFrom = if (rnd.nextInt(4) == 0) options else scored.filter { it.second == low }.map { it.first }
+            val next = pickFrom[rnd.nextInt(pickFrom.size)]
+            path += next
+            used += next
         }
-        path.removeAt(path.size - 1)
-        occupied[cell.row][cell.col] = false
-        return false
+        if (path.size > maxLen) return null
+        return if ((remaining[path.size] ?: 0) > 0) path else null
+    }
+
+    private fun pickLength(remaining: Map<Int, Int>, rnd: Random): Int {
+        val total = remaining.values.sum()
+        var roll = rnd.nextInt(total.coerceAtLeast(1))
+        for ((len, n) in remaining.toSortedMap()) {
+            if (roll < n) return len
+            roll -= n
+        }
+        return remaining.keys.first()
     }
 }
 
-data class LevelSpec(val size: Int, val wordCount: Int, val minLength: Int, val maxLength: Int, val difficulty: Int)
+data class LevelSpec(val size: Int, val minLength: Int, val maxLength: Int, val difficulty: Int)
 
 object WordSearchLevels {
     const val PER_DIFFICULTY = 3
 
     private val tiers = listOf(
-        LevelSpec(size = 6, wordCount = 4, minLength = 3, maxLength = 5, difficulty = 1),
-        LevelSpec(size = 8, wordCount = 6, minLength = 4, maxLength = 6, difficulty = 2),
-        LevelSpec(size = 10, wordCount = 8, minLength = 4, maxLength = 7, difficulty = 3),
-        LevelSpec(size = 12, wordCount = 10, minLength = 5, maxLength = 8, difficulty = 4),
+        LevelSpec(size = 5, minLength = 3, maxLength = 5, difficulty = 1),
+        LevelSpec(size = 6, minLength = 3, maxLength = 6, difficulty = 2),
+        LevelSpec(size = 8, minLength = 4, maxLength = 7, difficulty = 3),
+        LevelSpec(size = 10, minLength = 4, maxLength = 8, difficulty = 4),
     )
 
     val count: Int = tiers.size * PER_DIFFICULTY
@@ -259,20 +348,16 @@ object WordSearchLevels {
     fun build(language: ContentLanguage, index: Int, dictionary: WordDictionary): WordSearchLevel {
         require(index in 0 until count) { "level index out of range" }
         val spec = spec(index)
-        val seed = seedFor(language, index)
-        val inBand = dictionary.core.filter { it.length in spec.minLength..spec.maxLength }.sorted()
-        val pool = if (inBand.size >= spec.wordCount) inBand else dictionary.core.sorted()
-        require(pool.size >= spec.wordCount) { "dictionary for ${language.tag} is too small" }
-        val words = pool.shuffled(kotlin.random.Random(seed)).take(spec.wordCount)
         return WordSearchGenerator.generate(
             id = levelId(language, index),
             language = language,
             index = index,
             size = spec.size,
             difficulty = spec.difficulty,
-            seed = seed,
-            words = words,
-            fillerPool = dictionary.fillerPool,
+            seed = seedFor(language, index),
+            minLength = spec.minLength,
+            maxLength = spec.maxLength,
+            pool = dictionary.core,
         )
     }
 }

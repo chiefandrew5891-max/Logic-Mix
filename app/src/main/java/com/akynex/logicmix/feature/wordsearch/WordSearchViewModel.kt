@@ -125,7 +125,9 @@ class WordSearchViewModel @Inject constructor(
             return
         }
         val level = withContext(Dispatchers.Default) { WordSearchLevels.build(content, index, words) }
-        val session = store.begin(level, System.currentTimeMillis())
+        val stored = store.begin(level, System.currentTimeMillis())
+        // Levels saved by an older generator may list words this grid no longer contains.
+        val session = stored.copy(mainFound = stored.mainFound.filterTo(HashSet()) { it in level.mainWords })
         // A level finished in Career but not yet advanced would end the Arcade stage before it starts.
         if (arcade != null && session.completed) {
             store.setCurrentIndex(content, index + 1)

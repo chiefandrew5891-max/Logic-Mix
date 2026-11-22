@@ -8,6 +8,7 @@ import com.akynex.logicmix.core.audio.SoundEffectsController
 import com.akynex.logicmix.core.data.LocalProfileRepository
 import com.akynex.logicmix.core.data.OrbStore
 import com.akynex.logicmix.core.data.ProgressRepository
+import com.akynex.logicmix.domain.arcade.ArcadeGoals
 import com.akynex.logicmix.domain.game.AttemptOutcome
 import com.akynex.logicmix.domain.game.GameMode
 import com.akynex.logicmix.domain.orb.OrbGame
@@ -41,6 +42,8 @@ data class OrbUiState(
     val hint: Pair<Int, Int>? = null,
     val noHint: Boolean = false,
     val xpAwarded: Int = 0,
+    /** Arcade only: removals needed to finish the stage; null in normal play, where the game stays endless. */
+    val goal: Int? = null,
 ) {
     val busy: Boolean get() = stage != null
     val shownCells: List<Int> get() = stage?.cells ?: game?.cells.orEmpty()
@@ -57,6 +60,7 @@ class OrbViewModel @Inject constructor(
     private val analytics = monetization.newGameAnalytics()
     /** Non-null while hosted by Arcade: a fresh seeded game whose goal is OrbRules.XP_SCORE; the saved Career game stays untouched. */
     private val arcade = monetization.arcade.activeFor(com.akynex.logicmix.domain.content.GameCategory.ORB_LINES)
+    private val goal: Int? = arcade?.let(ArcadeGoals::orbLines)
     private val ctx = com.akynex.logicmix.core.analytics.GameContext(com.akynex.logicmix.domain.content.GameCategory.ORB_LINES, family = "orb_lines", mode = "endless")
     override fun onCleared() { analytics.leave() }
 
@@ -79,7 +83,7 @@ class OrbViewModel @Inject constructor(
                 seed = arcade?.seed ?: System.currentTimeMillis()
                 startedAt = System.currentTimeMillis()
             }
-            _state.value = OrbUiState(game = restored ?: OrbGame.new(seed), best = saved.best)
+            _state.value = OrbUiState(game = restored ?: OrbGame.new(seed), best = saved.best, goal = goal)
             analytics.openCategory(ctx)
             analytics.puzzleStarted("orb-$seed", ctx, resumed = restored != null, hints = restored?.hintsUsed ?: 0)
             if (restored != null) claimXp(restored)
@@ -151,8 +155,10 @@ class OrbViewModel @Inject constructor(
 
     private fun comboSound(removed: Int) = sfx.play(Sfx.ORB_POP)
 
+    private fun solved(game: OrbGame): Boolean = if (goal != null) game.lines >= goal else game.score >= OrbRules.XP_SCORE
+
     private fun claimXp(game: OrbGame) {
-        if (xpClaimed || game.score < OrbRules.XP_SCORE) return
+        if (xpClaimed || !solved(game)) return
         xpClaimed = true
         viewModelScope.launch {
             profiles.ensureProfile()
@@ -205,7 +211,7 @@ class OrbViewModel @Inject constructor(
         xpClaimed = false
         val g = OrbGame.new(seed)
         analytics.puzzleStarted("orb-$seed", ctx)
-        _state.update { OrbUiState(game = g, best = it.best) }
+        _state.update { OrbUiState(game = g, best = it.best, goal = goal) }
         persist(g)
     }
 }

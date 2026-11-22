@@ -29,6 +29,7 @@ import com.akynex.logicmix.core.designsystem.GoldTrophy
 import com.akynex.logicmix.core.designsystem.LogicMixTokens
 import com.akynex.logicmix.core.designsystem.XpLine
 import com.akynex.logicmix.domain.twodots.TwoDotsMode
+import com.akynex.logicmix.feature.arcade.ArcadeGoalBanner
 import com.akynex.logicmix.feature.game.ActionButton
 import com.akynex.logicmix.feature.game.Card
 
@@ -56,6 +57,10 @@ fun TwoDotsRoute(onBack: () -> Unit, viewModel: TwoDotsViewModel = hiltViewModel
                     GameTool(stringResource(R.string.td_mode_endless), { viewModel.setMode(TwoDotsMode.ENDLESS) }, !state.busy, game.mode == TwoDotsMode.ENDLESS),
                 ),
             )
+            state.goal?.let { goal ->
+                val shown = minOf(game.score, goal)
+                ArcadeGoalBanner(stringResource(R.string.arcade_goal_score, goal, shown), shown, goal)
+            }
             Card {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM)) {
                     val shown by animateIntAsState(game.score, label = "score")

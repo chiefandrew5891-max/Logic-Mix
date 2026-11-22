@@ -351,4 +351,11 @@
     <string name="privacy_policy_online_unavailable">Онлайн-версия пока недоступна. Эта офлайн-копия — актуальный текст.</string>
     <string name="privacy_policy_draft">Черновик: ещё не проверен издателем.</string>
     <string name="victory_level_complete">Уровень пройден!</string>
+    <plurals name="arcade_goal_lines">
+        <item quantity="one">Соберите %1$d линию — %2$d/%1$d</item>
+        <item quantity="few">Соберите %1$d линии — %2$d/%1$d</item>
+        <item quantity="many">Соберите %1$d линий — %2$d/%1$d</item>
+        <item quantity="other">Соберите %1$d линии — %2$d/%1$d</item>
+    </plurals>
+    <string name="arcade_goal_score">Цель: набрать %1$d очков — %2$d/%1$d</string>
 </resources>

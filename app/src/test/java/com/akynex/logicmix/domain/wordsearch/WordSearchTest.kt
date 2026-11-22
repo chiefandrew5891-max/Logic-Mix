@@ -38,11 +38,40 @@ class WordSearchGeneratorTest {
                 val spec = WordSearchLevels.spec(index)
                 assertTrue("${level.id}: ${WordSearchVerifier.errors(level)}", WordSearchVerifier.errors(level).isEmpty())
                 assertEquals(spec.size * spec.size, level.letters.length)
-                assertEquals(spec.wordCount, level.placements.size)
+                assertEquals("${level.id} fully covered", spec.size * spec.size, level.placements.sumOf { it.path.size })
+                level.letters.indices.forEach { i -> assertTrue(level.placements.any { p -> p.path.any { it.row * level.size + it.col == i } }) }
                 assertTrue(ids.add(level.id))
                 level.mainWords.forEach { assertTrue("${level.id}: $it", it in dictionary.core) }
             }
         }
+    }
+
+    @Test fun russianBonusDictionaryRecognisesRealWordsOnceOnly() {
+        val ru = WordDictionaries.load(ContentLanguage.RU)!!
+        assertTrue("ru dictionary size ${ru.bonusWordCount}", ru.bonusWordCount > 900_000)
+        listOf("РОД", "РОМ", "МАГ", "НОС", "ЛОМ", "ШОК", "ДОМА", "ЁЖИК").forEach { assertTrue(it, it in ru) }
+        listOf("ЪЪЪ", "ФЫВА", "РОДЫЫ").forEach { assertFalse(it, it in ru) }
+    }
+
+    @Test fun bonusWordsDoNotCompleteTheLevelAndPayOnce() {
+        val ru = WordDictionaries.load(ContentLanguage.RU)!!
+        // МАГ / НОС / ШОК: the reversed middle row spells СОН, a real word that is not in the solution.
+        val level = WordSearchLevel(
+            id = "ws-ru-test", language = ContentLanguage.RU, index = 0, size = 3, seed = 1L, difficulty = 1,
+            letters = "МАГНОСШОК",
+            placements = listOf(
+                Placement("МАГ", listOf(Cell(0, 0), Cell(0, 1), Cell(0, 2))),
+                Placement("НОС", listOf(Cell(1, 0), Cell(1, 1), Cell(1, 2))),
+                Placement("ШОК", listOf(Cell(2, 0), Cell(2, 1), Cell(2, 2))),
+            ),
+        )
+        assertTrue(WordSearchVerifier.errors(level).isEmpty())
+        val bonus = listOf(Cell(1, 2), Cell(1, 1), Cell(1, 0))
+        assertEquals(WordCheck.Extra("СОН"), WordSearchChecker.check(level, ru, bonus, emptySet(), emptySet()))
+        assertEquals(WordCheck.Duplicate("СОН"), WordSearchChecker.check(level, ru, bonus, emptySet(), setOf("СОН")))
+        // The bonus word is not part of the solution, so it can never stand in for a main word.
+        assertFalse("СОН" in level.mainWords)
+        assertEquals(WordCheck.Main("МАГ"), WordSearchChecker.check(level, ru, level.placements[0].path, setOf("НОС"), setOf("СОН")))
     }
 
     @Test fun mainWordsAreSpelledAlongOrthogonalPathsWithoutReusedCells() {

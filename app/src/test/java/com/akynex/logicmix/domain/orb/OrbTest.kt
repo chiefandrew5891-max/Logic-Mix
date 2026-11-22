@@ -160,4 +160,16 @@ class OrbTest {
         assertEquals(0, OrbRules.scoreFor(4))
         assertTrue(OrbRules.scoreFor(6) > OrbRules.scoreFor(5))
     }
+
+    @Test
+    fun lineCounterRisesOnClearAndRollsBackOnUndo() {
+        val cells = board(idx(0, 0) to 1, idx(0, 1) to 1, idx(0, 2) to 1, idx(0, 3) to 1, idx(1, 4) to 1)
+        val g = OrbGame.of(cells, listOf(2, 3, 4))
+        assertEquals(0, g.lines)
+        val cleared = g.move(idx(1, 4), idx(0, 4))!!.game
+        assertEquals(1, cleared.lines)
+        assertEquals(0, cleared.undo().lines)
+        // A move that clears nothing does not count.
+        assertEquals(0, OrbGame.new(7).let { it.move(it.cells.indexOfFirst { c -> c != 0 }, it.cells.indexOfFirst { c -> c == 0 })!!.game.lines })
+    }
 }

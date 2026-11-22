@@ -351,4 +351,9 @@
     <string name="privacy_policy_online_unavailable">The online version is not available yet. This offline copy is the current text.</string>
     <string name="privacy_policy_draft">Draft: not yet reviewed by the publisher.</string>
     <string name="victory_level_complete">Level complete!</string>
+    <plurals name="arcade_goal_lines">
+        <item quantity="one">Collect %1$d line — %2$d/%1$d</item>
+        <item quantity="other">Collect %1$d lines — %2$d/%1$d</item>
+    </plurals>
+    <string name="arcade_goal_score">Goal: score %1$d points — %2$d/%1$d</string>
 </resources>

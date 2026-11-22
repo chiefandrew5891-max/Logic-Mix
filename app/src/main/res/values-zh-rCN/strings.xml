@@ -351,4 +351,8 @@
     <string name="privacy_policy_online_unavailable">在线版本暂不可用。此离线副本为当前文本。</string>
     <string name="privacy_policy_draft">草稿：尚未经发布者审核。</string>
     <string name="victory_level_complete">关卡完成！</string>
+    <plurals name="arcade_goal_lines">
+        <item quantity="other">消除 %1$d 条线 — %2$d/%1$d</item>
+    </plurals>
+    <string name="arcade_goal_score">目标：获得 %1$d 分 — %2$d/%1$d</string>
 </resources>

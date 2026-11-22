@@ -96,7 +96,7 @@ object OrbLines {
     }
 }
 
-private data class OrbSnapshot(val cells: List<Int>, val next: List<Int>, val score: Int, val rng: Long)
+private data class OrbSnapshot(val cells: List<Int>, val next: List<Int>, val score: Int, val rng: Long, val lines: Int)
 
 data class OrbMove(
     val game: OrbGame,
@@ -139,6 +139,8 @@ class OrbGame private constructor(
     val rng: Long,
     val hintsUsed: Int,
     private val history: List<OrbSnapshot>,
+    /** Removal events (a move or a spawn that cleared at least one line) in this game; the Arcade goal counts these. */
+    val lines: Int = 0,
 ) {
     val over: Boolean get() = cells.none { it == 0 }
     val canUndo: Boolean get() = history.isNotEmpty()
@@ -169,14 +171,15 @@ class OrbGame private constructor(
             if (afterSpawn.isNotEmpty()) gained += clear(board, afterSpawn)
             upcoming = roll.colors(OrbRules.SPAWN)
         }
-        val snap = OrbSnapshot(cells, next, score, rng)
-        val game = OrbGame(board, upcoming, score + gained, roll.state, hintsUsed, (history + snap).takeLast(MAX_UNDO))
+        val snap = OrbSnapshot(cells, next, score, rng, this.lines)
+        val cleared = if (lines.isNotEmpty() || afterSpawn.isNotEmpty()) 1 else 0
+        val game = OrbGame(board, upcoming, score + gained, roll.state, hintsUsed, (history + snap).takeLast(MAX_UNDO), this.lines + cleared)
         return OrbMove(game, path, lines, spawned, afterSpawn)
     }
 
     fun undo(): OrbGame {
         val last = history.lastOrNull() ?: return this
-        return OrbGame(last.cells, last.next, last.score, last.rng, hintsUsed, history.dropLast(1))
+        return OrbGame(last.cells, last.next, last.score, last.rng, hintsUsed, history.dropLast(1), last.lines)
     }
 
     /** A real hint: a reachable move that completes a line right now, or null when none exists. */
@@ -193,7 +196,7 @@ class OrbGame private constructor(
         return null
     }
 
-    fun withHint(): OrbGame = OrbGame(cells, next, score, rng, hintsUsed + 1, history)
+    fun withHint(): OrbGame = OrbGame(cells, next, score, rng, hintsUsed + 1, history, lines)
 
     fun encode(): String = "${cells.joinToString("")};${next.joinToString("")};$score;$rng;$hintsUsed"
 

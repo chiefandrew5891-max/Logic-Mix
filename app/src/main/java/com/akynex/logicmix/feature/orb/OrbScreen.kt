@@ -25,11 +25,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.akynex.logicmix.R
+import com.akynex.logicmix.feature.arcade.ArcadeGoalBanner
 import com.akynex.logicmix.core.designsystem.GameHeader
 import com.akynex.logicmix.core.designsystem.GameTool
 import com.akynex.logicmix.core.designsystem.GameToolRow
@@ -60,6 +62,10 @@ private fun OrbScreen(state: OrbUiState, onBack: () -> Unit, vm: OrbViewModel) {
         ) {
             GameHeader(stringResource(R.string.orb_title), onBack, onRestart = vm::newGame, restartEnabled = !state.busy)
             if (game != null) {
+                state.goal?.let { goal ->
+                    val shown = minOf(game.lines, goal)
+                    ArcadeGoalBanner(pluralStringResource(R.plurals.arcade_goal_lines, goal, goal, shown), shown, goal)
+                }
                 InfoPanel(game.score, maxOf(state.best, game.score), game.next)
                 OrbBoard(state, vm::tap)
                 if (game.over) {

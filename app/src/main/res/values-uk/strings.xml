@@ -351,4 +351,11 @@
     <string name="privacy_policy_online_unavailable">Онлайн-версія поки недоступна. Ця офлайн-копія — актуальний текст.</string>
     <string name="privacy_policy_draft">Чернетка: ще не перевірена видавцем.</string>
     <string name="victory_level_complete">Рівень пройдено!</string>
+    <plurals name="arcade_goal_lines">
+        <item quantity="one">Зберіть %1$d лінію — %2$d/%1$d</item>
+        <item quantity="few">Зберіть %1$d лінії — %2$d/%1$d</item>
+        <item quantity="many">Зберіть %1$d ліній — %2$d/%1$d</item>
+        <item quantity="other">Зберіть %1$d лінії — %2$d/%1$d</item>
+    </plurals>
+    <string name="arcade_goal_score">Мета: набрати %1$d очок — %2$d/%1$d</string>
 </resources>

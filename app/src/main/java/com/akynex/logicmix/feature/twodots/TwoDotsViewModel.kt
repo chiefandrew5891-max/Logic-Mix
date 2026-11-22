@@ -8,6 +8,7 @@ import com.akynex.logicmix.core.audio.SoundEffectsController
 import com.akynex.logicmix.core.data.LocalProfileRepository
 import com.akynex.logicmix.core.data.ProgressRepository
 import com.akynex.logicmix.core.data.TwoDotsStore
+import com.akynex.logicmix.domain.arcade.ArcadeGoals
 import com.akynex.logicmix.domain.game.AttemptOutcome
 import com.akynex.logicmix.domain.game.GameMode
 import com.akynex.logicmix.domain.twodots.TwoDotsGame
@@ -47,6 +48,8 @@ data class TwoDotsUiState(
     val gainKey: Int = 0,
     val xpAwarded: Int = 0,
     val arcade: Boolean = false,
+    /** Arcade only: score needed within the classic move limit; null in normal play. */
+    val goal: Int? = null,
 ) {
     val busy: Boolean get() = stage != null
     val shownCells: List<Int> get() = stage?.cells ?: game?.cells.orEmpty()
@@ -64,6 +67,7 @@ class TwoDotsViewModel @Inject constructor(
     private val analytics = monetization.newGameAnalytics()
     /** Non-null while hosted by Arcade: a fresh seeded CLASSIC game whose goal is TwoDotsRules.XP_SCORE; saved games stay untouched. */
     private val arcade = monetization.arcade.activeFor(com.akynex.logicmix.domain.content.GameCategory.TWO_DOTS)
+    private val goal: Int? = arcade?.let(ArcadeGoals::twoDotsScore)
     private fun ctx(mode: TwoDotsMode) = com.akynex.logicmix.core.analytics.GameContext(com.akynex.logicmix.domain.content.GameCategory.TWO_DOTS, family = "two_dots", mode = mode.name.lowercase())
     override fun onCleared() { analytics.leave() }
 
@@ -83,7 +87,7 @@ class TwoDotsViewModel @Inject constructor(
             val restored = if (arcade != null) null else TwoDotsGame.restore(saved.game)?.takeIf { !it.over && it.mode == saved.mode }
             val game = restored ?: if (arcade != null) TwoDotsGame.new(TwoDotsMode.CLASSIC, arcade.seed) else TwoDotsGame.new(saved.mode, System.currentTimeMillis())
             startedAt = if (restored != null && saved.startedAt > 0) saved.startedAt else System.currentTimeMillis()
-            _state.value = TwoDotsUiState(game = game, best = saved.best, arcade = arcade != null)
+            _state.value = TwoDotsUiState(game = game, best = saved.best, arcade = arcade != null, goal = goal)
             analytics.openCategory(ctx(game.mode))
             analytics.puzzleStarted(game.xpId, ctx(game.mode), resumed = restored != null, hints = game.hintsUsed)
             if (restored != null) claimXp(game)
@@ -170,8 +174,11 @@ class TwoDotsViewModel @Inject constructor(
         _state.update { if (it.gainKey == key) it.copy(gain = 0) else it }
     }
 
+    /** Arcade ends on its own score goal (moves permitting); normal play keeps the classic XP threshold. */
+    private fun solved(game: TwoDotsGame): Boolean = if (goal != null) game.score >= goal else game.xpReady
+
     private fun claimXp(game: TwoDotsGame) {
-        if (!game.xpReady || claimedId == game.xpId) return
+        if (!solved(game) || claimedId == game.xpId) return
         claimedId = game.xpId
         val started = startedAt
         viewModelScope.launch {
@@ -240,7 +247,7 @@ class TwoDotsViewModel @Inject constructor(
         val game = TwoDotsGame.new(mode, startedAt)
         analytics.puzzleStarted(game.xpId, ctx(mode))
         _state.update {
-            TwoDotsUiState(game = game, best = it.best, arcade = arcade != null)
+            TwoDotsUiState(game = game, best = it.best, arcade = arcade != null, goal = goal)
         }
         persist(game)
     }
