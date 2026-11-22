@@ -346,4 +346,8 @@
     <string name="arcade_ach_full_set">Все категории в полном наборе</string>
     <string name="arcade_ach_no_hints">Без подсказок</string>
     <string name="arcade_ach_record">Новый рекорд</string>
+    <string name="privacy_policy_title">Политика конфиденциальности</string>
+    <string name="privacy_policy_view_online">Открыть онлайн</string>
+    <string name="privacy_policy_online_unavailable">Онлайн-версия пока недоступна. Эта офлайн-копия — актуальный текст.</string>
+    <string name="privacy_policy_draft">Черновик: ещё не проверен издателем.</string>
 </resources>

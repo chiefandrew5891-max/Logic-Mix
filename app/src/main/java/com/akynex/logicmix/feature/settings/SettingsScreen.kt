@@ -68,6 +68,7 @@ import com.akynex.logicmix.core.locale.AppLanguage
 fun SettingsScreen(
     onBack: () -> Unit,
     onGameStyleStep: (StyleStep) -> Unit = {},
+    onPrivacyPolicy: () -> Unit = {},
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val gameStyle by viewModel.gameStyle.collectAsState(initial = GameStylePrefs())
@@ -95,6 +96,7 @@ fun SettingsScreen(
         gameStyle = gameStyle,
         onArcade = viewModel::selectArcade,
         onGameStyleStep = onGameStyleStep,
+        onPrivacyPolicy = onPrivacyPolicy,
     )
 }
 
@@ -118,6 +120,7 @@ internal fun SettingsContent(
     onAnalyticsConsent: (Boolean) -> Unit = {},
     showAdOptions: Boolean = false,
     onAdOptions: () -> Unit = {},
+    onPrivacyPolicy: () -> Unit = {},
 ) {
     val colors = LogicMixTokens.colors
     Box(Modifier.fillMaxSize().background(colors.backgroundBrush)) {
@@ -184,7 +187,7 @@ internal fun SettingsContent(
                 Text(stringResource(R.string.settings_about), style = LogicMixTokens.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
                 Text(stringResource(R.string.settings_about_body), style = LogicMixTokens.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 InfoRow(stringResource(R.string.settings_help), stringResource(R.string.settings_planned))
-                InfoRow(stringResource(R.string.settings_privacy), stringResource(R.string.settings_planned))
+                InfoRow(stringResource(R.string.settings_privacy), null, onClick = onPrivacyPolicy)
             }
         }
     }
@@ -385,8 +388,8 @@ internal fun LanguageAccordion(selected: AppLanguage, onSelect: (AppLanguage) ->
 }
 
 @Composable
-private fun InfoRow(title: String, status: String?) {
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM)) {
+private fun InfoRow(title: String, status: String?, onClick: (() -> Unit)? = null) {
+    Row((if (onClick != null) Modifier.fillMaxWidth().heightIn(min = LogicMixTokens.minTouchTarget).clickable(role = Role.Button, onClick = onClick) else Modifier.fillMaxWidth()), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM)) {
         LogicMixIcon(R.drawable.ic_info, MaterialTheme.colorScheme.secondary)
         Text(title, style = LogicMixTokens.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.weight(1f))
         if (status != null) Text(status, style = LogicMixTokens.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)

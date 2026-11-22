@@ -346,4 +346,8 @@
     <string name="arcade_ach_full_set">Усі категорії в повному наборі</string>
     <string name="arcade_ach_no_hints">Без підказок</string>
     <string name="arcade_ach_record">Новий рекорд</string>
+    <string name="privacy_policy_title">Політика конфіденційності</string>
+    <string name="privacy_policy_view_online">Відкрити онлайн</string>
+    <string name="privacy_policy_online_unavailable">Онлайн-версія поки недоступна. Ця офлайн-копія — актуальний текст.</string>
+    <string name="privacy_policy_draft">Чернетка: ще не перевірена видавцем.</string>
 </resources>

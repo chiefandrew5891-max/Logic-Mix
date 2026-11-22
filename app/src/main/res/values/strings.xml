@@ -346,4 +346,8 @@
     <string name="arcade_ach_full_set">Every category in a full set</string>
     <string name="arcade_ach_no_hints">No hints</string>
     <string name="arcade_ach_record">New record</string>
+    <string name="privacy_policy_title">Privacy policy</string>
+    <string name="privacy_policy_view_online">View online</string>
+    <string name="privacy_policy_online_unavailable">The online version is not available yet. This offline copy is the current text.</string>
+    <string name="privacy_policy_draft">Draft: not yet reviewed by the publisher.</string>
 </resources>

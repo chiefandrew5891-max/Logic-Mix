@@ -346,4 +346,8 @@
     <string name="arcade_ach_full_set">完整套装中的所有类别</string>
     <string name="arcade_ach_no_hints">无提示</string>
     <string name="arcade_ach_record">新纪录</string>
+    <string name="privacy_policy_title">隐私政策</string>
+    <string name="privacy_policy_view_online">在线查看</string>
+    <string name="privacy_policy_online_unavailable">在线版本暂不可用。此离线副本为当前文本。</string>
+    <string name="privacy_policy_draft">草稿：尚未经发布者审核。</string>
 </resources>

@@ -49,6 +49,7 @@ import com.akynex.logicmix.feature.twodots.TwoDotsRoute
 import com.akynex.logicmix.feature.visual.VisualRoute
 import com.akynex.logicmix.feature.sudoku.SudokuRoute
 import com.akynex.logicmix.feature.home.HomeRoute
+import com.akynex.logicmix.feature.privacy.PrivacyPolicyScreen
 import com.akynex.logicmix.feature.settings.SettingsScreen
 import com.akynex.logicmix.feature.wordsearch.WordSearchRoute
 
@@ -92,6 +93,7 @@ object Routes {
     const val GAME_STYLE = "game_style/{start}"
     const val STYLE_INFO = "style_info/{style}"
     const val ARCADE = "arcade"
+    const val PRIVACY_POLICY = "privacy_policy"
 
     fun gameStyle(start: StyleStep) = "game_style/${start.name}"
     fun styleInfo(style: GameStyle) = "style_info/${style.name}"
@@ -210,7 +212,11 @@ private fun LogicMixNavigation(navController: NavHostController, gameStyle: Game
             SettingsScreen(
                 onBack = goBack,
                 onGameStyleStep = { navController.navigate(Routes.gameStyle(it)) },
+                onPrivacyPolicy = { navController.navigate(Routes.PRIVACY_POLICY) },
             )
+        }
+        composable(Routes.PRIVACY_POLICY) {
+            PrivacyPolicyScreen(onBack = goBack)
         }
     }
 }
