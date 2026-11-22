@@ -14,6 +14,7 @@ import io.github.chiefandrew5891max.logicmix.core.designsystem.rememberDrawableI
 import io.github.chiefandrew5891max.logicmix.core.designsystem.LogicMixPlayerHeader
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.layout.layout
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.WindowInsets
@@ -335,10 +336,17 @@ private fun CardSurface(
 @Composable
 private fun BrandFooter() {
     val muted = MaterialTheme.colorScheme.onSurfaceVariant
-    BoxWithConstraints(Modifier.fillMaxWidth()) {
+    // The parent column adds its own item spacing above and padding below; cancel them so only the gaps below remain.
+    BoxWithConstraints(
+        Modifier.fillMaxWidth().layout { measurable, constraints ->
+            val cut = LogicMixTokens.spacing.roundToPx()
+            val placeable = measurable.measure(constraints)
+            layout(placeable.width, (placeable.height - 2 * cut).coerceAtLeast(0)) { placeable.place(0, -cut) }
+        },
+    ) {
         val card = (maxWidth - LogicMixTokens.spacingS * (CATEGORY_COLUMNS - 1)) / CATEGORY_COLUMNS
         Column(
-            Modifier.fillMaxWidth().padding(top = card / 4).windowInsetsPadding(WindowInsets.navigationBars).padding(bottom = LogicMixTokens.spacingXs),
+            Modifier.fillMaxWidth().padding(top = card / 5).windowInsetsPadding(WindowInsets.navigationBars).padding(bottom = LogicMixTokens.spacingS),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text("© 2026 AKYneX studio™", color = muted.copy(alpha = 0.9f), fontSize = 12.sp, textAlign = TextAlign.Center)
