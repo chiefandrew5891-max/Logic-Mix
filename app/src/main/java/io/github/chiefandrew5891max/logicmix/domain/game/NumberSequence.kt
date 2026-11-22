@@ -24,6 +24,8 @@ data class NumberSequencePuzzle(
     val choices: List<String> = emptyList(),
     val rule: String = "",
     val seed: Long = 0L,
+    /** Encoded localizable task statement (see NumText); empty for classic puzzles. */
+    val question: String = "",
 )
 
 sealed interface ValidationResult {

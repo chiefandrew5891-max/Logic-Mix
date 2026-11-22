@@ -1,7 +1,7 @@
 package io.github.chiefandrew5891max.logicmix.domain.game.numlogic
 
 /** An explicit generating rule. [terms] returns null when a value leaves the safe range, so no overflow is possible. */
-class SeqRule(val text: String, val terms: (Int) -> List<Long>?) {
+class SeqRule(val text: String, val code: String, val terms: (Int) -> List<Long>?) {
     companion object {
         const val LIMIT = 100_000L
 
@@ -15,21 +15,38 @@ class SeqRule(val text: String, val terms: (Int) -> List<Long>?) {
             return out.take(n)
         }
 
-        fun arithmetic(a: Long, d: Long) = SeqRule(signed(d)) { n -> build(n, { it.last() + d }, listOf(a)) }
-        fun geometric(a: Long, r: Long) = SeqRule("×$r") { n -> build(n, { it.last() * r }, listOf(a)) }
+        fun arithmetic(a: Long, d: Long) = SeqRule(signed(d), "arith:$a,$d") { n -> build(n, { it.last() + d }, listOf(a)) }
+        fun geometric(a: Long, r: Long) = SeqRule("×$r", "geom:$a,$r") { n -> build(n, { it.last() * r }, listOf(a)) }
         fun alternatingAdd(a: Long, p: Long, q: Long) =
-            SeqRule("${signed(p)}, ${signed(q)}") { n -> build(n, { it.last() + if (it.size % 2 == 1) p else q }, listOf(a)) }
+            SeqRule("${signed(p)}, ${signed(q)}", "alt:$a,$p,$q") { n -> build(n, { it.last() + if (it.size % 2 == 1) p else q }, listOf(a)) }
         /** Differences themselves grow by [dd]: a second-order rule. */
         fun secondOrder(a: Long, d: Long, dd: Long) =
-            SeqRule("Δ ${signed(d)}, ${signed(d + dd)}, …") { n -> build(n, { it.last() + d + dd * (it.size - 1) }, listOf(a)) }
+            SeqRule("${signed(d)}, ${signed(d + dd)}, …", "second:$a,$d,$dd") { n -> build(n, { it.last() + d + dd * (it.size - 1) }, listOf(a)) }
         fun interleaved(a: Long, da: Long, b: Long, db: Long) =
-            SeqRule("${signed(da)} | ${signed(db)}") { n -> build(n, { if (it.size % 2 == 0) it[it.size - 2] + da else it[it.size - 2] + db }, listOf(a, b)) }
-        fun fibonacci(a: Long, b: Long) = SeqRule("aₙ = aₙ₋₁ + aₙ₋₂") { n -> build(n, { it[it.size - 1] + it[it.size - 2] }, listOf(a, b)) }
-        fun affine(a: Long, p: Long, q: Long) = SeqRule("×$p ${signed(q)}") { n -> build(n, { it.last() * p + q }, listOf(a)) }
+            SeqRule("${signed(da)} | ${signed(db)}", "inter:$a,$da,$b,$db") { n -> build(n, { if (it.size % 2 == 0) it[it.size - 2] + da else it[it.size - 2] + db }, listOf(a, b)) }
+        fun fibonacci(a: Long, b: Long) = SeqRule("aₙ = aₙ₋₁ + aₙ₋₂", "fib:$a,$b") { n -> build(n, { it[it.size - 1] + it[it.size - 2] }, listOf(a, b)) }
+        fun affine(a: Long, p: Long, q: Long) = SeqRule("×$p ${signed(q)}", "affine:$a,$p,$q") { n -> build(n, { it.last() * p + q }, listOf(a)) }
         fun mixed(a: Long, m: Long, k: Long) =
-            SeqRule("×$m, ${signed(k)}") { n -> build(n, { if (it.size % 2 == 1) it.last() * m else it.last() + k }, listOf(a)) }
+            SeqRule("×$m, ${signed(k)}", "mixed:$a,$m,$k") { n -> build(n, { if (it.size % 2 == 1) it.last() * m else it.last() + k }, listOf(a)) }
 
-        private fun signed(v: Long) = if (v >= 0) "+$v" else "−${-v}"
+        /** Rebuilds a rule from its machine code, or null when the code is malformed. */
+        fun fromCode(code: String): SeqRule? {
+            val kind = code.substringBefore(":")
+            val a = code.substringAfter(":", "").split(",").map { it.toLongOrNull() ?: return null }
+            return when {
+                kind == "arith" && a.size == 2 -> arithmetic(a[0], a[1])
+                kind == "geom" && a.size == 2 -> geometric(a[0], a[1])
+                kind == "alt" && a.size == 3 -> alternatingAdd(a[0], a[1], a[2])
+                kind == "second" && a.size == 3 -> secondOrder(a[0], a[1], a[2])
+                kind == "inter" && a.size == 4 -> interleaved(a[0], a[1], a[2], a[3])
+                kind == "fib" && a.size == 2 -> fibonacci(a[0], a[1])
+                kind == "affine" && a.size == 3 -> affine(a[0], a[1], a[2])
+                kind == "mixed" && a.size == 3 -> mixed(a[0], a[1], a[2])
+                else -> null
+            }
+        }
+
+        fun signed(v: Long) = if (v >= 0) "+$v" else "−${-v}"
     }
 }
 

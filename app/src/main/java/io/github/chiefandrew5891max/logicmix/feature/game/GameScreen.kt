@@ -3,7 +3,7 @@ package io.github.chiefandrew5891max.logicmix.feature.game
 import io.github.chiefandrew5891max.logicmix.core.audio.withTap
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
-import io.github.chiefandrew5891max.logicmix.domain.game.NumFamily
+import io.github.chiefandrew5891max.logicmix.domain.game.numlogic.NumText
 import io.github.chiefandrew5891max.logicmix.domain.game.NumberSequencePuzzle
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -94,7 +94,7 @@ fun GameScreen(
                 else -> {
                     val puzzle = state.puzzle
                     Card {
-                        Text(stringResource(promptRes(puzzle.family)), style = LogicMixTokens.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(numTextString(puzzle.question, R.string.game_find_next), style = LogicMixTokens.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         FlowRow(
                             horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS, Alignment.CenterHorizontally),
                             verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS),
@@ -122,7 +122,7 @@ fun GameScreen(
                         Card {
                             state.shownHints.forEachIndexed { i, hint ->
                                 Text(
-                                    stringResource(R.string.game_hint_line, i + 1, hint),
+                                    stringResource(R.string.game_hint_line, i + 1, numTextString(hint)),
                                     style = LogicMixTokens.typography.bodyLarge,
                                     color = MaterialTheme.colorScheme.onSurface,
                                 )
@@ -248,6 +248,7 @@ private fun NumberChip(text: String, highlight: Boolean) {
         Text(
             text,
             style = LogicMixTokens.typography.headlineMedium,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             color = if (highlight) colors.gold else MaterialTheme.colorScheme.onSurface,
         )
     }
@@ -300,15 +301,10 @@ internal fun Card(content: @Composable () -> Unit) {
 
 private fun NumberSequencePuzzle.answerText() = if (choices.isNotEmpty()) choices[answer] else answer.toString()
 
-private fun promptRes(family: NumFamily): Int = when (family) {
-    NumFamily.SEQUENCE -> R.string.game_find_next
-    NumFamily.ORDER_OPS -> R.string.nl_prompt_order_ops
-    NumFamily.PARENTHESES -> R.string.nl_prompt_parentheses
-    NumFamily.MISSING_OP -> R.string.nl_prompt_missing_op
-    NumFamily.PYRAMID -> R.string.nl_prompt_pyramid
-    NumFamily.MATRIX -> R.string.nl_prompt_matrix
-    NumFamily.BALANCE -> R.string.nl_prompt_balance
-    NumFamily.HIDDEN_RELATION -> R.string.nl_prompt_hidden_relation
-    NumFamily.ATTENTION -> R.string.nl_prompt_attention
-    NumFamily.MIXED -> R.string.nl_prompt_mixed
+/** Resolves an encoded Number Logic message in the current locale; plain strings (classic puzzles) pass through. */
+@Composable
+private fun numTextString(raw: String, fallback: Int? = null): String {
+    if (raw.isEmpty()) return if (fallback != null) stringResource(fallback) else ""
+    val t = NumText.decode(raw) ?: return raw
+    return stringResource(t.msg.stringRes(), *t.args.toTypedArray())
 }

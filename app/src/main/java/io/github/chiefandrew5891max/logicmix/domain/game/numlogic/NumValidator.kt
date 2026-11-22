@@ -15,11 +15,27 @@ object NumValidator {
         if (p.hints.isEmpty() || p.explanation.isBlank()) add("missing hints")
         if (isNotEmpty()) return@buildList
         val err = try { check(p) } catch (e: Exception) { "exception ${e.message}" }
-        if (err != null) add(err)
+        if (err != null) { add(err); return@buildList }
+        textProblem(p)?.let { add(it) }
+    }
+
+    private fun norm(s: String) = s.replace("−", "-").removePrefix("+").trim()
+
+    /** The statement and hints must exist, be well formed, match what the puzzle really asks, and never contain the answer. */
+    private fun textProblem(p: NumberSequencePuzzle): String? {
+        val q = NumText.decode(p.question) ?: return "no question"
+        if (p.hints.size != 2) return "need exactly two hints"
+        val h = p.hints.map { NumText.decode(it) ?: return "bad hint" }
+        val derived = NumTexts.derive(p) ?: return "no wording"
+        if (derived.question != q || derived.hint1 != h[0] || derived.hint2 != h[1]) return "texts do not match the puzzle"
+        val answer = if (p.choices.isNotEmpty()) norm(p.choices[p.answer]) else p.answer.toString()
+        if ((listOf(q) + h).any { t -> t.args.any { norm(it) == answer } }) return "answer leaked in text"
+        return null
     }
 
     private fun check(p: NumberSequencePuzzle): String? = when (p.family) {
         NumFamily.SEQUENCE -> if (p.rows.isNotEmpty()) "rows in sequence"
+        else if (SeqRule.fromCode(p.rule)?.terms(p.sequence.size + 1) != p.sequence.map { it.toLong() } + p.answer.toLong()) "rule does not produce the sequence"
         else if (SeqSolver.candidates(p.sequence.map { it.toLong() }) == setOf(p.answer.toLong())) null else "sequence answer not unique"
         NumFamily.ORDER_OPS, NumFamily.PARENTHESES -> expr(p)
         NumFamily.MIXED -> expr(p)
@@ -95,12 +111,18 @@ object NumValidator {
         val g = p.rows.map { r -> r.map { it.toLongOrNull() } }
         if (g.size != 3 || g.any { it.size != 3 } || g[2][2] != null) return "bad matrix"
         val ops = listOf(Op.ADD, Op.SUB, Op.MUL)
+        val rule = p.rule.split(",")
+        val ruleOp = ops.firstOrNull { it.sym == rule[0] } ?: return "bad matrix rule"
+        val ruleK = rule[1].toLong()
         fun f(op: Op, k: Long, a: Long, b: Long) = op.apply(Frac.of(a), Frac.of(b))!!.n + k
         val predictions = mutableSetOf<Long>()
         for (op in ops) for (k in -4L..4L) {
             if ((0..1).all { r -> f(op, k, g[r][0]!!, g[r][1]!!) == g[r][2] }) predictions += f(op, k, g[2][0] ?: return "gap", g[2][1] ?: return "gap")
             if ((0..1).all { c -> f(op, k, g[0][c]!!, g[1][c]!!) == g[2][c] }) predictions += f(op, k, g[0][2]!!, g[1][2]!!)
         }
+        val rowsOk = (0..1).all { r -> f(ruleOp, ruleK, g[r][0]!!, g[r][1]!!) == g[r][2] }
+        val colsOk = (0..1).all { c -> f(ruleOp, ruleK, g[0][c]!!, g[1][c]!!) == g[2][c] }
+        if (!rowsOk || (rule[2] == "1" && !colsOk)) return "matrix rule does not fit"
         return if (predictions == setOf(p.answer.toLong())) null else "matrix not unique $predictions"
     }
 
@@ -127,27 +149,35 @@ object NumValidator {
         for (a in 1L..12L) for (b in -9L..12L) fs += { n -> a * n + b }
         for (b in -9L..12L) fs += { n -> n * n + b }
         for (b in -3L..3L) fs += { n -> n * (n + b) }
+        val a = p.rule.split(",").drop(1).map { it.toLong() }
+        val own: (Long) -> Long = when (p.rule.substringBefore(",")) {
+            "lin" -> { n -> a[0] * n + a[1] }
+            "sq" -> { n -> n * n + a[0] }
+            "near" -> { n -> n * (n + a[0]) }
+            else -> return "bad hidden rule"
+        }
+        if (pairs.any { own(it.first) != it.second } || own(x) != p.answer.toLong()) return "hidden rule does not fit"
         val out = fs.filter { f -> pairs.all { f(it.first) == it.second } }.map { it(x) }.toSet()
         return if (out == setOf(p.answer.toLong())) null else "relation not unique $out"
     }
 
-    fun attentionAnswer(query: String, nums: List<Int>): Int? {
-        val k = Regex("(\\d+) ∣ n").find(query)?.groupValues?.get(1)?.toInt()
-        val t = Regex("n > (\\d+)").find(query)?.groupValues?.get(1)?.toInt()
-        return when {
-            query.startsWith("Σ{") && k != null -> nums.filter { it % k == 0 }.sum()
-            query.startsWith("#{") && k != null -> nums.count { it % k == 0 }
-            query.startsWith("#{") && t != null -> nums.count { it > t }
-            query == "max − min" -> nums.max() - nums.min()
-            query == "Σ S(n)" -> nums.sumOf { n -> n.toString().sumOf { it - '0' } }
-            query == "max₁ − max₂" -> nums.sortedDescending().let { it[0] - it[1] }
+    fun attentionAnswer(code: String, nums: List<Int>): Int? {
+        val k = code.substringAfter(",", "").toIntOrNull()
+        return when (code.substringBefore(",")) {
+            "sumdiv" -> k?.let { nums.filter { n -> n % it == 0 }.sum() }
+            "cntdiv" -> k?.let { nums.count { n -> n % it == 0 } }
+            "cntgt" -> k?.let { nums.count { n -> n > it } }
+            "range" -> nums.max() - nums.min()
+            "digits" -> nums.sumOf { n -> n.toString().sumOf { it - '0' } }
+            "second" -> nums.sortedDescending().let { it[0] - it[1] }
             else -> null
         }
     }
 
     private fun attention(p: NumberSequencePuzzle): String? {
-        val nums = p.rows[1].map { it.toInt() }
+        if (p.rows.size != 1) return "bad attention rows"
+        val nums = p.rows[0].map { it.toInt() }
         if (nums.toSet().size != nums.size) return "duplicate numbers"
-        return if (attentionAnswer(p.rows[0][0], nums) == p.answer) null else "wrong attention answer"
+        return if (attentionAnswer(p.rule, nums) == p.answer) null else "wrong attention answer"
     }
 }

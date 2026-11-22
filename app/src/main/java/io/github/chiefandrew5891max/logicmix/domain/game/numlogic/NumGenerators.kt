@@ -17,15 +17,24 @@ object NumGenerators {
         val d = difficulty.coerceIn(1, 5)
         for (attempt in 0 until ATTEMPTS) {
             val rnd = Random(seed * 1_000_003L + attempt * 7_919L + family.ordinal)
-            val p = build(family, d, rnd)?.copy(id = id, difficulty = d, seed = seed, family = family) ?: continue
+            val raw = build(family, d, rnd)?.copy(id = id, difficulty = d, seed = seed, family = family) ?: continue
+            val p = withTexts(raw) ?: continue
             if (NumValidator.problems(p).isEmpty()) return p
         }
         return fallback(id, d, seed)
     }
 
-    fun fallback(id: String, d: Int, seed: Long) = NumberSequencePuzzle(
-        id, d, "next", listOf(2, 4, 6, 8, 10), 12, "+2", listOf("2 · 2 · 2 · 2", "+2"), NumFamily.SEQUENCE, emptyList(), emptyList(), "+2", seed,
-    )
+    /** Attaches the question and both hints derived from the puzzle's own data; no wording means no puzzle. */
+    private fun withTexts(p: NumberSequencePuzzle): NumberSequencePuzzle? {
+        val t = NumTexts.derive(p) ?: return null
+        return p.copy(question = t.question.encode(), hints = listOf(t.hint1.encode(), t.hint2.encode()))
+    }
+
+    const val FALLBACK_RULE = "arith:2,2"
+
+    fun fallback(id: String, d: Int, seed: Long): NumberSequencePuzzle = withTexts(
+        NumberSequencePuzzle(id, d, "next", listOf(2, 4, 6, 8, 10), 12, "+2", emptyList(), NumFamily.SEQUENCE, emptyList(), emptyList(), FALLBACK_RULE, seed),
+    )!!
 
     private fun build(f: NumFamily, d: Int, rnd: Random): NumberSequencePuzzle? = when (f) {
         NumFamily.SEQUENCE -> sequence(d, rnd)
@@ -41,9 +50,9 @@ object NumGenerators {
     }
 
     private fun puzzle(
-        rows: List<List<String>>, answer: Int, hints: List<String>, explanation: String,
+        rows: List<List<String>>, answer: Int, explanation: String,
         choices: List<String> = emptyList(), sequence: List<Int> = emptyList(), rule: String = "",
-    ) = NumberSequencePuzzle("", 1, "next", sequence, answer, explanation, hints, NumFamily.SEQUENCE, rows, choices, rule, 0)
+    ) = NumberSequencePuzzle("", 1, "next", sequence, answer, explanation, emptyList(), NumFamily.SEQUENCE, rows, choices, rule, 0)
 
     private fun Random.between(a: Int, b: Int) = a + nextInt(b - a + 1)
     private fun Random.sign() = if (nextBoolean()) 1 else -1
@@ -57,15 +66,14 @@ object NumGenerators {
             { SeqRule.alternatingAdd(rnd.between(1, 20).toLong(), rnd.between(2, 9).toLong(), (-rnd.between(1, 6)).toLong()) to 7 },
             { SeqRule.secondOrder(rnd.between(0, 10).toLong(), rnd.between(1, 4).toLong(), rnd.between(1, 3).toLong()) to 6 },
             { SeqRule.interleaved(rnd.between(1, 15).toLong(), rnd.between(2, 6).toLong(), rnd.between(30, 60).toLong(), -rnd.between(2, 7).toLong()) to 8 },
-            { SeqRule.affine(rnd.between(1, 4).toLong(), 2, rnd.between(-3, 5).toLong()) to 6 },
+            { SeqRule.affine(rnd.between(1, 4).toLong(), 2, rnd.between(-3, 5).toLong().takeIf { it != 0L } ?: 1L) to 6 },
             { SeqRule.fibonacci(rnd.between(1, 4).toLong(), rnd.between(1, 6).toLong()) to 7 },
             { SeqRule.mixed(rnd.between(1, 5).toLong(), rnd.between(2, 3).toLong(), rnd.between(1, 6).toLong()) to 7 },
         )
         val (rule, shown) = rules[rnd.nextInt(minOf(rules.size, 2 + 2 * d))]()
         val all = rule.terms(shown + 1) ?: return null
         val given = all.take(shown)
-        val diffs = (1 until given.size).map { given[it] - given[it - 1] }.joinToString(" · ") { if (it >= 0) "+$it" else "−${-it}" }
-        return puzzle(emptyList(), all.last().toInt(), listOf(diffs, rule.text), rule.text, sequence = given.map { it.toInt() }, rule = rule.text)
+        return puzzle(emptyList(), all.last().toInt(), rule.text, sequence = given.map { it.toInt() }, rule = rule.code)
     }
 
     // ---- expressions ----
@@ -98,7 +106,7 @@ object NumGenerators {
         val v = Exprs.eval(e, env) ?: return null
         val trace = Exprs.trace(e, env) ?: return null
         val text = Exprs.render(e)
-        return puzzle(extra + listOf(listOf(text, "=", "?")), v.n.toInt(), listOf("( ) ▸ × ÷ ▸ + −", trace.first()), trace.joinToString(" → "))
+        return puzzle(extra + listOf(listOf(text, "=", "?")), v.n.toInt(), trace.joinToString(" → "))
     }
 
     private fun orderOps(d: Int, rnd: Random): NumberSequencePuzzle? {
@@ -137,10 +145,7 @@ object NumGenerators {
         }
         if (matching.size != 1) return null
         val shown = buildString { append(nums[0]); ops.forEachIndexed { i, o -> append(" ${if (i == hide) "?" else o.sym} ${nums[i + 1]}") } } + " = ${target.n}"
-        val wrongOp = CHOICES.first { it != ops[hide].sym }
-        val wrongText = text.split(" ").toMutableList().also { it[1 + hide * 2] = wrongOp }.joinToString(" ")
-        val wrongValue = Exprs.parse(wrongText)?.let { Exprs.eval(it) }
-        return puzzle(listOf(listOf(shown)), matching[0], listOf("+ − × ÷", "$wrongText = ${wrongValue ?: "?"} ≠ ${target.n}"), "$text = ${target.n}", CHOICES)
+        return puzzle(listOf(listOf(shown)), matching[0], "$text = ${target.n}", CHOICES)
     }
 
     // ---- pyramids ----
@@ -156,20 +161,19 @@ object NumGenerators {
         val rows = full.mapIndexed { r, row ->
             row.mapIndexed { c, v -> if (r to c == asked) "?" else if (r to c in blanks) "_" else v.toString() }
         }
-        val (relA, relB) = describeRelation(full, asked)
-        return puzzle(rows, full[asked.first][asked.second], listOf("a + b ▸ ↑", relA), relB)
+        return puzzle(rows, full[asked.first][asked.second], describeRelation(full, asked))
     }
 
-    private fun describeRelation(full: List<List<Int>>, cell: Pair<Int, Int>): Pair<String, String> {
+    private fun describeRelation(full: List<List<Int>>, cell: Pair<Int, Int>): String {
         val (r, c) = cell
         if (r < full.size - 1) {
             val a = full[r + 1][c]; val b = full[r + 1][c + 1]
-            return "$a + $b = ${full[r][c]}" to "$a + $b = ${full[r][c]}"
+            return "$a + $b = ${full[r][c]}"
         }
         val above = full[r - 1]
         val left = if (c > 0) full[r][c - 1] else null
         val text = if (left != null) "${above[c - 1]} − $left = ${full[r][c]}" else "${above[0]} − ${full[r][1]} = ${full[r][0]}"
-        return text to text
+        return text
     }
 
     // ---- matrices ----
@@ -188,8 +192,8 @@ object NumGenerators {
         if (grid.any { row -> row.any { Math.abs(it) > 999 } }) return null
         val rows = grid.mapIndexed { r, row -> row.mapIndexed { c, v -> if (r == 2 && c == 2) "?" else v.toString() } }
         val sym = op.sym
-        val ruleText = "a $sym b" + (if (k > 0) " + $k" else if (k < 0) " − ${-k}" else "")
-        return puzzle(rows, grid[2][2].toInt(), listOf(if (both) "→ ↓" else "→", "${grid[0][0]} $sym ${grid[0][1]}${if (k != 0) " ${if (k > 0) "+" else "−"} ${Math.abs(k)}" else ""} = ${grid[0][2]}"), ruleText)
+        val example = "${grid[0][0]} $sym ${grid[0][1]}${if (k != 0) " ${if (k > 0) "+" else "−"} ${Math.abs(k)}" else ""} = ${grid[0][2]}"
+        return puzzle(rows, grid[2][2].toInt(), example, rule = "$sym,$k,${if (both) 1 else 0}")
     }
 
     // ---- balance ----
@@ -209,7 +213,7 @@ object NumGenerators {
         val question = sideExpr() ?: return null
         val rows = equations.map { listOf(Exprs.render(it), "=", Exprs.eval(it, env)!!.n.toString()) } + listOf(listOf(Exprs.render(question), "=", "?"))
         val answer = Exprs.eval(question, env)!!.n.toInt()
-        return puzzle(rows, answer, listOf("= ⚖", env.entries.joinToString(" ") { "${it.key}=?" }), env.entries.joinToString(", ") { "${it.key} = ${it.value}" })
+        return puzzle(rows, answer, env.entries.joinToString(", ") { "${it.key} = ${it.value}" })
     }
 
     // ---- hidden relation ----
@@ -218,11 +222,13 @@ object NumGenerators {
         val p = rnd.between(2, 4 + d).toLong()
         val q = rnd.between(-6, 9).toLong()
         val kind = rnd.nextInt(if (d <= 2) 1 else if (d <= 3) 2 else 3)
+        if (kind == 2 && q % 4 == 0L) return null
         val f: (Long) -> Long = when (kind) { 0 -> { n -> p * n + q }; 1 -> { n -> n * n + q }; else -> { n -> n * (n + (q % 4)) } }
+        val code = when (kind) { 0 -> "lin,$p,$q"; 1 -> "sq,$q"; else -> "near,${q % 4}" }
         val text = when (kind) { 0 -> "n × $p ${if (q >= 0) "+ $q" else "− ${-q}"}"; 1 -> "n² ${if (q >= 0) "+ $q" else "− ${-q}"}"; else -> "n × (n ${if (q % 4 >= 0) "+" else "−"} ${Math.abs(q % 4)})" }
         val inputs = (1..9).shuffled(rnd).take(5)
         val rows = inputs.take(4).map { listOf(it.toString(), "→", f(it.toLong()).toString()) } + listOf(listOf(inputs[4].toString(), "→", "?"))
-        return puzzle(rows, f(inputs[4].toLong()).toInt(), listOf("Δ: " + inputs.take(4).sorted().zipWithNext { a, b -> f(b.toLong()) - f(a.toLong()) }.joinToString(" · "), "f(n)"), "f(n) = $text", rule = text)
+        return puzzle(rows, f(inputs[4].toLong()).toInt(), text, rule = code)
     }
 
     // ---- attention ----
@@ -232,13 +238,25 @@ object NumGenerators {
         val nums = List(count) { rnd.between(if (d <= 2) 5 else 10, if (d <= 2) 40 else 99) }.distinct()
         if (nums.size < count - 1) return null
         val k = rnd.between(2, 5)
-        val kinds = listOf(
-            "Σ{n : $k ∣ n}", "#{n : $k ∣ n}", "max − min", "#{n : n > ${rnd.between(15, 60)}}", "Σ S(n)", "max₁ − max₂",
-        )
-        val query = kinds[rnd.nextInt(minOf(kinds.size, 2 + d))]
-        val answer = NumValidator.attentionAnswer(query, nums) ?: return null
+        val t = rnd.between(15, 60)
+        val codes = listOf("sumdiv,$k", "cntdiv,$k", "range", "cntgt,$t", "digits", "second")
+        val code = codes[rnd.nextInt(minOf(codes.size, 2 + d))]
+        val answer = NumValidator.attentionAnswer(code, nums) ?: return null
         if (answer == 0 || answer > 999) return null
-        return puzzle(listOf(listOf(query), nums.map { it.toString() }), answer, listOf("n ∈ { … }", query), "$query = $answer")
+        return puzzle(listOf(nums.map { it.toString() }), answer, attentionExplanation(code, nums, answer), rule = code)
+    }
+
+    internal fun attentionExplanation(code: String, nums: List<Int>, answer: Int): String {
+        val k = code.substringAfter(",", "").toIntOrNull()
+        val sorted = nums.sortedDescending()
+        return when (code.substringBefore(",")) {
+            "sumdiv" -> nums.filter { it % k!! == 0 }.joinToString(" + ") + " = $answer"
+            "cntdiv" -> nums.filter { it % k!! == 0 }.joinToString(", ") + " → $answer"
+            "cntgt" -> nums.filter { it > k!! }.joinToString(", ") + " → $answer"
+            "range" -> "${nums.max()} − ${nums.min()} = $answer"
+            "digits" -> nums.joinToString(" + ") { n -> n.toString().toList().joinToString(" + ") } + " = $answer"
+            else -> "${sorted[0]} − ${sorted[1]} = $answer"
+        }
     }
 
     // ---- mixed ----

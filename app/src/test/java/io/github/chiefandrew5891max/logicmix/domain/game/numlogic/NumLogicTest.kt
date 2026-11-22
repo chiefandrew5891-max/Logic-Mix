@@ -42,7 +42,7 @@ class NumLogicTest {
             val p = NumGenerators.generate(f, d, s, "x")
             assertEquals("$f d$d s$s", emptyList<String>(), NumValidator.problems(p))
             assertEquals("$f d$d s$s fell back", f.takeIf { it == NumFamily.SEQUENCE } ?: f, p.family)
-            assertTrue("$f d$d s$s fallback rule", p.family != NumFamily.SEQUENCE || p.rule != "+2" || p.sequence != listOf(2, 4, 6, 8, 10))
+            assertTrue("$f d$d s$s fallback rule", p.family != NumFamily.SEQUENCE || p.rule != NumGenerators.FALLBACK_RULE)
             assertEquals(p, NumGenerators.generate(f, d, s, "x"))
         }
     }
