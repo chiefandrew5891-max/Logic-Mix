@@ -157,7 +157,7 @@ private fun ArcadeLobby(
                 stringResource(R.string.arcade_title), style = LogicMixTokens.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.onBackground, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(),
             )
-            val names = state.selected.sortedBy { it.ordinal }.joinToString(", ") { stringResource(it.titleRes()) }
+            val names = state.selected.sortedBy { it.ordinal }.map { stringResource(it.titleRes()) }.joinToString(", ")
             Text(
                 if (state.selected.isEmpty()) stringResource(R.string.style_arcade_empty)
                 else stringResource(R.string.arcade_selected, state.selected.size, names),
@@ -167,7 +167,7 @@ private fun ArcadeLobby(
             )
             if (state.unavailable.isNotEmpty()) {
                 Text(
-                    stringResource(R.string.arcade_unavailable, state.unavailable.sortedBy { it.ordinal }.joinToString(", ") { stringResource(it.titleRes()) }),
+                    stringResource(R.string.arcade_unavailable, state.unavailable.sortedBy { it.ordinal }.map { stringResource(it.titleRes()) }.joinToString(", ")),
                     style = LogicMixTokens.typography.bodyMedium, color = LogicMixTokens.colors.gold,
                     textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(),
                 )
