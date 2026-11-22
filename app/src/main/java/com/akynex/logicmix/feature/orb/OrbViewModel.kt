@@ -55,6 +55,8 @@ class OrbViewModel @Inject constructor(
     monetization: com.akynex.logicmix.core.monetization.Monetization,
 ) : ViewModel() {
     private val analytics = monetization.newGameAnalytics()
+    /** Non-null while hosted by Arcade: a fresh seeded game whose goal is OrbRules.XP_SCORE; the saved Career game stays untouched. */
+    private val arcade = monetization.arcade.activeFor(com.akynex.logicmix.domain.content.GameCategory.ORB_LINES)
     private val ctx = com.akynex.logicmix.core.analytics.GameContext(com.akynex.logicmix.domain.content.GameCategory.ORB_LINES, family = "orb_lines", mode = "endless")
     override fun onCleared() { analytics.leave() }
 
@@ -69,13 +71,13 @@ class OrbViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val saved = store.load()
-            val restored = saved.game?.let { OrbGame.restore(it) }?.takeIf { !it.over }
+            val restored = if (arcade != null) null else saved.game?.let { OrbGame.restore(it) }?.takeIf { !it.over }
             if (restored != null) {
                 seed = saved.seed
                 startedAt = saved.startedAt
             } else {
-                seed = System.currentTimeMillis()
-                startedAt = seed
+                seed = arcade?.seed ?: System.currentTimeMillis()
+                startedAt = System.currentTimeMillis()
             }
             _state.value = OrbUiState(game = restored ?: OrbGame.new(seed), best = saved.best)
             analytics.openCategory(ctx)
@@ -87,6 +89,7 @@ class OrbViewModel @Inject constructor(
     private fun persist(game: OrbGame) {
         val best = maxOf(_state.value.best, game.score)
         _state.update { it.copy(best = best) }
+        if (arcade != null) return
         viewModelScope.launch {
             store.save(game.encode(), seed, startedAt, best)
             if (game.over) store.clearGame()

@@ -6,6 +6,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import com.akynex.logicmix.core.ads.AdAnalytics
 import com.akynex.logicmix.core.ads.AdMobRewardedGateway
 import com.akynex.logicmix.core.ads.RewardedAdController
+import com.akynex.logicmix.core.arcade.ArcadeBridge
 import com.akynex.logicmix.core.analytics.CrashKind
 import com.akynex.logicmix.core.analytics.CrashReporter
 import com.akynex.logicmix.core.analytics.FirebaseAnalyticsSink
@@ -60,7 +61,9 @@ class Monetization @Inject constructor(@ApplicationContext context: android.cont
         crash.applyConsent(consent.state)
     }
 
-    fun newGameAnalytics() = GameAnalytics(tracker)
+    val arcade = ArcadeBridge()
+
+    fun newGameAnalytics() = GameAnalytics(tracker, onCompleted = arcade::report)
 
     /** Из MainActivity.onCreate: форма согласия показывается, только если она требуется. */
     fun gatherConsent(activity: Activity) = ump.gather(activity) { can, personalized ->

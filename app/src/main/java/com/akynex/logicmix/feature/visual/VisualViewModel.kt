@@ -36,6 +36,8 @@ class VisualViewModel @Inject constructor(
     monetization: com.akynex.logicmix.core.monetization.Monetization,
 ) : ViewModel() {
     private val analytics = monetization.newGameAnalytics()
+    /** Non-null while hosted by Arcade: serves the next unsolved Career level and replays by stage count once the content is used up. */
+    private val arcade = monetization.arcade.activeFor(com.akynex.logicmix.domain.content.GameCategory.VISUAL_LOGIC)
     private val baseCtx = GameContext(GameCategory.VISUAL_LOGIC, mode = "career")
     override fun onCleared() { analytics.leave() }
 
@@ -47,7 +49,8 @@ class VisualViewModel @Inject constructor(
         viewModelScope.launch { open(games.store.levelIndex(KEY)) }
     }
 
-    private suspend fun open(index: Int) {
+    private suspend fun open(careerIndex: Int) {
+        val index = if (arcade != null && careerIndex >= VisualCareer.total) arcade.ordinal % VisualCareer.total else careerIndex
         val level = VisualCareer.levelAt(index)
         if (level == null) {
             _state.value = VisualUiState(loading = false, index = VisualCareer.total, allDone = true)
@@ -145,6 +148,9 @@ class VisualViewModel @Inject constructor(
         viewModelScope.launch {
             games.store.clearState(KEY, puzzleId)
             val result = games.complete(puzzleId, startedAt, hintsUsed)
+            // Same effect as the Next button, so the following Arcade stage gets a new puzzle.
+            val served = _state.value.index
+            if (arcade != null && games.store.levelIndex(KEY) == served) games.store.setLevelIndex(KEY, served + 1)
             _state.update { it.copy(xpAwarded = result.xpAwarded) }
             analytics.completed(result.xpAwarded)
             sfx.play(Sfx.CORRECT)

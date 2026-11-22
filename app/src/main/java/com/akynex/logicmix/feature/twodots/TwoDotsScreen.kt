@@ -49,7 +49,8 @@ fun TwoDotsRoute(onBack: () -> Unit, viewModel: TwoDotsViewModel = hiltViewModel
             restartEnabled = game != null && !state.busy,
         )
         if (game != null) {
-            GameToolRow(
+            // Arcade always plays CLASSIC (the mode with a finite goal), so the mode switch is not offered there.
+            if (!state.arcade) GameToolRow(
                 listOf(
                     GameTool(stringResource(R.string.td_mode_classic), { viewModel.setMode(TwoDotsMode.CLASSIC) }, !state.busy, game.mode == TwoDotsMode.CLASSIC),
                     GameTool(stringResource(R.string.td_mode_endless), { viewModel.setMode(TwoDotsMode.ENDLESS) }, !state.busy, game.mode == TwoDotsMode.ENDLESS),

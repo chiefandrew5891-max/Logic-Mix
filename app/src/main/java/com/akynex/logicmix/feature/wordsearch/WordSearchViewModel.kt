@@ -75,6 +75,9 @@ class WordSearchViewModel @Inject constructor(
     monetization: com.akynex.logicmix.core.monetization.Monetization,
 ) : ViewModel() {
     private val analytics = monetization.newGameAnalytics()
+    /** Non-null while hosted by Arcade: serves the next unsolved Career level; when all are solved the stage is skipped without penalty. */
+    private val arcade = monetization.arcade.activeFor(GameCategory.WORD_SEARCH)
+    private val arcadeBridge = monetization.arcade
     private var ctx: com.akynex.logicmix.core.analytics.GameContext? = null
     override fun onCleared() { analytics.leave() }
 
@@ -118,10 +121,16 @@ class WordSearchViewModel @Inject constructor(
         val words = dictionary ?: return
         if (index >= WordSearchLevels.count) {
             _state.value = WordSearchUiState(loading = false, allDone = true)
+            arcadeBridge.exhausted(GameCategory.WORD_SEARCH)
             return
         }
         val level = withContext(Dispatchers.Default) { WordSearchLevels.build(content, index, words) }
         val session = store.begin(level, System.currentTimeMillis())
+        // A level finished in Career but not yet advanced would end the Arcade stage before it starts.
+        if (arcade != null && session.completed) {
+            store.setCurrentIndex(content, index + 1)
+            return openLevel(index + 1)
+        }
         store.setCurrentIndex(content, index)
         val c = com.akynex.logicmix.core.analytics.GameContext(
             GameCategory.WORD_SEARCH, family = "word_search", mode = "career", levelIndex = index + 1, contentLanguage = content.tag)
@@ -204,6 +213,7 @@ class WordSearchViewModel @Inject constructor(
             hintsUsed = s.hintsUsed,
         )
         store.complete(level, result.xpAwarded)
+        if (arcade != null && store.currentIndex(level.language) == level.index) store.setCurrentIndex(level.language, level.index + 1)
         analytics.completed(result.xpAwarded)
         if (result.xpAwarded > 0) sfx.play(Sfx.XP_GAIN)
         sfx.play(if (result.after.level > result.before.level) Sfx.LEVEL_UP else Sfx.LEVEL_COMPLETE)

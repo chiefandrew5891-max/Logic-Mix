@@ -50,6 +50,8 @@ class SudokuViewModel @Inject constructor(
     monetization: com.akynex.logicmix.core.monetization.Monetization,
 ) : ViewModel() {
     private val analytics = monetization.newGameAnalytics()
+    /** Non-null while this screen is hosted by Arcade: a fresh seeded puzzle, and the saved Career game stays untouched. */
+    private val arcade = monetization.arcade.activeFor(com.akynex.logicmix.domain.content.GameCategory.SUDOKU)
     private fun ctx(d: SudokuDifficulty) = com.akynex.logicmix.core.analytics.GameContext(
         com.akynex.logicmix.domain.content.GameCategory.SUDOKU, family = "sudoku",
         mode = "endless", difficulty = d.name.lowercase())
@@ -64,7 +66,21 @@ class SudokuViewModel @Inject constructor(
         viewModelScope.launch { tick() }
     }
 
+    private suspend fun startArcade(stage: com.akynex.logicmix.domain.arcade.ArcadeStage) {
+        val difficulty = when {
+            stage.ordinal < 2 -> SudokuDifficulty.EASY
+            stage.ordinal < 5 -> SudokuDifficulty.MEDIUM
+            else -> SudokuDifficulty.HARD
+        }
+        _state.value = SudokuUiState(SudokuPhase.LOADING)
+        val puzzle = withContext(Dispatchers.Default) { SudokuGenerator.generate(difficulty, stage.seed) }
+        _state.value = SudokuUiState(SudokuPhase.PLAY, SudokuGame(puzzle), stage.seed)
+        analytics.openCategory(ctx(difficulty))
+        analytics.puzzleStarted(puzzle.id, ctx(difficulty))
+    }
+
     private suspend fun restore() {
+        arcade?.let { return startArcade(it) }
         val saved = store.active()
         val puzzle = saved?.let { withContext(Dispatchers.Default) { SudokuGenerator.generate(it.difficulty, it.seed) } }
         val game = if (puzzle != null && saved != null) SudokuGame.restore(puzzle, saved.game) else null
@@ -93,7 +109,7 @@ class SudokuViewModel @Inject constructor(
     private fun persist() {
         val s = _state.value
         val game = s.game ?: return
-        if (s.phase != SudokuPhase.PLAY || s.solved) return
+        if (arcade != null || s.phase != SudokuPhase.PLAY || s.solved) return
         viewModelScope.launch { store.save(game.puzzle.difficulty, s.seed, game.encode(), s.elapsedSec) }
     }
 
@@ -168,7 +184,7 @@ class SudokuViewModel @Inject constructor(
         val s = _state.value
         _state.update { it.copy(solved = true) }
         viewModelScope.launch {
-            store.clear()
+            if (arcade == null) store.clear()
             profiles.ensureProfile()
             progress.ensureProgress(profileId)
             val now = System.currentTimeMillis()

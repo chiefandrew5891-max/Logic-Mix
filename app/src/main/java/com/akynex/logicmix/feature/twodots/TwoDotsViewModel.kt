@@ -46,6 +46,7 @@ data class TwoDotsUiState(
     val gain: Int = 0,
     val gainKey: Int = 0,
     val xpAwarded: Int = 0,
+    val arcade: Boolean = false,
 ) {
     val busy: Boolean get() = stage != null
     val shownCells: List<Int> get() = stage?.cells ?: game?.cells.orEmpty()
@@ -61,6 +62,8 @@ class TwoDotsViewModel @Inject constructor(
     monetization: com.akynex.logicmix.core.monetization.Monetization,
 ) : ViewModel() {
     private val analytics = monetization.newGameAnalytics()
+    /** Non-null while hosted by Arcade: a fresh seeded CLASSIC game whose goal is TwoDotsRules.XP_SCORE; saved games stay untouched. */
+    private val arcade = monetization.arcade.activeFor(com.akynex.logicmix.domain.content.GameCategory.TWO_DOTS)
     private fun ctx(mode: TwoDotsMode) = com.akynex.logicmix.core.analytics.GameContext(com.akynex.logicmix.domain.content.GameCategory.TWO_DOTS, family = "two_dots", mode = mode.name.lowercase())
     override fun onCleared() { analytics.leave() }
 
@@ -77,10 +80,10 @@ class TwoDotsViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val saved = store.load()
-            val restored = TwoDotsGame.restore(saved.game)?.takeIf { !it.over && it.mode == saved.mode }
-            val game = restored ?: TwoDotsGame.new(saved.mode, System.currentTimeMillis())
+            val restored = if (arcade != null) null else TwoDotsGame.restore(saved.game)?.takeIf { !it.over && it.mode == saved.mode }
+            val game = restored ?: if (arcade != null) TwoDotsGame.new(TwoDotsMode.CLASSIC, arcade.seed) else TwoDotsGame.new(saved.mode, System.currentTimeMillis())
             startedAt = if (restored != null && saved.startedAt > 0) saved.startedAt else System.currentTimeMillis()
-            _state.value = TwoDotsUiState(game = game, best = saved.best)
+            _state.value = TwoDotsUiState(game = game, best = saved.best, arcade = arcade != null)
             analytics.openCategory(ctx(game.mode))
             analytics.puzzleStarted(game.xpId, ctx(game.mode), resumed = restored != null, hints = game.hintsUsed)
             if (restored != null) claimXp(game)
@@ -98,6 +101,7 @@ class TwoDotsViewModel @Inject constructor(
         val best = _state.value.best.toMutableMap()
         best[game.mode] = maxOf(best[game.mode] ?: 0, game.score)
         _state.update { it.copy(best = best) }
+        if (arcade != null) return
         val started = startedAt
         viewModelScope.launch {
             store.save(game.mode, game.encode(), started, best[game.mode] ?: 0)
@@ -214,7 +218,7 @@ class TwoDotsViewModel @Inject constructor(
     fun setMode(mode: TwoDotsMode) {
         val s = _state.value
         val g = s.game ?: return
-        if (s.busy || g.mode == mode) return
+        if (s.busy || g.mode == mode || arcade != null) return
         sfx.play(Sfx.BUTTON_TAP)
         analytics.selectMode(ctx(mode))
         viewModelScope.launch {
@@ -236,7 +240,7 @@ class TwoDotsViewModel @Inject constructor(
         val game = TwoDotsGame.new(mode, startedAt)
         analytics.puzzleStarted(game.xpId, ctx(mode))
         _state.update {
-            TwoDotsUiState(game = game, best = it.best)
+            TwoDotsUiState(game = game, best = it.best, arcade = arcade != null)
         }
         persist(game)
     }

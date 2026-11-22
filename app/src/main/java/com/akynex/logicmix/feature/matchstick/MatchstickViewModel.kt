@@ -36,6 +36,8 @@ class MatchstickViewModel @Inject constructor(
     monetization: com.akynex.logicmix.core.monetization.Monetization,
 ) : ViewModel() {
     private val analytics = monetization.newGameAnalytics()
+    /** Non-null while hosted by Arcade: serves the next unsolved Career level and replays by stage count once the content is used up. */
+    private val arcade = monetization.arcade.activeFor(com.akynex.logicmix.domain.content.GameCategory.MATCHSTICK)
     private val baseCtx = com.akynex.logicmix.core.analytics.GameContext(
         com.akynex.logicmix.domain.content.GameCategory.MATCHSTICK, family = "matchstick", mode = "career")
     override fun onCleared() { analytics.leave() }
@@ -52,6 +54,7 @@ class MatchstickViewModel @Inject constructor(
         profiles.ensureProfile()
         progress.ensureProgress(profileId)
         val puzzle = MatchPuzzles.firstUnsolved(progress.solvedPuzzleIds(profileId).toSet())
+            ?: arcade?.let { MatchPuzzles.build(it.ordinal % MatchPuzzles.COUNT) }
         _state.value = if (puzzle == null) MatchUiState(allDone = true)
         else MatchUiState(game = MatchGame(puzzle), startedAt = System.currentTimeMillis())
         if (puzzle != null) {

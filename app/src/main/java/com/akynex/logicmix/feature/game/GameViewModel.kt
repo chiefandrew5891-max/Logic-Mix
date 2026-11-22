@@ -53,6 +53,8 @@ class GameViewModel @Inject constructor(
     monetization: com.akynex.logicmix.core.monetization.Monetization,
 ) : ViewModel() {
     private val analytics = monetization.newGameAnalytics()
+    /** Non-null while hosted by Arcade: serves the next unsolved Career level and replays by stage count once the content is used up. */
+    private val arcade = monetization.arcade.activeFor(com.akynex.logicmix.domain.content.GameCategory.NUMBER_SEQUENCE)
     private val genericCtx = GameContext(GameCategory.NUMBER_SEQUENCE, mode = "career")
     private fun ctx(p: NumberSequencePuzzle) = genericCtx.copy(
         family = p.family.name.lowercase(), difficulty = p.difficulty.toString(),
@@ -75,6 +77,7 @@ class GameViewModel @Inject constructor(
             val solved = progress.solvedPuzzleIds(profileId).toSet()
             val resumed = sessions.session.first()?.puzzleId?.let(NumberLogicCareer::byId)?.takeIf { it.id !in solved }
             val puzzle = resumed ?: NumberLogicCareer.firstUnsolved(solved)
+                ?: arcade?.let { NumberLogicCareer.levelAt(it.ordinal % NumberLogicCareer.total) }
             if (puzzle == null) {
                 sessions.clear()
                 _state.value = GameUiState(loading = false, finished = true)

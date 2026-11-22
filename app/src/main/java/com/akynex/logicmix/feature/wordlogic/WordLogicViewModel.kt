@@ -40,6 +40,8 @@ class WordLogicViewModel @Inject constructor(
     monetization: com.akynex.logicmix.core.monetization.Monetization,
 ) : ViewModel() {
     private val analytics = monetization.newGameAnalytics()
+    /** Non-null while hosted by Arcade: serves the next unsolved Career level and replays by stage count once the content is used up. */
+    private val arcade = monetization.arcade.activeFor(com.akynex.logicmix.domain.content.GameCategory.WORD_LOGIC)
     override fun onCleared() { analytics.leave() }
 
     private val _state = MutableStateFlow(WordLogicUiState())
@@ -55,8 +57,9 @@ class WordLogicViewModel @Inject constructor(
         }
     }
 
-    private suspend fun open(index: Int) {
+    private suspend fun open(careerIndex: Int) {
         val puzzles = _state.value.puzzles
+        val index = if (arcade != null && careerIndex >= puzzles.size && puzzles.isNotEmpty()) arcade.ordinal % puzzles.size else careerIndex
         if (index >= puzzles.size) {
             _state.update { it.copy(index = puzzles.size, game = null, allDone = true, xpAwarded = 0) }
             return
@@ -111,6 +114,9 @@ class WordLogicViewModel @Inject constructor(
         viewModelScope.launch {
             games.store.clearState(KEY, game.puzzle.id)
             val result = games.complete(game.puzzle.id, startedAt, game.hintsUsed)
+            // Same effect as the Next button, so the following Arcade stage gets a new puzzle.
+            val served = _state.value.index
+            if (arcade != null && games.store.levelIndex(KEY) == served) games.store.setLevelIndex(KEY, served + 1)
             _state.update { it.copy(xpAwarded = result.xpAwarded) }
             analytics.completed(result.xpAwarded)
             sfx.play(Sfx.CORRECT)

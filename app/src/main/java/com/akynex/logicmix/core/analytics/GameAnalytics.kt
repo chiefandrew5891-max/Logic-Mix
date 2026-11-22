@@ -1,5 +1,8 @@
 package com.akynex.logicmix.core.analytics
 
+import com.akynex.logicmix.domain.arcade.ArcadeRules
+import com.akynex.logicmix.domain.arcade.StageReport
+
 /**
  * Состояние аналитики одной игровой сессии/экрана (создаётся во ViewModel, не в Composable — рекомпозиция
  * не может породить событий). Все методы идемпотентны на уровне реальных действий.
@@ -7,6 +10,8 @@ package com.akynex.logicmix.core.analytics
 class GameAnalytics(
     private val tracker: AnalyticsTracker,
     private val clock: () -> Long = System::currentTimeMillis,
+    /** Тот же момент завершения, но для Arcade: вызывается один раз на головоломку, независимо от согласия на аналитику. */
+    private val onCompleted: (StageReport) -> Unit = {},
 ) {
     private class Active(val key: String, val ctx: GameContext, val startedAt: Long) {
         var attempts = 0
@@ -68,6 +73,8 @@ class GameAnalytics(
         val a = cur ?: return
         cur = null
         val attempts = (a.attempts + 1).toLong()
+        val duration = (clock() - a.startedAt).coerceAtLeast(0)
+        onCompleted(StageReport(a.ctx.category, a.hints, a.attempts, duration, ArcadeRules.tierOf(a.ctx.category, a.ctx.difficulty)))
         log(Ev.PUZZLE_COMPLETE, a.ctx, mapOf(
             P.DURATION_MS to (clock() - a.startedAt).coerceAtLeast(0), P.ATTEMPT_COUNT to attempts,
             P.HINT_COUNT to a.hints.toLong(), P.RESULT to PuzzleResult.SOLVED.key,
