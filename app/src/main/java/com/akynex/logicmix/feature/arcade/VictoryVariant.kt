@@ -35,3 +35,19 @@ object VictoryPicker {
         return pool[random.nextInt(pool.size)]
     }
 }
+
+/**
+ * Title face by UI language. Titan One (SIL OFL, licenses/TitanOne-OFL.txt) is Latin-only, so Cyrillic uses the app's
+ * Nunito Black and Chinese uses the system CJK font; the same outline/fill styling is applied to all three.
+ */
+enum class TitleFont {
+    TITAN, ROUNDED_BLACK, SYSTEM_CJK;
+
+    companion object {
+        fun forLanguage(language: String): TitleFont = when (language) {
+            "ru", "uk" -> ROUNDED_BLACK
+            "zh" -> SYSTEM_CJK
+            else -> TITAN
+        }
+    }
+}

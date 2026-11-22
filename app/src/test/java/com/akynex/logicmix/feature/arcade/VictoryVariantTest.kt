@@ -40,4 +40,11 @@ class VictoryVariantTest {
             assertTrue(v.leftHorn.x < 0.5f && v.rightHorn.x > 0.5f)
         }
     }
+
+    @Test fun titleFontCoversEveryLanguage() {
+        assertEquals(TitleFont.ROUNDED_BLACK, TitleFont.forLanguage("ru"))
+        assertEquals(TitleFont.ROUNDED_BLACK, TitleFont.forLanguage("uk"))
+        assertEquals(TitleFont.SYSTEM_CJK, TitleFont.forLanguage("zh"))
+        for (l in listOf("en", "it", "de", "fr", "es")) assertEquals(TitleFont.TITAN, TitleFont.forLanguage(l))
+    }
 }

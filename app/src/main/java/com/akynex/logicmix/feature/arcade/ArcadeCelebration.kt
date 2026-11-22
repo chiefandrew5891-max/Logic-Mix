@@ -54,7 +54,18 @@ import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextMeasurer
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontVariation
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.unit.em
+import androidx.compose.foundation.layout.width
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -86,6 +97,16 @@ fun ArcadeCelebration(c: Celebration, viewModel: ArcadeViewModel) {
     val points = remember(c.id) { Animatable(0f) }
     LaunchedEffect(c.id) { viewModel.playCelebrationSounds(c) }
     LaunchedEffect(c.id) { if (!reduced) pop.animateTo(1f, spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow)) }
+    // The title fades in after the artwork has popped, swells a little and settles.
+    val titleAlpha = remember(c.id) { Animatable(if (reduced) 1f else 0f) }
+    val titleScale = remember(c.id) { Animatable(if (reduced) 1f else 0.8f) }
+    LaunchedEffect(c.id) {
+        if (reduced) return@LaunchedEffect
+        delay(300)
+        launch { titleAlpha.animateTo(1f, tween(350)) }
+        titleScale.animateTo(1.08f, tween(300))
+        titleScale.animateTo(1f, spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium))
+    }
     LaunchedEffect(c.id) { points.animateTo(c.award.toFloat(), tween(if (reduced) 1 else 900)) }
     LaunchedEffect(c.id) {
         val ms = if (reduced) REDUCED_MS else if (c.levelUp) SCENE_MS + 600 else SCENE_MS
@@ -124,7 +145,10 @@ fun ArcadeCelebration(c: Celebration, viewModel: ArcadeViewModel) {
                     val r = variant.ribbon
                     FitText(
                         stringResource(R.string.victory_level_complete),
-                        Modifier.offset(imgW * r.left, imgH * r.top).size(imgW * (r.right - r.left), imgH * (r.bottom - r.top)),
+                        Modifier
+                            .offset(imgW * r.left, imgH * r.top)
+                            .size(imgW * (r.right - r.left), imgH * (r.bottom - r.top))
+                            .graphicsLayer { alpha = titleAlpha.value; scaleX = titleScale.value; scaleY = titleScale.value },
                     )
                 }
                 Column(Modifier.padding(top = LogicMixTokens.spacingS).graphicsLayer { alpha = pop.value }, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS)) {
@@ -149,22 +173,42 @@ fun ArcadeCelebration(c: Celebration, viewModel: ArcadeViewModel) {
     }
 }
 
+/** Festive ribbon title: cream gradient fill, thin gold outline, soft dark shadow; font chosen per language (see [TitleFont]). */
+@OptIn(ExperimentalTextApi::class)
 @Composable
 private fun FitText(text: String, modifier: Modifier) {
     BoxWithConstraints(modifier, contentAlignment = Alignment.Center) {
         val measurer = rememberTextMeasurer()
         val density = LocalDensity.current
-        val base = LogicMixTokens.typography.headlineMedium.copy(fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-        val w = constraints.maxWidth
-        val h = constraints.maxHeight
+        val language = LocalConfiguration.current.locales[0].language
+        val family = remember(language) {
+            when (TitleFont.forLanguage(language)) {
+                TitleFont.TITAN -> FontFamily(Font(R.font.titan_one))
+                TitleFont.ROUNDED_BLACK -> FontFamily(Font(R.font.nunito, FontWeight.Black, variationSettings = FontVariation.Settings(FontVariation.weight(900))))
+                TitleFont.SYSTEM_CJK -> FontFamily.SansSerif
+            }
+        }
+        val weight = if (TitleFont.forLanguage(language) == TitleFont.TITAN) FontWeight.Normal else FontWeight.Black
+        val base = remember(family) { TextStyle(fontFamily = family, fontWeight = weight, textAlign = TextAlign.Center, lineHeight = 1.05.em) }
+        // Reserve room for the outline and shadow so nothing touches the golden rim of the ribbon.
+        val w = (constraints.maxWidth * 0.94f).toInt()
+        val h = (constraints.maxHeight * 0.92f).toInt()
         val sizePx = remember(text, w, h, base) { fitFontPx(measurer, text, base, w, h, density) }
-        Text(
-            text,
-            style = base.copy(fontSize = with(density) { sizePx.toSp() }, shadow = Shadow(Color(0xCC000000), Offset(0f, 3f), 6f)),
-            color = Color.White,
-            maxLines = 2,
-            textAlign = TextAlign.Center,
-        )
+        val fontSize = with(density) { sizePx.toSp() }
+        val outline = Stroke(width = sizePx * 0.11f, join = StrokeJoin.Round)
+        Box(Modifier.width(with(density) { w.toDp() }), contentAlignment = Alignment.Center) {
+            Text(text, style = base.copy(fontSize = fontSize, color = Color(0x99000000), drawStyle = outline, shadow = Shadow(Color(0x88000000), Offset(0f, sizePx * 0.07f), sizePx * 0.12f)), maxLines = 2, textAlign = TextAlign.Center)
+            Text(text, style = base.copy(fontSize = fontSize, color = Color(0xFFE2A31B), drawStyle = Stroke(width = sizePx * 0.08f, join = StrokeJoin.Round)), maxLines = 2, textAlign = TextAlign.Center)
+            Text(
+                text,
+                style = base.copy(
+                    fontSize = fontSize,
+                    brush = Brush.verticalGradient(listOf(Color(0xFFFFFFFF), Color(0xFFFFF4D6), Color(0xFFF6D98A))),
+                ),
+                maxLines = 2,
+                textAlign = TextAlign.Center,
+            )
+        }
     }
 }
 
