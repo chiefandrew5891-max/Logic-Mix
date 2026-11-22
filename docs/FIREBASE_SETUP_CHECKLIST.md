@@ -22,6 +22,14 @@
 13. **[Console]** Мониторинг: Storage egress, число запросов, расходы; проверить, что алерты приходят.
 14. Откат и публикация: promote staging → production тем же файлом (sha256 совпадает); откат — вернуть предыдущий `packVersion` в манифесте production.
 
+## Развёртывание backend (после шагов выше; шаблоны — `backend/deploy/`)
+
+- **[CLI]** Включить API Cloud Run, Cloud Scheduler, Artifact Registry; создать репозиторий образов; собрать образ (`backend/deploy/Dockerfile`).
+- **[CLI]** Создать сервисный аккаунт Job с правом записи только в нужный бакет; применить `backend/deploy/job.yaml` (staging), затем `scheduler.yaml` (раз в неделю).
+- **[CLI]** Правила: `backend/deploy/storage.rules` (`public/**` чтение, запись запрещена, `private/**` закрыт), `backend/deploy/firestore.rules`.
+- **Действия с возможными расходами:** Blaze, Cloud Run Job, Scheduler, хранение и исходящий трафик Storage, Artifact Registry. Выполнять только по решению владельца.
+- До публикации в production перевести источники в `approved` в `registry.py` после проверки лицензий (ShareAlike, атрибуция).
+
 ## Что нужно сообщить разработчику
 
 Только: Project ID, регион Storage, названия сервисных аккаунтов, подтверждение этапа. Ничего секретного.

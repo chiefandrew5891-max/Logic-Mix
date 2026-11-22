@@ -1,0 +1,10 @@
+# Cloud Scheduler → запуск Cloud Run Job раз в неделю. Не применено; требует проекта и Blaze.
+# Команда (после создания job):
+#   gcloud scheduler jobs create http logicmix-content-weekly \
+#     --location=${REGION} --schedule="0 3 * * 1" --time-zone="Etc/UTC" \
+#     --uri="https://${REGION}-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/${PROJECT_ID}/jobs/logicmix-content-staging:run" \
+#     --http-method=POST --oauth-service-account-email=${SCHEDULER_SA}
+# Расход: один запуск в неделю; стоимость и бесплатные квоты проверить в актуальной документации Google.
+schedule: "0 3 * * 1"
+timeZone: Etc/UTC
+target: logicmix-content-staging

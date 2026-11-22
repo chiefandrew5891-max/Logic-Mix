@@ -1,0 +1,18 @@
+// Шаблон правил Storage. НЕ применён: проект Firebase не создан. Применять через `firebase deploy --only storage`.
+// public/** читается всеми (контент не секретен), запись всем клиентам запрещена (запись — только сервисные аккаунты, они обходят правила).
+// private/** (история манифестов) недоступна клиентам.
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /public/{channel}/{allPaths=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+    match /private/{allPaths=**} {
+      allow read, write: if false;
+    }
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

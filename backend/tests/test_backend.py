@@ -288,5 +288,23 @@ class ClientProtocol(unittest.TestCase):
         self.assertEqual(ru.installed(), {})
 
 
+class JobEntry(unittest.TestCase):
+    def test_job_runs_locally_without_cloud(self):
+        from logicmix_backend import job
+        with tempfile.TemporaryDirectory() as d:
+            src = Path(d) / "src" / "fixture"
+            src.mkdir(parents=True)
+            (src / "en.jsonl").write_text((FX / "en_fixture.jsonl").read_text("utf-8"), "utf-8")
+            orig = job.GcsObjectStore
+            job.GcsObjectStore = lambda bucket: LocalObjectStore(Path(d) / "bucket")
+            try:
+                rc = job.run({"LM_BUCKET": "b", "LM_LANGS": "en", "LM_SOURCES_DIR": str(Path(d) / "src"),
+                              "LM_DATA_VERSION": "1", "LM_APPROVE": "1", "LM_DB": ":memory:"})
+            finally:
+                job.GcsObjectStore = orig
+            self.assertEqual(rc, 0)
+            self.assertTrue((Path(d) / "bucket/public/staging/v1/manifest.json").exists())
+
+
 if __name__ == "__main__":
     unittest.main()
