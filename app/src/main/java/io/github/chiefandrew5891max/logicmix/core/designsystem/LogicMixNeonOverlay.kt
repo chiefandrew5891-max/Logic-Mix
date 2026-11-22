@@ -110,14 +110,14 @@ fun LogicMixNeonOverlay(drawableId: Int, pulseTick: Int, modifier: Modifier = Mo
         // Same rectangle as Image(ContentScale.Fit): the masks are stretched from their own size onto it.
         val rect = FitRect.fit(size.width, size.height, b.srcW.toFloat(), b.srcH.toFloat())
         val split = rect.mapX(NeonSignGeometry.TUBE_LEFT)
-        layer(rect, b.logicHalo, LogicHalo, engine.logic * 0.55f)
-        layer(rect, b.logicCore, LogicCore, engine.logic * 0.45f)
+        layer(rect, b.logicHalo, LogicHalo, engine.logic * 1.1f)
+        layer(rect, b.logicCore, LogicCore, engine.logic * 0.9f)
         if (engine.tube == engine.mix) {
-            layer(rect, b.mixHalo, MixHalo, engine.mix * 0.55f)
-            layer(rect, b.mixCore, MixCore, engine.mix * 0.45f)
+            layer(rect, b.mixHalo, MixHalo, engine.mix * 1.1f)
+            layer(rect, b.mixCore, MixCore, engine.mix * 0.9f)
         } else {
-            clipRect(right = split) { layer(rect, b.mixHalo, MixHalo, engine.mix * 0.55f); layer(rect, b.mixCore, MixCore, engine.mix * 0.45f) }
-            clipRect(left = split) { layer(rect, b.mixHalo, MixHalo, engine.tube * 0.55f); layer(rect, b.mixCore, MixCore, engine.tube * 0.45f) }
+            clipRect(right = split) { layer(rect, b.mixHalo, MixHalo, engine.mix * 1.1f); layer(rect, b.mixCore, MixCore, engine.mix * 0.9f) }
+            clipRect(left = split) { layer(rect, b.mixHalo, MixHalo, engine.tube * 1.1f); layer(rect, b.mixCore, MixCore, engine.tube * 0.9f) }
         }
     }
 }

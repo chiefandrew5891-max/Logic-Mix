@@ -87,7 +87,7 @@ fun LogicMixGarlandOverlay(
             val glowR = radius * look.glowRadius
             drawCircle(
                 brush = Brush.radialGradient(
-                    0f to GlowAmber.copy(alpha = 0.7f), 0.4f to GlowAmber.copy(alpha = 0.3f), 1f to Color.Transparent,
+                    0f to GlowAmber, 0.4f to GlowAmber.copy(alpha = 0.55f), 1f to Color.Transparent,
                     center = c, radius = glowR,
                 ),
                 radius = glowR, center = c, alpha = look.glowAlpha, blendMode = BlendMode.Plus,
@@ -95,7 +95,7 @@ fun LogicMixGarlandOverlay(
             val haloR = radius * look.haloRadius
             drawCircle(
                 brush = Brush.radialGradient(
-                    0f to Gold, 0.5f to Amber.copy(alpha = 0.6f), 1f to Color.Transparent,
+                    0f to Gold, 0.5f to Amber.copy(alpha = 0.9f), 1f to Color.Transparent,
                     center = c, radius = haloR,
                 ),
                 radius = haloR, center = c, alpha = look.haloAlpha,

@@ -40,8 +40,8 @@ data class BulbLook(
             val b = brightness.coerceIn(0f, 1f)
             val s = GarlandEngine.smooth(b)
             return BulbLook(
-                glowRadius = 2.5f + 1.0f * b, glowAlpha = 0.55f * s,
-                haloRadius = 1.6f + 0.6f * b, haloAlpha = 0.8f * s,
+                glowRadius = 2.5f + 1.0f * b, glowAlpha = (1.4f * s).coerceAtMost(1f),
+                haloRadius = 1.6f + 0.6f * b, haloAlpha = (1.6f * s).coerceAtMost(1f),
                 bodyRadius = 1.05f + 0.1f * b, bodyAlpha = (1.8f * s).coerceAtMost(1f),
                 coreRadius = 0.6f * (0.7f + 0.3f * b), coreAlpha = (1.5f * s).coerceAtMost(1f),
                 specAlpha = 0.9f * s,
