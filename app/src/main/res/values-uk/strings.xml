@@ -195,4 +195,17 @@
     <string name="vl_hint_position">Стежте, куди зміщується фігура.</string>
     <string name="vl_hint_combined">Змінюються одразу дві речі: стежте за кожною окремо.</string>
     <string name="vl_hint_matrix">Порівняйте рядки й стовпці: кожен напрямок має своє правило.</string>
+    <string name="category_two_dots">Дві точки</string>
+    <string name="td_score">Рахунок</string>
+    <string name="td_moves_left">Ходів залишилось</string>
+    <string name="td_best">Рекорд</string>
+    <string name="td_hint">Підказка</string>
+    <string name="td_new_game">Нова гра</string>
+    <string name="td_over">Гру завершено</string>
+    <string name="td_final_score">Підсумковий рахунок: %1$d</string>
+    <string name="td_mode_classic">Класика · 20 ходів</string>
+    <string name="td_mode_endless">Нескінченний</string>
+    <string name="td_no_moves">Немає доступних ходів — поле перемішано.</string>
+    <string name="td_no_hint">Зараз немає доступного ланцюжка.</string>
+    <string name="td_rules">З’єднайте 2 і більше точок одного кольору. Замкніть контур — зникнуть усі точки цього кольору.</string>
 </resources>

@@ -195,4 +195,17 @@
     <string name="vl_hint_position">Suivez le déplacement de la forme.</string>
     <string name="vl_hint_combined">Deux choses changent à la fois : suivez-les séparément.</string>
     <string name="vl_hint_matrix">Comparez lignes et colonnes : chaque sens a sa règle.</string>
+    <string name="category_two_dots">Deux points</string>
+    <string name="td_score">Score</string>
+    <string name="td_moves_left">Coups restants</string>
+    <string name="td_best">Record</string>
+    <string name="td_hint">Indice</string>
+    <string name="td_new_game">Nouvelle partie</string>
+    <string name="td_over">Partie terminée</string>
+    <string name="td_final_score">Score final : %1$d</string>
+    <string name="td_mode_classic">Classique · 20 coups</string>
+    <string name="td_mode_endless">Sans fin</string>
+    <string name="td_no_moves">Aucun coup possible — le plateau a été mélangé.</string>
+    <string name="td_no_hint">Aucune chaîne n’est disponible pour le moment.</string>
+    <string name="td_rules">Reliez 2 points ou plus de la même couleur. Fermez une boucle pour retirer toute cette couleur.</string>
 </resources>

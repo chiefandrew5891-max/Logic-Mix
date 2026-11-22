@@ -11,20 +11,20 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class CategoryGridTest {
-    @Test fun eightCategoriesInApprovedOrderUseThreeColumnsWithoutFiller() {
+    @Test fun nineCategoriesInApprovedOrderUseThreeColumnsWithoutFiller() {
         val all = CategoryAvailability.ordered(AppLanguage.ENGLISH)
         assertEquals(
-            listOf("MATCHSTICK", "NUMBER_SEQUENCE", "WORD_LOGIC", "MINI_CROSSWORD", "VISUAL_LOGIC", "WORD_SEARCH", "SUDOKU", "ORB_LINES"),
+            listOf("MATCHSTICK", "NUMBER_SEQUENCE", "WORD_LOGIC", "MINI_CROSSWORD", "VISUAL_LOGIC", "WORD_SEARCH", "SUDOKU", "ORB_LINES", "TWO_DOTS"),
             all.map { it.name },
         )
-        assertEquals(listOf(3, 3, 2), categoryRows(all).map { it.size })
+        assertEquals(listOf(3, 3, 3), categoryRows(all).map { it.size })
     }
 
     @Test fun chineseHidesFillwordsAndOthersRemain() {
         val zh = CategoryAvailability.ordered(AppLanguage.CHINESE_SIMPLIFIED)
         assertTrue(GameCategory.WORD_SEARCH !in zh)
-        assertEquals(7, zh.size)
-        assertEquals(listOf(3, 3, 1), categoryRows(zh).map { it.size })
+        assertEquals(8, zh.size)
+        assertEquals(listOf(3, 3, 2), categoryRows(zh).map { it.size })
         assertTrue(GameCategory.WORD_SEARCH in CategoryAvailability.ordered(AppLanguage.FRENCH))
     }
 
@@ -33,7 +33,7 @@ class CategoryGridTest {
         assertEquals(
             setOf(
                 "game_matchsticks", "game_number_sequences", "game_word_logic", "game_mini_crosswords",
-                "game_visual_logic", "game_fillwords", "game_sudoku", "game_orb_lines", "mode_arcade", "mode_trainer", "mode_categories",
+                "game_visual_logic", "game_fillwords", "game_sudoku", "game_orb_lines", "game_two_dots", "mode_arcade", "mode_trainer", "mode_categories",
             ),
             names.toSet(),
         )

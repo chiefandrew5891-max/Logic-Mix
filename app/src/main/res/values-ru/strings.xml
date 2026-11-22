@@ -195,4 +195,17 @@
     <string name="vl_hint_position">Следите, куда смещается фигура.</string>
     <string name="vl_hint_combined">Меняются сразу две вещи: следите за каждой отдельно.</string>
     <string name="vl_hint_matrix">Сравните строки и столбцы: у каждого направления своё правило.</string>
+    <string name="category_two_dots">Две точки</string>
+    <string name="td_score">Счёт</string>
+    <string name="td_moves_left">Ходов осталось</string>
+    <string name="td_best">Рекорд</string>
+    <string name="td_hint">Подсказка</string>
+    <string name="td_new_game">Новая игра</string>
+    <string name="td_over">Игра окончена</string>
+    <string name="td_final_score">Итоговый счёт: %1$d</string>
+    <string name="td_mode_classic">Классика · 20 ходов</string>
+    <string name="td_mode_endless">Бесконечный</string>
+    <string name="td_no_moves">Нет доступных ходов — поле перемешано.</string>
+    <string name="td_no_hint">Сейчас нет доступной цепочки.</string>
+    <string name="td_rules">Соедините 2 и более точек одного цвета. Замкните контур — исчезнут все точки этого цвета.</string>
 </resources>

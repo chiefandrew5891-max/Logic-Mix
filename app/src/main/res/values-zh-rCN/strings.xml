@@ -195,4 +195,17 @@
     <string name="vl_hint_position">留意图形移动到哪里。</string>
     <string name="vl_hint_combined">同时有两处变化：分别追踪每一个。</string>
     <string name="vl_hint_matrix">比较行与列：每个方向有各自的规则。</string>
+    <string name="category_two_dots">两点</string>
+    <string name="td_score">得分</string>
+    <string name="td_moves_left">剩余步数</string>
+    <string name="td_best">最高分</string>
+    <string name="td_hint">提示</string>
+    <string name="td_new_game">新游戏</string>
+    <string name="td_over">游戏结束</string>
+    <string name="td_final_score">最终得分：%1$d</string>
+    <string name="td_mode_classic">经典 · 20 步</string>
+    <string name="td_mode_endless">无尽</string>
+    <string name="td_no_moves">没有可用的步骤——棋盘已重新排列。</string>
+    <string name="td_no_hint">目前没有可连接的链。</string>
+    <string name="td_rules">连接 2 个或更多同色圆点。连成闭环可消除该颜色的所有圆点。</string>
 </resources>

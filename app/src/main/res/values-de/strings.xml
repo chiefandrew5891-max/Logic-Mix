@@ -195,4 +195,17 @@
     <string name="vl_hint_position">Verfolge, wohin sich die Form bewegt.</string>
     <string name="vl_hint_combined">Zwei Dinge ändern sich gleichzeitig: verfolge jedes einzeln.</string>
     <string name="vl_hint_matrix">Vergleiche Zeilen und Spalten: Jede Richtung hat ihre eigene Regel.</string>
+    <string name="category_two_dots">Zwei Punkte</string>
+    <string name="td_score">Punkte</string>
+    <string name="td_moves_left">Züge übrig</string>
+    <string name="td_best">Bestwert</string>
+    <string name="td_hint">Tipp</string>
+    <string name="td_new_game">Neues Spiel</string>
+    <string name="td_over">Spiel vorbei</string>
+    <string name="td_final_score">Endstand: %1$d</string>
+    <string name="td_mode_classic">Klassisch · 20 Züge</string>
+    <string name="td_mode_endless">Endlos</string>
+    <string name="td_no_moves">Keine Züge möglich — das Feld wurde gemischt.</string>
+    <string name="td_no_hint">Gerade ist keine Kette möglich.</string>
+    <string name="td_rules">Verbinde 2 oder mehr Punkte einer Farbe. Schließe eine Schleife, um diese Farbe zu entfernen.</string>
 </resources>

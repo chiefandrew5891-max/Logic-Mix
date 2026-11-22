@@ -4,7 +4,7 @@ import io.github.chiefandrew5891max.logicmix.core.locale.AppLanguage
 
 /** Declaration order is the display order on the home screen; ids are persisted by name. */
 enum class GameCategory {
-    MATCHSTICK, NUMBER_SEQUENCE, WORD_LOGIC, MINI_CROSSWORD, VISUAL_LOGIC, WORD_SEARCH, SUDOKU, ORB_LINES;
+    MATCHSTICK, NUMBER_SEQUENCE, WORD_LOGIC, MINI_CROSSWORD, VISUAL_LOGIC, WORD_SEARCH, SUDOKU, ORB_LINES, TWO_DOTS;
 
     /** Name of the optional PNG in res/drawable-nodpi; see IMAGE_ASSETS.md. */
     val imageName: String
@@ -17,10 +17,11 @@ enum class GameCategory {
             WORD_SEARCH -> "game_fillwords"
             SUDOKU -> "game_sudoku"
             ORB_LINES -> "game_orb_lines"
+            TWO_DOTS -> "game_two_dots"
         }
 
     /** Categories with a real playable screen; the rest open the localized coming-soon screen. */
-    val isPlayable: Boolean get() = this == NUMBER_SEQUENCE || this == WORD_LOGIC || this == MINI_CROSSWORD || this == VISUAL_LOGIC || this == WORD_SEARCH || this == SUDOKU || this == MATCHSTICK || this == ORB_LINES
+    val isPlayable: Boolean get() = this == NUMBER_SEQUENCE || this == WORD_LOGIC || this == MINI_CROSSWORD || this == VISUAL_LOGIC || this == WORD_SEARCH || this == SUDOKU || this == MATCHSTICK || this == ORB_LINES || this == TWO_DOTS
 }
 
 /**

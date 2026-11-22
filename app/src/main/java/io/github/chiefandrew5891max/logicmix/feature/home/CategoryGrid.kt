@@ -30,6 +30,7 @@ fun GameCategory.titleRes(): Int = when (this) {
     GameCategory.WORD_SEARCH -> R.string.category_word_search
     GameCategory.SUDOKU -> R.string.category_sudoku
     GameCategory.ORB_LINES -> R.string.category_orb_lines
+    GameCategory.TWO_DOTS -> R.string.category_two_dots
 }
 
 /** Splits categories into rows of [CATEGORY_COLUMNS]; the last row is never padded with fake items. */

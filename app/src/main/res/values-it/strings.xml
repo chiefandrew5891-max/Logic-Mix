@@ -195,4 +195,17 @@
     <string name="vl_hint_position">Segui dove si sposta la forma.</string>
     <string name="vl_hint_combined">Cambiano due cose insieme: segui ognuna separatamente.</string>
     <string name="vl_hint_matrix">Confronta righe e colonne: ogni direzione ha la sua regola.</string>
+    <string name="category_two_dots">Due punti</string>
+    <string name="td_score">Punteggio</string>
+    <string name="td_moves_left">Mosse rimaste</string>
+    <string name="td_best">Record</string>
+    <string name="td_hint">Suggerimento</string>
+    <string name="td_new_game">Nuova partita</string>
+    <string name="td_over">Partita finita</string>
+    <string name="td_final_score">Punteggio finale: %1$d</string>
+    <string name="td_mode_classic">Classica · 20 mosse</string>
+    <string name="td_mode_endless">Infinita</string>
+    <string name="td_no_moves">Nessuna mossa disponibile — il campo è stato mescolato.</string>
+    <string name="td_no_hint">Al momento non c’è nessuna catena disponibile.</string>
+    <string name="td_rules">Collega 2 o più punti dello stesso colore. Chiudi un anello per eliminare tutto quel colore.</string>
 </resources>

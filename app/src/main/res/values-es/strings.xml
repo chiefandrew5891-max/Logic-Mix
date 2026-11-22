@@ -195,4 +195,17 @@
     <string name="vl_hint_position">Sigue hacia dónde se mueve la forma.</string>
     <string name="vl_hint_combined">Cambian dos cosas a la vez: sigue cada una por separado.</string>
     <string name="vl_hint_matrix">Compara filas y columnas: cada dirección tiene su regla.</string>
+    <string name="category_two_dots">Dos puntos</string>
+    <string name="td_score">Puntos</string>
+    <string name="td_moves_left">Movimientos restantes</string>
+    <string name="td_best">Récord</string>
+    <string name="td_hint">Pista</string>
+    <string name="td_new_game">Nueva partida</string>
+    <string name="td_over">Fin de la partida</string>
+    <string name="td_final_score">Puntuación final: %1$d</string>
+    <string name="td_mode_classic">Clásico · 20 movimientos</string>
+    <string name="td_mode_endless">Sin fin</string>
+    <string name="td_no_moves">No hay movimientos — el tablero se ha mezclado.</string>
+    <string name="td_no_hint">Ahora no hay ninguna cadena disponible.</string>
+    <string name="td_rules">Une 2 o más puntos del mismo color. Cierra un bucle para eliminar todo ese color.</string>
 </resources>

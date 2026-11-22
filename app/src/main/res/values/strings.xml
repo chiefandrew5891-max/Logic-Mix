@@ -195,4 +195,17 @@
     <string name="vl_hint_position">Follow where the shape moves.</string>
     <string name="vl_hint_combined">Two things change at once: track each one separately.</string>
     <string name="vl_hint_matrix">Compare rows and columns: each direction has its own rule.</string>
+    <string name="category_two_dots">Two Dots</string>
+    <string name="td_score">Score</string>
+    <string name="td_moves_left">Moves left</string>
+    <string name="td_best">Best</string>
+    <string name="td_hint">Hint</string>
+    <string name="td_new_game">New game</string>
+    <string name="td_over">Game over</string>
+    <string name="td_final_score">Final score: %1$d</string>
+    <string name="td_mode_classic">Classic · 20 moves</string>
+    <string name="td_mode_endless">Endless</string>
+    <string name="td_no_moves">No moves available — the board was shuffled.</string>
+    <string name="td_no_hint">No chain is available right now.</string>
+    <string name="td_rules">Connect 2 or more dots of one color. Close a loop to clear that color.</string>
 </resources>
