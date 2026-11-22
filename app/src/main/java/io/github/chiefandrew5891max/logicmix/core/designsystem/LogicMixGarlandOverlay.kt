@@ -25,6 +25,7 @@ import kotlin.random.Random
 private val Amber = Color(0xFFFFA726)
 private val Gold = Color(0xFFFFC94D)
 private val SoftYellow = Color(0xFFFFE9A8)
+private val Dim = Color(0xFF2A0B3D)
 private val WarmWhite = Color(0xFFFFFBEA)
 
 /**
@@ -82,21 +83,32 @@ fun LogicMixGarlandOverlay(
         for (i in points.indices) {
             val level = engine.levels[i].coerceIn(0f, 1f)
             val c = Offset(points[i].x * size.width, points[i].y * h)
+            val dim = ((GarlandEngine.REST - level) / GarlandEngine.REST).coerceIn(0f, 1f) * 0.88f
+            if (dim > 0.01f) {
+                val darkR = radius * 2.1f
+                drawCircle(
+                    brush = Brush.radialGradient(
+                        0f to Dim, 0.6f to Dim, 1f to Color.Transparent, center = c, radius = darkR,
+                    ),
+                    radius = darkR, center = c, alpha = dim,
+                )
+            }
+            val lit = ((level - GarlandEngine.REST) / (1f - GarlandEngine.REST)).coerceIn(0f, 1f)
             val haloR = radius * (2.2f + 1.6f * level)
             drawCircle(
                 brush = Brush.radialGradient(
                     listOf(Gold.copy(alpha = 0.55f), Amber.copy(alpha = 0.22f), Color.Transparent),
                     center = c, radius = haloR,
                 ),
-                radius = haloR, center = c, alpha = (0.2f + 0.8f * level).coerceIn(0f, 1f), blendMode = BlendMode.Plus,
+                radius = haloR, center = c, alpha = lit, blendMode = BlendMode.Plus,
             )
             val coreR = radius * (0.75f + 0.35f * level)
             drawCircle(
                 brush = Brush.radialGradient(
-                    listOf(if (level > 0.75f) WarmWhite else SoftYellow, Gold, Color.Transparent),
+                    listOf(if (lit > 0.5f) WarmWhite else SoftYellow, Gold, Color.Transparent),
                     center = c, radius = coreR,
                 ),
-                radius = coreR, center = c, alpha = (0.15f + 0.6f * level).coerceIn(0f, 1f), blendMode = BlendMode.Plus,
+                radius = coreR, center = c, alpha = 0.2f + 0.8f * lit, blendMode = BlendMode.Plus,
             )
         }
     }

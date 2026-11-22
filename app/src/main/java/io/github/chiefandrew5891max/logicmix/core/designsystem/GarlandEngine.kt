@@ -151,7 +151,7 @@ class GarlandEngine(private val random: Random, private val count: Int = Garland
             val e = 0.5f - 0.5f * cos(2f * PI.toFloat() * t / BREATH_SECONDS)
             0.2f + 0.7f * smooth(e)
         }
-        GarlandMode.RandomSparkle -> 0.3f + 0.7f * sparkShown[i]
+        GarlandMode.RandomSparkle -> 0.2f + 0.8f * sparkShown[i]
         GarlandMode.DoubleWave -> {
             val f = (t % DOUBLE_PERIOD) / DOUBLE_PERIOD
             val reach = -WAVE_WIDTH + minOf(f / 0.8f, 1f) * (0.5f + WAVE_WIDTH)
@@ -189,7 +189,7 @@ class GarlandEngine(private val random: Random, private val count: Int = Garland
     private fun bump(d: Float) = smooth((1f - kotlin.math.abs(d) / WAVE_WIDTH).coerceIn(0f, 1f))
 
     companion object {
-        const val REST = 0.3f
+        const val REST = 0.5f
         const val WAVE_WIDTH = 0.2f
         const val SWEEP_SPEED = 0.33f
         const val BREATH_SECONDS = 4.5f
