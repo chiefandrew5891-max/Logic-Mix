@@ -209,4 +209,5 @@
     <string name="td_no_moves">Нет доступных ходов — поле перемешано.</string>
     <string name="td_no_hint">Сейчас нет доступной цепочки.</string>
     <string name="td_rules">Соедините 2 и более точек одного цвета. Замкните контур — исчезнут все точки этого цвета.</string>
+    <string name="footer_rights">Все права защищены.</string>
 </resources>

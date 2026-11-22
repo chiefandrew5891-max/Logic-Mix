@@ -209,4 +209,5 @@
     <string name="td_no_moves">Keine Züge möglich — das Feld wurde gemischt.</string>
     <string name="td_no_hint">Gerade ist keine Kette möglich.</string>
     <string name="td_rules">Verbinde 2 oder mehr Punkte einer Farbe. Schließe eine Schleife, um diese Farbe zu entfernen.</string>
+    <string name="footer_rights">Alle Rechte vorbehalten.</string>
 </resources>

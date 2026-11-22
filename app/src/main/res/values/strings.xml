@@ -209,4 +209,5 @@
     <string name="td_no_moves">No moves available — the board was shuffled.</string>
     <string name="td_no_hint">No chain is available right now.</string>
     <string name="td_rules">Connect 2 or more dots of one color. Close a loop to clear that color.</string>
+    <string name="footer_rights">All rights reserved.</string>
 </resources>

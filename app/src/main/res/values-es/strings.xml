@@ -209,4 +209,5 @@
     <string name="td_no_moves">No hay movimientos — el tablero se ha mezclado.</string>
     <string name="td_no_hint">Ahora no hay ninguna cadena disponible.</string>
     <string name="td_rules">Une 2 o más puntos del mismo color. Cierra un bucle para eliminar todo ese color.</string>
+    <string name="footer_rights">Todos los derechos reservados.</string>
 </resources>

@@ -209,4 +209,5 @@
     <string name="td_no_moves">Nessuna mossa disponibile — il campo è stato mescolato.</string>
     <string name="td_no_hint">Al momento non c’è nessuna catena disponibile.</string>
     <string name="td_rules">Collega 2 o più punti dello stesso colore. Chiudi un anello per eliminare tutto quel colore.</string>
+    <string name="footer_rights">Tutti i diritti riservati.</string>
 </resources>

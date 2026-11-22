@@ -209,4 +209,5 @@
     <string name="td_no_moves">没有可用的步骤——棋盘已重新排列。</string>
     <string name="td_no_hint">目前没有可连接的链。</string>
     <string name="td_rules">连接 2 个或更多同色圆点。连成闭环可消除该颜色的所有圆点。</string>
+    <string name="footer_rights">保留所有权利。</string>
 </resources>

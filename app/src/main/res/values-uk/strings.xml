@@ -209,4 +209,5 @@
     <string name="td_no_moves">Немає доступних ходів — поле перемішано.</string>
     <string name="td_no_hint">Зараз немає доступного ланцюжка.</string>
     <string name="td_rules">З’єднайте 2 і більше точок одного кольору. Замкніть контур — зникнуть усі точки цього кольору.</string>
+    <string name="footer_rights">Усі права захищені.</string>
 </resources>

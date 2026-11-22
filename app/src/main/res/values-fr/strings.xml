@@ -209,4 +209,5 @@
     <string name="td_no_moves">Aucun coup possible — le plateau a été mélangé.</string>
     <string name="td_no_hint">Aucune chaîne n’est disponible pour le moment.</string>
     <string name="td_rules">Reliez 2 points ou plus de la même couleur. Fermez une boucle pour retirer toute cette couleur.</string>
+    <string name="footer_rights">Tous droits réservés.</string>
 </resources>
