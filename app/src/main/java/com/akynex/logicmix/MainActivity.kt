@@ -21,6 +21,7 @@ import com.akynex.logicmix.domain.content.StartTarget
 import com.akynex.logicmix.feature.gamestyle.GameStyleRoute
 import com.akynex.logicmix.feature.gamestyle.StyleStep
 import com.akynex.logicmix.feature.home.PrimaryAction
+import com.akynex.logicmix.feature.arcade.ArcadeRoute
 import com.akynex.logicmix.feature.home.StyleInfoScreen
 import com.akynex.logicmix.feature.home.titleRes
 import androidx.activity.compose.BackHandler
@@ -90,6 +91,7 @@ object Routes {
     const val CATEGORY_SOON = "category_soon/{category}"
     const val GAME_STYLE = "game_style/{start}"
     const val STYLE_INFO = "style_info/{style}"
+    const val ARCADE = "arcade"
 
     fun gameStyle(start: StyleStep) = "game_style/${start.name}"
     fun styleInfo(style: GameStyle) = "style_info/${style.name}"
@@ -112,6 +114,7 @@ object Routes {
         StartTarget.Default -> GAME
         is StartTarget.Category -> forCategory(target.category)
         is StartTarget.StyleInfo -> styleInfo(target.style)
+        StartTarget.Arcade -> ARCADE
     }
 }
 
@@ -188,6 +191,12 @@ private fun LogicMixNavigation(navController: NavHostController, gameStyle: Game
         composable(Routes.GAME_STYLE, arguments = listOf(navArgument("start") { type = NavType.StringType })) { entry ->
             val start = StyleStep.entries.firstOrNull { it.name == entry.arguments?.getString("start") } ?: StyleStep.STYLE
             GameStyleRoute(start = start, onFinished = openFromFlow, onBack = goBack)
+        }
+        composable(Routes.ARCADE) {
+            ArcadeRoute(
+                onBack = goBack,
+                onEditCategories = { navController.navigate(Routes.gameStyle(StyleStep.ARCADE)) },
+            )
         }
         composable(Routes.STYLE_INFO, arguments = listOf(navArgument("style") { type = NavType.StringType })) { entry ->
             val style = GameStyle.fromStored(entry.arguments?.getString("style")) ?: GameStyle.ARCADE

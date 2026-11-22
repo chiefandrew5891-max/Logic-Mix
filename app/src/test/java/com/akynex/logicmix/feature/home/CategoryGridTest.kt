@@ -45,7 +45,7 @@ class CategoryGridTest {
     @Test fun startTargetFollowsStyleButNeverBreaksAnActiveSession() {
         val all = GameCategory.entries.toSet()
         val arcade = GameStylePrefs(onboardingDone = true, style = GameStyle.ARCADE)
-        assertEquals(StartTarget.StyleInfo(GameStyle.ARCADE), StartTarget.resolve(false, arcade, all))
+        assertEquals(StartTarget.Arcade, StartTarget.resolve(false, arcade, all))
         assertEquals(StartTarget.Default, StartTarget.resolve(true, arcade, all))
         assertEquals(StartTarget.Default, StartTarget.resolve(false, GameStylePrefs(), all))
         val single = GameStylePrefs(true, GameStyle.CATEGORIES, preferredCategory = GameCategory.SUDOKU)

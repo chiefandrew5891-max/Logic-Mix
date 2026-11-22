@@ -27,7 +27,7 @@ class GameStyleViewModel @Inject constructor(private val settings: SettingsRepos
         settings.effectiveLanguage().map { CategoryAvailability.ordered(it) }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), GameCategory.entries.toList())
 
-    fun confirm(style: GameStyle, trainer: Set<GameCategory>? = null, preferred: GameCategory? = null) {
-        viewModelScope.launch { settings.confirmGameStyle(style, trainer, preferred) }
+    fun confirm(style: GameStyle, trainer: Set<GameCategory>? = null, preferred: GameCategory? = null, arcade: Set<GameCategory>? = null) {
+        viewModelScope.launch { settings.confirmGameStyle(style, trainer, preferred, arcade) }
     }
 }

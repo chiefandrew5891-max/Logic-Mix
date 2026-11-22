@@ -21,6 +21,7 @@ data class GameStylePrefs(
     val onboardingDone: Boolean = false,
     val style: GameStyle? = null,
     val trainerCategories: Set<GameCategory> = emptySet(),
+    val arcadeCategories: Set<GameCategory> = emptySet(),
     val preferredCategory: GameCategory? = null,
 )
 
@@ -30,6 +31,7 @@ sealed interface StartTarget {
     data object Default : StartTarget
     data class Category(val category: GameCategory) : StartTarget
     data class StyleInfo(val style: GameStyle) : StartTarget
+    data object Arcade : StartTarget
 
     companion object {
         fun resolve(
@@ -40,7 +42,8 @@ sealed interface StartTarget {
             // An unfinished session is always resumed, whatever the preferred style is.
             if (hasActiveSession || !prefs.onboardingDone) return Default
             return when (prefs.style) {
-                GameStyle.ARCADE, GameStyle.TRAINER -> StyleInfo(prefs.style)
+                GameStyle.ARCADE -> Arcade
+                GameStyle.TRAINER -> StyleInfo(prefs.style)
                 GameStyle.CATEGORIES -> prefs.preferredCategory?.takeIf { it in available }?.let(::Category) ?: Default
                 null -> Default
             }

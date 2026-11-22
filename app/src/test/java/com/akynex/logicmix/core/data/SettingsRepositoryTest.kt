@@ -84,12 +84,14 @@ class SettingsRepositoryTest {
 
     @Test fun confirmedGameStylePersistsWithStableIds() = runBlocking {
         repo.confirmGameStyle(GameStyle.TRAINER, trainer = setOf(GameCategory.SUDOKU, GameCategory.WORD_LOGIC))
+        repo.confirmGameStyle(GameStyle.ARCADE, arcade = setOf(GameCategory.TWO_DOTS))
         repo.confirmGameStyle(GameStyle.CATEGORIES, preferred = GameCategory.NUMBER_SEQUENCE)
         val saved = repo.gameStyle.first()
         assertTrue(saved.onboardingDone)
         assertEquals(GameStyle.CATEGORIES, saved.style)
         // The trainer selection is kept when only another part of the choice changes.
         assertEquals(setOf(GameCategory.SUDOKU, GameCategory.WORD_LOGIC), saved.trainerCategories)
+        assertEquals(setOf(GameCategory.TWO_DOTS), saved.arcadeCategories)
         assertEquals(GameCategory.NUMBER_SEQUENCE, saved.preferredCategory)
         assertEquals(AppLanguage.SYSTEM, repo.language.first())
     }

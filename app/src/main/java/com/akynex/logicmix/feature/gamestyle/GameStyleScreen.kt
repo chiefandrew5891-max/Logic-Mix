@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,7 +47,7 @@ import com.akynex.logicmix.domain.content.GameStylePrefs
 import com.akynex.logicmix.domain.content.StartTarget
 import com.akynex.logicmix.feature.home.CategoryGrid
 
-enum class StyleStep { STYLE, TRAINER, CATEGORY }
+enum class StyleStep { STYLE, TRAINER, CATEGORY, ARCADE }
 
 @StringRes
 fun GameStyle.titleRes(): Int = when (this) {
@@ -77,7 +78,7 @@ fun GameStyleRoute(
         Box(Modifier.fillMaxSize().background(LogicMixTokens.colors.backgroundBrush))
         return
     }
-    GameStyleFlow(start, loaded, categories, viewModel::confirm, onFinished, onBack)
+    GameStyleFlow(start, loaded, categories, { s, t, p, a -> viewModel.confirm(s, t, p, a) }, onFinished, onBack)
 }
 
 @Composable
@@ -85,15 +86,17 @@ internal fun GameStyleFlow(
     start: StyleStep,
     prefs: GameStylePrefs,
     categories: List<GameCategory>,
-    onConfirm: (GameStyle, Set<GameCategory>?, GameCategory?) -> Unit,
+    onConfirm: (GameStyle, Set<GameCategory>?, GameCategory?, Set<GameCategory>?) -> Unit,
     onFinished: (StartTarget) -> Unit,
     onBack: () -> Unit,
 ) {
     var step by rememberSaveable { mutableStateOf(start) }
     var style by rememberSaveable { mutableStateOf(prefs.style) }
     var trainer by rememberSaveable { mutableStateOf(prefs.trainerCategories.map { it.name }) }
+    var arcade by rememberSaveable { mutableStateOf(prefs.arcadeCategories.map { it.name }) }
     var single by rememberSaveable { mutableStateOf(prefs.preferredCategory?.name) }
     val selectedTrainer = categories.filter { it.name in trainer }.toSet()
+    val selectedArcade = categories.filter { it.name in arcade }.toSet()
     val selectedSingle = categories.firstOrNull { it.name == single }
 
     // Back from a second step returns to the style cards when the flow started there.
@@ -122,10 +125,7 @@ internal fun GameStyleFlow(
                     }
                     ConfirmButton(enabled = style != null) {
                         when (style) {
-                            GameStyle.ARCADE -> {
-                                onConfirm(GameStyle.ARCADE, null, null)
-                                onFinished(StartTarget.StyleInfo(GameStyle.ARCADE))
-                            }
+                            GameStyle.ARCADE -> step = StyleStep.ARCADE
                             GameStyle.TRAINER -> step = StyleStep.TRAINER
                             GameStyle.CATEGORIES -> step = StyleStep.CATEGORY
                             null -> Unit
@@ -141,8 +141,33 @@ internal fun GameStyleFlow(
                         selected = selectedTrainer, multi = true,
                     )
                     ConfirmButton(enabled = selectedTrainer.isNotEmpty()) {
-                        onConfirm(GameStyle.TRAINER, selectedTrainer, null)
+                        onConfirm(GameStyle.TRAINER, selectedTrainer, null, null)
                         onFinished(StartTarget.StyleInfo(GameStyle.TRAINER))
+                    }
+                }
+                StyleStep.ARCADE -> {
+                    Header(R.string.style_arcade_title, R.string.style_arcade_hint)
+                    CategoryGrid(
+                        categories, onClick = { c ->
+                            arcade = if (c.name in arcade) arcade - c.name else arcade + c.name
+                        },
+                        selected = selectedArcade, multi = true,
+                    )
+                    OutlinedButton(
+                        { arcade = if (selectedArcade.size == categories.size) emptyList() else categories.map { it.name } },
+                        Modifier.fillMaxWidth().heightIn(min = LogicMixTokens.minTouchTarget),
+                    ) {
+                        Text(stringResource(if (selectedArcade.size == categories.size) R.string.style_arcade_clear_all else R.string.style_arcade_select_all))
+                    }
+                    if (selectedArcade.isEmpty()) {
+                        Text(
+                            stringResource(R.string.style_arcade_empty), style = LogicMixTokens.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                    ConfirmButton(enabled = selectedArcade.isNotEmpty()) {
+                        onConfirm(GameStyle.ARCADE, null, null, selectedArcade)
+                        onFinished(StartTarget.Arcade)
                     }
                 }
                 StyleStep.CATEGORY -> {
@@ -150,7 +175,7 @@ internal fun GameStyleFlow(
                     CategoryGrid(categories, onClick = { single = it.name }, selected = setOfNotNull(selectedSingle))
                     ConfirmButton(enabled = selectedSingle != null) {
                         selectedSingle?.let {
-                            onConfirm(GameStyle.CATEGORIES, null, it)
+                            onConfirm(GameStyle.CATEGORIES, null, it, null)
                             onFinished(StartTarget.Category(it))
                         }
                     }

@@ -220,7 +220,7 @@ private fun GameStyleSection(prefs: GameStylePrefs, onArcade: () -> Unit, onStep
                 selected = current == option,
                 onClick = {
                     when (option) {
-                        GameStyle.ARCADE -> onArcade()
+                        GameStyle.ARCADE -> onStep(StyleStep.ARCADE)
                         GameStyle.TRAINER -> onStep(StyleStep.TRAINER)
                         GameStyle.CATEGORIES -> onStep(StyleStep.CATEGORY)
                     }

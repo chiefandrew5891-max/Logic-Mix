@@ -71,17 +71,19 @@ class SettingsRepository internal constructor(private val store: DataStore<Prefe
             onboardingDone = p[ONBOARDING_DONE] ?: false,
             style = GameStyle.fromStored(p[GAME_STYLE]),
             trainerCategories = p[TRAINER_CATEGORIES].orEmpty().mapNotNull(::category).toSet(),
+            arcadeCategories = p[ARCADE_CATEGORIES].orEmpty().mapNotNull(::category).toSet(),
             preferredCategory = category(p[PREFERRED_CATEGORY]),
         )
     }
 
     /** Saves a confirmed style together with its selection in one atomic edit. */
-    suspend fun confirmGameStyle(style: GameStyle, trainer: Set<GameCategory>? = null, preferred: GameCategory? = null) {
+    suspend fun confirmGameStyle(style: GameStyle, trainer: Set<GameCategory>? = null, preferred: GameCategory? = null, arcade: Set<GameCategory>? = null) {
         store.edit {
             it[ONBOARDING_DONE] = true
             it[GAME_STYLE] = style.name
             if (trainer != null) it[TRAINER_CATEGORIES] = trainer.map(GameCategory::name).toSet()
             if (preferred != null) it[PREFERRED_CATEGORY] = preferred.name
+            if (arcade != null) it[ARCADE_CATEGORIES] = arcade.map(GameCategory::name).toSet()
         }
     }
 
@@ -89,6 +91,7 @@ class SettingsRepository internal constructor(private val store: DataStore<Prefe
         val ONBOARDING_DONE = booleanPreferencesKey("game_style_onboarding_done")
         val GAME_STYLE = stringPreferencesKey("game_style")
         val TRAINER_CATEGORIES = stringSetPreferencesKey("trainer_categories")
+        val ARCADE_CATEGORIES = stringSetPreferencesKey("arcade_categories")
         val PREFERRED_CATEGORY = stringPreferencesKey("preferred_category")
         fun category(name: String?): GameCategory? = GameCategory.entries.firstOrNull { it.name == name }
 
