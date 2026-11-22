@@ -14,6 +14,8 @@ import io.github.chiefandrew5891max.logicmix.domain.game.NumberSequenceEngine
 import io.github.chiefandrew5891max.logicmix.domain.game.numlogic.NumberLogicCareer
 import io.github.chiefandrew5891max.logicmix.domain.game.NumberSequencePuzzle
 import io.github.chiefandrew5891max.logicmix.domain.game.SolveResult
+import io.github.chiefandrew5891max.logicmix.core.analytics.GameContext
+import io.github.chiefandrew5891max.logicmix.domain.content.GameCategory
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -48,7 +50,17 @@ class GameViewModel @Inject constructor(
     private val progress: ProgressRepository,
     private val sessions: GameSessionStore,
     private val sfx: SoundEffectsController,
+    monetization: io.github.chiefandrew5891max.logicmix.core.monetization.Monetization,
 ) : ViewModel() {
+    private val analytics = monetization.newGameAnalytics()
+    private val genericCtx = GameContext(GameCategory.NUMBER_SEQUENCE, mode = "career")
+    private fun ctx(p: NumberSequencePuzzle) = genericCtx.copy(
+        family = p.family.name.lowercase(), difficulty = p.difficulty.toString(),
+        levelIndex = NumberLogicCareer.indexOf(p.id) + 1, contentLanguage = "en",
+    )
+
+    override fun onCleared() { analytics.leave() }
+
     private val profileId = LocalProfileRepository.LOCAL_PROFILE_ID
     private val _state = MutableStateFlow(GameUiState())
     val state: StateFlow<GameUiState> = _state.asStateFlow()
@@ -69,6 +81,8 @@ class GameViewModel @Inject constructor(
                 return@launch
             }
             val session = sessions.begin(puzzle.id, System.currentTimeMillis())
+            analytics.openCategory(genericCtx)
+            analytics.puzzleStarted(puzzle.id, ctx(puzzle), resumed = resumed != null, hints = session.hintsUsed)
             _state.value = GameUiState(
                 loading = false,
                 puzzle = puzzle,
@@ -95,6 +109,7 @@ class GameViewModel @Inject constructor(
         if (!s.canUseHint) return
         val used = s.hintsUsed + 1
         sfx.play(Sfx.HINT)
+        analytics.hintRequested(); analytics.hintUsed()
         _state.update { it.copy(hintsUsed = used) }
         viewModelScope.launch { sessions.setHintsUsed(puzzle.id, used) }
     }
@@ -108,6 +123,7 @@ class GameViewModel @Inject constructor(
             SolveResult.Incorrect -> {
                 sfx.play(Sfx.WRONG)
                 _state.update { it.copy(feedback = Feedback.WRONG) }
+                analytics.attemptFailed()
                 record(puzzle, s, AttemptOutcome.INCORRECT)
             }
             SolveResult.Correct -> {
@@ -121,6 +137,7 @@ class GameViewModel @Inject constructor(
                     )
                     sessions.clear()
                     _state.update { it.copy(xpAwarded = result.xpAwarded) }
+                    analytics.completed(result.xpAwarded)
                     if (result.xpAwarded > 0) sfx.play(Sfx.XP_GAIN)
                     sfx.play(if (result.after.level > result.before.level) Sfx.LEVEL_UP else Sfx.LEVEL_COMPLETE)
                 }
@@ -136,6 +153,7 @@ class GameViewModel @Inject constructor(
     fun restart() {
         if (_state.value.solved || _state.value.puzzle == null) return
         sfx.play(Sfx.BUTTON_TAP)
+        analytics.restarted()
         _state.update { it.copy(input = "", feedback = Feedback.NONE) }
     }
 

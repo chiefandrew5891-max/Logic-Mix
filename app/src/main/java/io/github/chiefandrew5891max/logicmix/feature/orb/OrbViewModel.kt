@@ -52,7 +52,12 @@ class OrbViewModel @Inject constructor(
     private val progress: ProgressRepository,
     private val store: OrbStore,
     private val sfx: SoundEffectsController,
+    monetization: io.github.chiefandrew5891max.logicmix.core.monetization.Monetization,
 ) : ViewModel() {
+    private val analytics = monetization.newGameAnalytics()
+    private val ctx = io.github.chiefandrew5891max.logicmix.core.analytics.GameContext(io.github.chiefandrew5891max.logicmix.domain.content.GameCategory.ORB_LINES, family = "orb_lines", mode = "endless")
+    override fun onCleared() { analytics.leave() }
+
     private val profileId = LocalProfileRepository.LOCAL_PROFILE_ID
     private val _state = MutableStateFlow(OrbUiState())
     val state: StateFlow<OrbUiState> = _state.asStateFlow()
@@ -73,6 +78,8 @@ class OrbViewModel @Inject constructor(
                 startedAt = seed
             }
             _state.value = OrbUiState(game = restored ?: OrbGame.new(seed), best = saved.best)
+            analytics.openCategory(ctx)
+            analytics.puzzleStarted("orb-$seed", ctx, resumed = restored != null, hints = restored?.hintsUsed ?: 0)
             if (restored != null) claimXp(restored)
         }
     }
@@ -152,6 +159,7 @@ class OrbViewModel @Inject constructor(
                 startedAt, System.currentTimeMillis(), game.hintsUsed,
             )
             _state.update { it.copy(xpAwarded = result.xpAwarded) }
+            analytics.completed(result.xpAwarded)
             if (result.xpAwarded > 0) {
                 sfx.play(Sfx.XP_GAIN)
                 if (result.after.level > result.before.level) sfx.play(Sfx.LEVEL_UP)
@@ -179,6 +187,7 @@ class OrbViewModel @Inject constructor(
             return
         }
         sfx.play(Sfx.HINT)
+        analytics.hintRequested(); analytics.hintUsed()
         val next = g.withHint()
         _state.update { it.copy(game = next, hint = move, selected = move.first, noHint = false) }
         persist(next)
@@ -187,10 +196,12 @@ class OrbViewModel @Inject constructor(
     fun newGame() {
         if (_state.value.busy) return
         sfx.play(Sfx.BUTTON_TAP)
+        analytics.restarted()
         seed = System.currentTimeMillis()
         startedAt = seed
         xpClaimed = false
         val g = OrbGame.new(seed)
+        analytics.puzzleStarted("orb-$seed", ctx)
         _state.update { OrbUiState(game = g, best = it.best) }
         persist(g)
     }

@@ -10,6 +10,8 @@ import io.github.chiefandrew5891max.logicmix.domain.visual.VisualGame
 import io.github.chiefandrew5891max.logicmix.domain.visual.geo.GeoGame
 import io.github.chiefandrew5891max.logicmix.domain.visual.geo.VisualCareer
 import io.github.chiefandrew5891max.logicmix.domain.visual.geo.VisualLevel
+import io.github.chiefandrew5891max.logicmix.core.analytics.GameContext
+import io.github.chiefandrew5891max.logicmix.domain.content.GameCategory
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,7 +33,12 @@ data class VisualUiState(
 class VisualViewModel @Inject constructor(
     private val games: CategoryGames,
     private val sfx: SoundEffectsController,
+    monetization: io.github.chiefandrew5891max.logicmix.core.monetization.Monetization,
 ) : ViewModel() {
+    private val analytics = monetization.newGameAnalytics()
+    private val baseCtx = GameContext(GameCategory.VISUAL_LOGIC, mode = "career")
+    override fun onCleared() { analytics.leave() }
+
     private val _state = MutableStateFlow(VisualUiState())
     val state: StateFlow<VisualUiState> = _state.asStateFlow()
     private var startedAt = System.currentTimeMillis()
@@ -48,6 +55,12 @@ class VisualViewModel @Inject constructor(
         }
         startedAt = System.currentTimeMillis()
         val saved = games.store.state(KEY, level.id)
+        analytics.openCategory(baseCtx)
+        val (family, difficulty) = when (level) {
+            is VisualLevel.Classic -> "classic" to null
+            is VisualLevel.Generated -> level.puzzle.family.name.lowercase() to level.puzzle.difficulty.toString()
+        }
+        analytics.puzzleStarted(level.id, baseCtx.copy(family = family, difficulty = difficulty, levelIndex = index + 1), resumed = saved != null)
         _state.value = when (level) {
             is VisualLevel.Classic -> VisualUiState(loading = false, index = index, game = VisualGame.restore(level.puzzle, saved))
             is VisualLevel.Generated -> VisualUiState(loading = false, index = index, geo = GeoGame.restore(level.puzzle, saved))
@@ -71,6 +84,7 @@ class VisualViewModel @Inject constructor(
         _state.update { it.copy(game = next) }
         if (next.solved) finish(next) else {
             sfx.play(Sfx.WRONG)
+            analytics.attemptFailed()
             persist(next)
         }
     }
@@ -81,6 +95,7 @@ class VisualViewModel @Inject constructor(
         val next = game.hint()
         if (next === game) return
         sfx.play(Sfx.HINT)
+        analytics.hintRequested(); analytics.hintUsed()
         _state.update { it.copy(game = next) }
         persist(next)
     }
@@ -90,6 +105,7 @@ class VisualViewModel @Inject constructor(
         val game = _state.value.game ?: return
         if (game.solved) return
         val next = game.restart()
+        analytics.restarted()
         _state.update { it.copy(game = next) }
         persist(next)
     }
@@ -101,6 +117,7 @@ class VisualViewModel @Inject constructor(
         _state.update { it.copy(geo = next) }
         if (next.solved) finish(next.puzzle.id, next.hintsUsed) else {
             sfx.play(Sfx.WRONG)
+            analytics.attemptFailed()
             persist(next)
         }
     }
@@ -109,6 +126,7 @@ class VisualViewModel @Inject constructor(
         val next = game.hint()
         if (next === game) return
         sfx.play(Sfx.HINT)
+        analytics.hintRequested(); analytics.hintUsed()
         _state.update { it.copy(geo = next) }
         persist(next)
     }
@@ -116,6 +134,7 @@ class VisualViewModel @Inject constructor(
     private fun restartGeo(game: GeoGame) {
         if (game.solved) return
         val next = game.restart()
+        analytics.restarted()
         _state.update { it.copy(geo = next) }
         persist(next)
     }
@@ -127,6 +146,7 @@ class VisualViewModel @Inject constructor(
             games.store.clearState(KEY, puzzleId)
             val result = games.complete(puzzleId, startedAt, hintsUsed)
             _state.update { it.copy(xpAwarded = result.xpAwarded) }
+            analytics.completed(result.xpAwarded)
             sfx.play(Sfx.CORRECT)
             if (result.xpAwarded > 0) sfx.play(Sfx.XP_GAIN)
             if (result.after.level > result.before.level) sfx.play(Sfx.LEVEL_UP)

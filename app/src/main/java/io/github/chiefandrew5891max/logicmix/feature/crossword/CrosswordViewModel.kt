@@ -13,6 +13,8 @@ import io.github.chiefandrew5891max.logicmix.domain.crossword.CrosswordEntry
 import io.github.chiefandrew5891max.logicmix.domain.crossword.CrosswordGame
 import io.github.chiefandrew5891max.logicmix.domain.crossword.CrosswordCareer
 import io.github.chiefandrew5891max.logicmix.domain.crossword.CrosswordPuzzle
+import io.github.chiefandrew5891max.logicmix.core.analytics.GameContext
+import io.github.chiefandrew5891max.logicmix.domain.content.GameCategory
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,7 +44,11 @@ class CrosswordViewModel @Inject constructor(
     private val games: CategoryGames,
     private val settings: SettingsRepository,
     private val sfx: SoundEffectsController,
+    monetization: io.github.chiefandrew5891max.logicmix.core.monetization.Monetization,
 ) : ViewModel() {
+    private val analytics = monetization.newGameAnalytics()
+    override fun onCleared() { analytics.leave() }
+
     private val _state = MutableStateFlow(CrosswordUiState())
     val state: StateFlow<CrosswordUiState> = _state.asStateFlow()
     private var startedAt = System.currentTimeMillis()
@@ -70,6 +76,10 @@ class CrosswordViewModel @Inject constructor(
         val puzzle = puzzles[index]
         val game = CrosswordGame.restore(puzzle, games.store.state(key, puzzle.id))
         startedAt = System.currentTimeMillis()
+        val ctx = GameContext(GameCategory.MINI_CROSSWORD, family = "mini_crossword", mode = "career",
+            levelIndex = index + 1, contentLanguage = _state.value.language.tag)
+        analytics.openCategory(ctx)
+        analytics.puzzleStarted(puzzle.id, ctx, resumed = game.hintsUsed > 0)
         _state.update { it.copy(index = index, game = game, allDone = false, xpAwarded = 0, check = CheckResult.NONE) }
     }
 
@@ -101,17 +111,26 @@ class CrosswordViewModel @Inject constructor(
         val next = change(game)
         val result = if (next.wrong.isEmpty()) CheckResult.OK else CheckResult.MISTAKES
         sfx.play(if (result == CheckResult.OK) Sfx.WORD_FOUND else Sfx.WRONG)
+        if (result == CheckResult.MISTAKES) analytics.attemptFailed()
         _state.update { it.copy(game = next, check = result) }
     }
 
-    fun hintLetter() = update(Sfx.HINT) { it.hintLetter() }
+    fun hintLetter() = hint { it.hintLetter() }
 
-    fun hintWord() = update(Sfx.HINT) { it.hintWord() }
+    fun hintWord() = hint { it.hintWord() }
+
+    private fun hint(change: (CrosswordGame) -> CrosswordGame) {
+        val before = _state.value.game?.takeIf { !it.solved } ?: return
+        analytics.hintRequested()
+        update(Sfx.HINT, change = change)
+        if ((_state.value.game?.hintsUsed ?: 0) > before.hintsUsed) analytics.hintUsed()
+    }
 
     fun restart() {
         val game = _state.value.game ?: return
         if (game.solved) return
         val next = game.restart()
+        analytics.restarted()
         _state.update { it.copy(game = next, check = CheckResult.NONE) }
         viewModelScope.launch { games.store.saveState(key, next.puzzle.id, next.encode()) }
     }
@@ -121,6 +140,7 @@ class CrosswordViewModel @Inject constructor(
             games.store.clearState(key, game.puzzle.id)
             val result = games.complete(game.puzzle.id, startedAt, game.hintsUsed)
             _state.update { it.copy(xpAwarded = result.xpAwarded) }
+            analytics.completed(result.xpAwarded)
             sfx.play(Sfx.CORRECT)
             if (result.xpAwarded > 0) sfx.play(Sfx.XP_GAIN)
             if (result.after.level > result.before.level) sfx.play(Sfx.LEVEL_UP)

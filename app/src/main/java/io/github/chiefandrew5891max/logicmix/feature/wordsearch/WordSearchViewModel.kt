@@ -72,7 +72,12 @@ class WordSearchViewModel @Inject constructor(
     private val store: WordSearchStore,
     settings: SettingsRepository,
     private val sfx: SoundEffectsController,
+    monetization: io.github.chiefandrew5891max.logicmix.core.monetization.Monetization,
 ) : ViewModel() {
+    private val analytics = monetization.newGameAnalytics()
+    private var ctx: io.github.chiefandrew5891max.logicmix.core.analytics.GameContext? = null
+    override fun onCleared() { analytics.leave() }
+
     private val profileId = LocalProfileRepository.LOCAL_PROFILE_ID
     private val _state = MutableStateFlow(WordSearchUiState())
     val state: StateFlow<WordSearchUiState> = _state.asStateFlow()
@@ -118,6 +123,11 @@ class WordSearchViewModel @Inject constructor(
         val level = withContext(Dispatchers.Default) { WordSearchLevels.build(content, index, words) }
         val session = store.begin(level, System.currentTimeMillis())
         store.setCurrentIndex(content, index)
+        val c = io.github.chiefandrew5891max.logicmix.core.analytics.GameContext(
+            GameCategory.WORD_SEARCH, family = "word_search", mode = "career", levelIndex = index + 1, contentLanguage = content.tag)
+        ctx = c
+        analytics.openCategory(c)
+        if (!session.completed) analytics.puzzleStarted(level.id, c, resumed = session.mainFound.isNotEmpty() || session.hintsUsed > 0, hints = session.hintsUsed)
         _state.value = WordSearchUiState(
             loading = false,
             level = level,
@@ -165,6 +175,7 @@ class WordSearchViewModel @Inject constructor(
                     }
                     is WordCheck.Unknown, WordCheck.InvalidPath -> {
                         sfx.play(Sfx.WORD_INVALID)
+                        analytics.attemptFailed()
                         _state.update { it.copy(feedback = WordFeedback.UNKNOWN) }
                     }
                     WordCheck.TooShort -> _state.update { it.copy(feedback = WordFeedback.TOO_SHORT) }
@@ -193,6 +204,7 @@ class WordSearchViewModel @Inject constructor(
             hintsUsed = s.hintsUsed,
         )
         store.complete(level, result.xpAwarded)
+        analytics.completed(result.xpAwarded)
         if (result.xpAwarded > 0) sfx.play(Sfx.XP_GAIN)
         sfx.play(if (result.after.level > result.before.level) Sfx.LEVEL_UP else Sfx.LEVEL_COMPLETE)
         _state.update { it.copy(completed = true, xpAwarded = result.xpAwarded) }
@@ -206,6 +218,7 @@ class WordSearchViewModel @Inject constructor(
                 if (!s.canUseHint) return@withLock
                 val target = level.placements.first { it.word !in s.mainFound }
                 sfx.play(Sfx.HINT)
+                analytics.hintRequested(); analytics.hintUsed()
                 store.setHintsUsed(level, s.hintsUsed + 1)
                 _state.update { it.copy(hintsUsed = it.hintsUsed + 1, hintCell = target.path.first(), feedback = WordFeedback.NONE) }
             }
@@ -229,6 +242,7 @@ class WordSearchViewModel @Inject constructor(
                 val level = s.level ?: return@withLock
                 if (s.completed) return@withLock
                 sfx.play(Sfx.BUTTON_TAP)
+                analytics.restarted()
                 store.resetProgress(level)
                 _state.update {
                     it.copy(mainFound = emptySet(), extraFound = emptySet(), hintCell = null, feedback = WordFeedback.NONE, flash = emptyList(), extraXp = 0)

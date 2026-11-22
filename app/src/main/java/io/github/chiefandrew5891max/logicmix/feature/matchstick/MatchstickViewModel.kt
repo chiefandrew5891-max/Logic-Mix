@@ -33,7 +33,13 @@ class MatchstickViewModel @Inject constructor(
     private val profiles: LocalProfileRepository,
     private val progress: ProgressRepository,
     private val sfx: SoundEffectsController,
+    monetization: io.github.chiefandrew5891max.logicmix.core.monetization.Monetization,
 ) : ViewModel() {
+    private val analytics = monetization.newGameAnalytics()
+    private val baseCtx = io.github.chiefandrew5891max.logicmix.core.analytics.GameContext(
+        io.github.chiefandrew5891max.logicmix.domain.content.GameCategory.MATCHSTICK, family = "matchstick", mode = "career")
+    override fun onCleared() { analytics.leave() }
+
     private val profileId = LocalProfileRepository.LOCAL_PROFILE_ID
     private val _state = MutableStateFlow(MatchUiState())
     val state: StateFlow<MatchUiState> = _state.asStateFlow()
@@ -48,6 +54,10 @@ class MatchstickViewModel @Inject constructor(
         val puzzle = MatchPuzzles.firstUnsolved(progress.solvedPuzzleIds(profileId).toSet())
         _state.value = if (puzzle == null) MatchUiState(allDone = true)
         else MatchUiState(game = MatchGame(puzzle), startedAt = System.currentTimeMillis())
+        if (puzzle != null) {
+            analytics.openCategory(baseCtx)
+            analytics.puzzleStarted(puzzle.id, baseCtx)
+        }
     }
 
     fun next() {
@@ -67,7 +77,7 @@ class MatchstickViewModel @Inject constructor(
         sfx.play(Sfx.MATCHSTICK_PLACE)
         when {
             next.solved -> finish(next)
-            next.failed -> sfx.play(Sfx.WRONG)
+            next.failed -> { sfx.play(Sfx.WRONG); analytics.attemptFailed() }
         }
         return true
     }
@@ -83,6 +93,7 @@ class MatchstickViewModel @Inject constructor(
         val game = _state.value.game ?: return
         if (game.solved) return
         sfx.play(Sfx.BUTTON_TAP)
+        analytics.restarted()
         _state.update { it.copy(game = game.reset(), hint = null, noHint = false) }
     }
 
@@ -93,6 +104,8 @@ class MatchstickViewModel @Inject constructor(
         val base = if (game.hintMove() == null) game.reset() else game
         val move = base.hintMove()
         sfx.play(Sfx.HINT)
+        analytics.hintRequested()
+        if (move != null) analytics.hintUsed()
         if (move == null) {
             _state.update { it.copy(noHint = true) }
         } else {
@@ -108,6 +121,7 @@ class MatchstickViewModel @Inject constructor(
                 started, System.currentTimeMillis(), game.hintsUsed,
             )
             _state.update { it.copy(xpAwarded = result.xpAwarded) }
+            analytics.completed(result.xpAwarded)
             sfx.play(Sfx.CORRECT)
             if (result.xpAwarded > 0) sfx.play(Sfx.XP_GAIN)
             sfx.play(if (result.after.level > result.before.level) Sfx.LEVEL_UP else Sfx.LEVEL_COMPLETE)

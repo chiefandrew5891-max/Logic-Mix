@@ -58,7 +58,12 @@ class TwoDotsViewModel @Inject constructor(
     private val progress: ProgressRepository,
     private val store: TwoDotsStore,
     private val sfx: SoundEffectsController,
+    monetization: io.github.chiefandrew5891max.logicmix.core.monetization.Monetization,
 ) : ViewModel() {
+    private val analytics = monetization.newGameAnalytics()
+    private fun ctx(mode: TwoDotsMode) = io.github.chiefandrew5891max.logicmix.core.analytics.GameContext(io.github.chiefandrew5891max.logicmix.domain.content.GameCategory.TWO_DOTS, family = "two_dots", mode = mode.name.lowercase())
+    override fun onCleared() { analytics.leave() }
+
     private val profileId = LocalProfileRepository.LOCAL_PROFILE_ID
     private val _state = MutableStateFlow(TwoDotsUiState())
     val state: StateFlow<TwoDotsUiState> = _state.asStateFlow()
@@ -76,6 +81,8 @@ class TwoDotsViewModel @Inject constructor(
             val game = restored ?: TwoDotsGame.new(saved.mode, System.currentTimeMillis())
             startedAt = if (restored != null && saved.startedAt > 0) saved.startedAt else System.currentTimeMillis()
             _state.value = TwoDotsUiState(game = game, best = saved.best)
+            analytics.openCategory(ctx(game.mode))
+            analytics.puzzleStarted(game.xpId, ctx(game.mode), resumed = restored != null, hints = game.hintsUsed)
             if (restored != null) claimXp(game)
         }
     }
@@ -169,6 +176,7 @@ class TwoDotsViewModel @Inject constructor(
             val result = progress.recordAttempt(
                 profileId, game.xpId, GameMode.CAREER, AttemptOutcome.CORRECT, started, System.currentTimeMillis(), game.hintsUsed,
             )
+            analytics.completed(result.xpAwarded)
             if (result.xpAwarded > 0) {
                 _state.update { it.copy(xpAwarded = result.xpAwarded) }
                 sfx.play(Sfx.XP_GAIN)
@@ -188,6 +196,7 @@ class TwoDotsViewModel @Inject constructor(
             return
         }
         sfx.play(Sfx.HINT)
+        analytics.hintRequested(); analytics.hintUsed()
         val next = g.withHint()
         _state.update { it.copy(game = next, hint = found, noHint = false) }
         persist(next)
@@ -198,6 +207,7 @@ class TwoDotsViewModel @Inject constructor(
         val s = _state.value
         val g = s.game ?: return
         if (s.busy) return
+        analytics.restarted()
         startFresh(g.mode)
     }
 
@@ -206,6 +216,7 @@ class TwoDotsViewModel @Inject constructor(
         val g = s.game ?: return
         if (s.busy || g.mode == mode) return
         sfx.play(Sfx.BUTTON_TAP)
+        analytics.selectMode(ctx(mode))
         viewModelScope.launch {
             store.setMode(mode)
             val (raw, started) = store.loadGame(mode)
@@ -223,6 +234,7 @@ class TwoDotsViewModel @Inject constructor(
     private fun startFresh(mode: TwoDotsMode) {
         startedAt = System.currentTimeMillis()
         val game = TwoDotsGame.new(mode, startedAt)
+        analytics.puzzleStarted(game.xpId, ctx(mode))
         _state.update {
             TwoDotsUiState(game = game, best = it.best)
         }

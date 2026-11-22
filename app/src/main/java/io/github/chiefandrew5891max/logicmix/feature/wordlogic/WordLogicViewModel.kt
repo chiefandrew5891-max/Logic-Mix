@@ -12,6 +12,8 @@ import io.github.chiefandrew5891max.logicmix.domain.content.ContentLanguage
 import io.github.chiefandrew5891max.logicmix.domain.wordlogic.WordLogicGame
 import io.github.chiefandrew5891max.logicmix.domain.wordlogic.WordLogicPacks
 import io.github.chiefandrew5891max.logicmix.domain.wordlogic.WordLogicPuzzle
+import io.github.chiefandrew5891max.logicmix.core.analytics.GameContext
+import io.github.chiefandrew5891max.logicmix.domain.content.GameCategory
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,7 +37,11 @@ class WordLogicViewModel @Inject constructor(
     private val games: CategoryGames,
     private val settings: SettingsRepository,
     private val sfx: SoundEffectsController,
+    monetization: io.github.chiefandrew5891max.logicmix.core.monetization.Monetization,
 ) : ViewModel() {
+    private val analytics = monetization.newGameAnalytics()
+    override fun onCleared() { analytics.leave() }
+
     private val _state = MutableStateFlow(WordLogicUiState())
     val state: StateFlow<WordLogicUiState> = _state.asStateFlow()
     private var startedAt = System.currentTimeMillis()
@@ -58,6 +64,10 @@ class WordLogicViewModel @Inject constructor(
         val puzzle = puzzles[index]
         val game = WordLogicGame.restore(puzzle, games.store.state(KEY, puzzle.id))
         startedAt = System.currentTimeMillis()
+        val ctx = GameContext(GameCategory.WORD_LOGIC, family = puzzle.type.name.lowercase(), mode = "career",
+            difficulty = puzzle.difficulty.toString(), levelIndex = index + 1, contentLanguage = puzzle.language.tag)
+        analytics.openCategory(ctx)
+        analytics.puzzleStarted(puzzle.id, ctx, resumed = game.hintsUsed > 0)
         _state.update { it.copy(index = index, game = game, allDone = false, xpAwarded = 0) }
     }
 
@@ -73,6 +83,7 @@ class WordLogicViewModel @Inject constructor(
         _state.update { it.copy(game = next) }
         if (next.solved) finish(next) else {
             sfx.play(Sfx.WRONG)
+            analytics.attemptFailed()
             persist(next)
         }
     }
@@ -82,6 +93,7 @@ class WordLogicViewModel @Inject constructor(
         val next = game.hint()
         if (next === game) return
         sfx.play(Sfx.HINT)
+        analytics.hintRequested(); analytics.hintUsed()
         _state.update { it.copy(game = next) }
         persist(next)
     }
@@ -90,6 +102,7 @@ class WordLogicViewModel @Inject constructor(
         val game = _state.value.game ?: return
         if (game.solved) return
         val next = game.restart()
+        analytics.restarted()
         _state.update { it.copy(game = next) }
         persist(next)
     }
@@ -99,6 +112,7 @@ class WordLogicViewModel @Inject constructor(
             games.store.clearState(KEY, game.puzzle.id)
             val result = games.complete(game.puzzle.id, startedAt, game.hintsUsed)
             _state.update { it.copy(xpAwarded = result.xpAwarded) }
+            analytics.completed(result.xpAwarded)
             sfx.play(Sfx.CORRECT)
             if (result.xpAwarded > 0) sfx.play(Sfx.XP_GAIN)
             if (result.after.level > result.before.level) sfx.play(Sfx.LEVEL_UP)

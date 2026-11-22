@@ -47,7 +47,14 @@ class SudokuViewModel @Inject constructor(
     private val progress: ProgressRepository,
     private val store: SudokuStore,
     private val sfx: SoundEffectsController,
+    monetization: io.github.chiefandrew5891max.logicmix.core.monetization.Monetization,
 ) : ViewModel() {
+    private val analytics = monetization.newGameAnalytics()
+    private fun ctx(d: SudokuDifficulty) = io.github.chiefandrew5891max.logicmix.core.analytics.GameContext(
+        io.github.chiefandrew5891max.logicmix.domain.content.GameCategory.SUDOKU, family = "sudoku",
+        mode = "endless", difficulty = d.name.lowercase())
+    override fun onCleared() { analytics.leave() }
+
     private val profileId = LocalProfileRepository.LOCAL_PROFILE_ID
     private val _state = MutableStateFlow(SudokuUiState())
     val state: StateFlow<SudokuUiState> = _state.asStateFlow()
@@ -62,6 +69,8 @@ class SudokuViewModel @Inject constructor(
         val puzzle = saved?.let { withContext(Dispatchers.Default) { SudokuGenerator.generate(it.difficulty, it.seed) } }
         val game = if (puzzle != null && saved != null) SudokuGame.restore(puzzle, saved.game) else null
         _state.value = if (game != null && saved != null) {
+            analytics.openCategory(ctx(game.puzzle.difficulty))
+            if (!game.solved) analytics.puzzleStarted(game.puzzle.id, ctx(game.puzzle.difficulty), resumed = true, hints = game.hintsUsed)
             SudokuUiState(SudokuPhase.PLAY, game, saved.seed, elapsedSec = saved.elapsedSec, solved = game.solved)
         } else {
             SudokuUiState(SudokuPhase.PICK)
@@ -95,12 +104,16 @@ class SudokuViewModel @Inject constructor(
             val seed = System.currentTimeMillis()
             val puzzle = withContext(Dispatchers.Default) { SudokuGenerator.generate(difficulty, seed) }
             _state.value = SudokuUiState(SudokuPhase.PLAY, SudokuGame(puzzle), seed)
+            analytics.openCategory(ctx(difficulty))
+            analytics.selectDifficulty(ctx(difficulty))
+            analytics.puzzleStarted(puzzle.id, ctx(difficulty))
             persist()
         }
     }
 
     /** Back to the difficulty picker (after finishing, or to abandon nothing: an unfinished game stays saved). */
     fun newGame() {
+        if (!_state.value.solved) analytics.abandoned()
         _state.value = SudokuUiState(SudokuPhase.PICK)
     }
 
@@ -140,10 +153,12 @@ class SudokuViewModel @Inject constructor(
         val s = _state.value
         val target = s.game?.hintTarget(s.selected) ?: return
         _state.update { it.copy(selected = target) }
-        apply({ it.hint(s.selected) }) { _, _ -> sfx.play(Sfx.HINT) }
+        analytics.hintRequested()
+        apply({ it.hint(s.selected) }) { _, _ -> sfx.play(Sfx.HINT); analytics.hintUsed() }
     }
 
     fun reset() {
+        if (_state.value.game?.solved == false) analytics.restarted()
         apply({ it.reset() }) { _, _ -> sfx.play(Sfx.BUTTON_TAP) }
         _state.update { it.copy(elapsedSec = 0, selected = null) }
         persist()
@@ -162,6 +177,7 @@ class SudokuViewModel @Inject constructor(
                 now - s.elapsedSec * 1000, now, game.hintsUsed,
             )
             _state.update { it.copy(xpAwarded = result.xpAwarded) }
+            analytics.completed(result.xpAwarded)
             if (result.xpAwarded > 0) sfx.play(Sfx.XP_GAIN)
             sfx.play(if (result.after.level > result.before.level) Sfx.LEVEL_UP else Sfx.LEVEL_COMPLETE)
         }
