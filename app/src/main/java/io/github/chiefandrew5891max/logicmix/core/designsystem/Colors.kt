@@ -25,6 +25,11 @@ private object Palette {
     val Red700 = Color(0xFFC62840)
     val Green400 = Color(0xFF3DDC97)
     val Green700 = Color(0xFF138A5B)
+    val LightBg0 = Color(0xFFDCCAF7)
+    val LightBg24 = Color(0xFFEDE5FC)
+    val LightBg52 = Color(0xFFFFFFFF)
+    val LightBg72 = Color(0xFFF4FFFF)
+    val LightBg100 = Color(0xFFC8F5F2)
     val Mist50 = Color(0xFFF2F6FF)
     val Mist100 = Color(0xFFE3ECFB)
     val Ink900 = Color(0xFF0B1B3B)
@@ -113,7 +118,10 @@ internal val LightLogicMixColors = LogicMixColors(
     xpFill = Palette.Teal700,
     glow = Palette.Violet600.copy(alpha = 0.18f),
     cardBorder = Palette.Violet600.copy(alpha = 0.25f),
-    backgroundBrush = Brush.verticalGradient(listOf(Color.White, Palette.Mist50, Palette.Mist100)),
+    backgroundBrush = Brush.verticalGradient(
+        0f to Palette.LightBg0, 0.24f to Palette.LightBg24, 0.52f to Palette.LightBg52,
+        0.72f to Palette.LightBg72, 1f to Palette.LightBg100,
+    ),
     primaryActionBrush = Brush.verticalGradient(listOf(Palette.Gold300, Palette.Gold500)),
     rewardBrush = Brush.linearGradient(listOf(Palette.Violet400, Palette.Violet600)),
     cardBrush = Brush.verticalGradient(listOf(Color.White, Palette.Mist50)),
