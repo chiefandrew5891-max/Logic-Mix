@@ -74,7 +74,13 @@ fun SettingsScreen(
     val audio by viewModel.audio.collectAsState(initial = DefaultAudio)
     val theme by viewModel.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
     val language by viewModel.language.collectAsState(initial = AppLanguage.SYSTEM)
+    val consent by viewModel.consent.collectAsState()
+    val activity = androidx.compose.ui.platform.LocalContext.current as? android.app.Activity
     SettingsContent(
+        analyticsConsent = consent.analytics,
+        onAnalyticsConsent = viewModel::setAnalyticsConsent,
+        showAdOptions = activity != null && viewModel.privacyOptionsRequired(activity),
+        onAdOptions = { activity?.let(viewModel::showPrivacyOptions) },
         audio = audio,
         theme = theme,
         language = language,
@@ -108,6 +114,10 @@ internal fun SettingsContent(
     gameStyle: GameStylePrefs = GameStylePrefs(),
     onArcade: () -> Unit = {},
     onGameStyleStep: (StyleStep) -> Unit = {},
+    analyticsConsent: Boolean = false,
+    onAnalyticsConsent: (Boolean) -> Unit = {},
+    showAdOptions: Boolean = false,
+    onAdOptions: () -> Unit = {},
 ) {
     val colors = LogicMixTokens.colors
     Box(Modifier.fillMaxSize().background(colors.backgroundBrush)) {
@@ -150,6 +160,17 @@ internal fun SettingsContent(
                     ThemeTile(R.drawable.ic_theme_system, R.string.theme_system, theme == ThemeMode.SYSTEM, { onTheme(ThemeMode.SYSTEM) }, Modifier.weight(1f))
                     ThemeTile(R.drawable.ic_theme_light, R.string.theme_light, theme == ThemeMode.LIGHT, { onTheme(ThemeMode.LIGHT) }, Modifier.weight(1f))
                     ThemeTile(R.drawable.ic_theme_dark, R.string.theme_dark, theme == ThemeMode.DARK, { onTheme(ThemeMode.DARK) }, Modifier.weight(1f))
+                }
+            }
+
+            Section(stringResource(R.string.settings_section_privacy)) {
+                SwitchRow(R.drawable.ic_effects, stringResource(R.string.settings_analytics), stringResource(R.string.settings_analytics_desc), analyticsConsent, onAnalyticsConsent)
+                if (showAdOptions) {
+                    Text(
+                        stringResource(R.string.settings_ad_options),
+                        style = LogicMixTokens.typography.titleMedium, color = colors.gold,
+                        modifier = Modifier.fillMaxWidth().heightIn(min = LogicMixTokens.minTouchTarget).clickable(role = Role.Button, onClick = onAdOptions).wrapContentHeight(Alignment.CenterVertically),
+                    )
                 }
             }
 

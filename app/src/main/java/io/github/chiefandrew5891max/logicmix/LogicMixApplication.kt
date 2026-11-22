@@ -11,11 +11,13 @@ import javax.inject.Inject
 class LogicMixApplication : Application() {
     @Inject lateinit var music: MusicController
     @Inject lateinit var effects: SoundEffectsController
+    @Inject lateinit var monetization: io.github.chiefandrew5891max.logicmix.core.monetization.Monetization
 
     override fun onCreate() {
         super.onCreate()
         music.start()
         effects.start()
+        io.github.chiefandrew5891max.logicmix.core.monetization.AppServices.install(monetization)
         ContentSyncWorker.schedule(this)
     }
 }

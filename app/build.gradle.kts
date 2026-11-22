@@ -6,6 +6,19 @@ plugins {
     alias(libs.plugins.hilt)
 }
 
+// google-services.json принадлежит владельцу и не хранится в Git. Без файла приложение собирается,
+// а Firebase-обёртки работают как no-op.
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
+    apply(plugin = "com.google.firebase.crashlytics")
+}
+
+val admobAppId: String? = providers.gradleProperty("ADMOB_APP_ID").orNull
+val admobRewardedUnitId: String? = providers.gradleProperty("ADMOB_REWARDED_UNIT_ID").orNull
+// Официальные тестовые идентификаторы Google. Реальных production-ID в репозитории нет.
+val testAppId = "ca-app-pub-3940256099942544~3347511713"
+val testRewardedUnitId = "ca-app-pub-3940256099942544/5224354917"
+
 android {
     namespace = "io.github.chiefandrew5891max.logicmix"
     compileSdk = 36
@@ -20,8 +33,16 @@ android {
     }
 
     buildTypes {
+        debug {
+            manifestPlaceholders["admobAppId"] = testAppId
+            buildConfigField("String", "ADMOB_REWARDED_UNIT_ID", "\"$testRewardedUnitId\"")
+            buildConfigField("boolean", "ADS_TEST_MODE", "true")
+        }
         release {
             isMinifyEnabled = false
+            manifestPlaceholders["admobAppId"] = admobAppId ?: testAppId
+            buildConfigField("String", "ADMOB_REWARDED_UNIT_ID", "\"${admobRewardedUnitId ?: testRewardedUnitId}\"")
+            buildConfigField("boolean", "ADS_TEST_MODE", (admobAppId == null || admobRewardedUnitId == null).toString())
         }
     }
 
@@ -62,6 +83,12 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.work.runtime)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.config)
+    implementation(libs.play.services.ads)
+    implementation(libs.ump)
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.lifecycle.process)
     implementation(libs.hilt.android)
@@ -69,4 +96,15 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
     testImplementation("org.json:json:20240303")
+}
+
+// Релиз с тестовыми рекламными идентификаторами публиковать нельзя.
+tasks.configureEach {
+    if (name in setOf("assembleRelease", "bundleRelease", "packageRelease")) {
+        doFirst {
+            check(admobAppId != null && admobRewardedUnitId != null) {
+                "Release requires -PADMOB_APP_ID and -PADMOB_REWARDED_UNIT_ID (real AdMob IDs from the owner)."
+            }
+        }
+    }
 }

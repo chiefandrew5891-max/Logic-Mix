@@ -55,9 +55,11 @@ import io.github.chiefandrew5891max.logicmix.feature.wordsearch.WordSearchRoute
 class MainActivity : AppCompatActivity() {
     @Inject lateinit var settings: SettingsRepository
     @Inject lateinit var sfx: SoundEffectsController
+    @Inject lateinit var monetization: io.github.chiefandrew5891max.logicmix.core.monetization.Monetization
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (savedInstanceState == null) monetization.gatherConsent(this)
         setContent {
             val themeMode by settings.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
             val language by settings.language.collectAsState(initial = null)

@@ -299,4 +299,15 @@
     <string name="nl_h1_mixed">先把每个字母换成它的数。</string>
     <string name="nl_h2_mixed_br">然后先算括号，再算 × 和 ÷，最后算 + 和 −。</string>
     <string name="nl_h2_mixed">然后先算 × 和 ÷，最后算 + 和 −。</string>
+    <string name="settings_section_privacy">隐私</string>
+    <string name="settings_analytics">匿名分析</string>
+    <string name="settings_analytics_desc">分享匿名使用统计，帮助我们改进谜题。默认关闭。</string>
+    <string name="settings_ad_options">广告隐私选项</string>
+    <string name="ad_label">广告</string>
+    <string name="ad_offer_hint">观看一段短广告，获得一次额外提示</string>
+    <string name="ad_watch">观看广告</string>
+    <string name="ad_not_now">暂不</string>
+    <string name="ad_loading">正在加载广告…</string>
+    <string name="ad_unavailable">目前没有可用广告，请稍后再试。</string>
+    <string name="ad_failed">广告加载失败</string>
 </resources>

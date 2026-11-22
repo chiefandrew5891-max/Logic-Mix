@@ -299,4 +299,15 @@
     <string name="nl_h1_mixed">Empieza sustituyendo cada letra por su número.</string>
     <string name="nl_h2_mixed_br">Luego calcula primero los paréntesis, después × y ÷, y por último + y −.</string>
     <string name="nl_h2_mixed">Luego calcula primero × y ÷, y por último + y −.</string>
+    <string name="settings_section_privacy">Privacidad</string>
+    <string name="settings_analytics">Analítica anónima</string>
+    <string name="settings_analytics_desc">Ayuda a mejorar los acertijos compartiendo estadísticas de uso anónimas. Desactivado por defecto.</string>
+    <string name="settings_ad_options">Opciones de privacidad de anuncios</string>
+    <string name="ad_label">Anuncio</string>
+    <string name="ad_offer_hint">Mira un anuncio corto para obtener una pista extra</string>
+    <string name="ad_watch">Ver anuncio</string>
+    <string name="ad_not_now">Ahora no</string>
+    <string name="ad_loading">Cargando anuncio…</string>
+    <string name="ad_unavailable">No hay anuncios disponibles ahora. Inténtalo más tarde.</string>
+    <string name="ad_failed">No se pudo cargar el anuncio</string>
 </resources>

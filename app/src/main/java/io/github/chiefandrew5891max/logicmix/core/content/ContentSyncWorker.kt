@@ -27,11 +27,17 @@ class ContentSyncWorker(ctx: Context, params: WorkerParameters) : CoroutineWorke
     override suspend fun doWork(): Result {
         if (ContentSyncConfig.BASE_URL.isEmpty()) return Result.success()
         val dir = File(applicationContext.filesDir, "content")
-        val report = PackSync.sync(
-            fetch = ::download, store = PackStore(dir), channel = ContentSyncConfig.CHANNEL,
-            wanted = { it.language in ContentSyncConfig.wantedLanguages && it.type in ContentSyncConfig.wantedTypes },
-            freeBytes = { dir.apply { mkdirs() }.usableSpace },
-        )
+        val report = try {
+            PackSync.sync(
+                fetch = ::download, store = PackStore(dir), channel = ContentSyncConfig.CHANNEL,
+                wanted = { it.language in ContentSyncConfig.wantedLanguages && it.type in ContentSyncConfig.wantedTypes },
+                freeBytes = { dir.apply { mkdirs() }.usableSpace },
+            )
+        } catch (e: Exception) {
+            io.github.chiefandrew5891max.logicmix.core.monetization.AppServices.nonFatal(
+                io.github.chiefandrew5891max.logicmix.core.analytics.CrashKind.PACK_VALIDATION, e)
+            return Result.retry()
+        }
         return if (report.failed.isEmpty()) Result.success() else Result.retry()
     }
 

@@ -17,7 +17,12 @@ import kotlinx.coroutines.launch
 class SettingsViewModel @Inject constructor(
     private val repository: SettingsRepository,
     private val sfx: SoundEffectsController,
+    private val monetization: io.github.chiefandrew5891max.logicmix.core.monetization.Monetization,
 ) : ViewModel() {
+    val consent = monetization.consentState
+    fun setAnalyticsConsent(v: Boolean) = monetization.consent.setAnalytics(v)
+    fun privacyOptionsRequired(a: android.app.Activity) = monetization.privacyOptionsRequired(a)
+    fun showPrivacyOptions(a: android.app.Activity) = monetization.showPrivacyOptions(a)
     val audio = repository.audio
     val themeMode = repository.themeMode
     val language = repository.language

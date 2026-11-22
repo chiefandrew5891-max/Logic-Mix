@@ -299,4 +299,15 @@
     <string name="nl_h1_mixed">Commencez par remplacer chaque lettre par son nombre.</string>
     <string name="nl_h2_mixed_br">Calculez ensuite d\'abord les parenthèses, puis × et ÷, et enfin + et −.</string>
     <string name="nl_h2_mixed">Calculez ensuite d\'abord × et ÷, puis + et −.</string>
+    <string name="settings_section_privacy">Confidentialité</string>
+    <string name="settings_analytics">Analyses anonymes</string>
+    <string name="settings_analytics_desc">Aidez à améliorer les énigmes en partageant des statistiques d’utilisation anonymes. Désactivé par défaut.</string>
+    <string name="settings_ad_options">Options de confidentialité des annonces</string>
+    <string name="ad_label">Publicité</string>
+    <string name="ad_offer_hint">Regardez une courte publicité pour obtenir un indice supplémentaire</string>
+    <string name="ad_watch">Regarder la pub</string>
+    <string name="ad_not_now">Pas maintenant</string>
+    <string name="ad_loading">Chargement de la publicité…</string>
+    <string name="ad_unavailable">Aucune publicité disponible pour le moment. Réessayez plus tard.</string>
+    <string name="ad_failed">Échec du chargement de la publicité</string>
 </resources>
