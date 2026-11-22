@@ -1,0 +1,144 @@
+package io.github.chiefandrew5891max.logicmix.feature.crossword
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.chiefandrew5891max.logicmix.core.audio.Sfx
+import io.github.chiefandrew5891max.logicmix.core.audio.SoundEffectsController
+import io.github.chiefandrew5891max.logicmix.core.data.CategoryGames
+import io.github.chiefandrew5891max.logicmix.core.data.SettingsRepository
+import io.github.chiefandrew5891max.logicmix.core.locale.effectiveLanguage
+import io.github.chiefandrew5891max.logicmix.domain.content.ContentLanguage
+import io.github.chiefandrew5891max.logicmix.domain.crossword.CrosswordEntry
+import io.github.chiefandrew5891max.logicmix.domain.crossword.CrosswordGame
+import io.github.chiefandrew5891max.logicmix.domain.crossword.CrosswordPacks
+import io.github.chiefandrew5891max.logicmix.domain.crossword.CrosswordPuzzle
+import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+
+enum class CheckResult { NONE, MISTAKES, OK }
+
+data class CrosswordUiState(
+    val loading: Boolean = true,
+    val puzzles: List<CrosswordPuzzle> = emptyList(),
+    val language: ContentLanguage = ContentLanguage.EN,
+    val unsupported: Boolean = false,
+    val index: Int = 0,
+    val game: CrosswordGame? = null,
+    val check: CheckResult = CheckResult.NONE,
+    val allDone: Boolean = false,
+    val xpAwarded: Int = 0,
+)
+
+@HiltViewModel
+class CrosswordViewModel @Inject constructor(
+    private val games: CategoryGames,
+    private val settings: SettingsRepository,
+    private val sfx: SoundEffectsController,
+) : ViewModel() {
+    private val _state = MutableStateFlow(CrosswordUiState())
+    val state: StateFlow<CrosswordUiState> = _state.asStateFlow()
+    private var startedAt = System.currentTimeMillis()
+    private var key = KEY_PREFIX
+
+    init {
+        // The interface language picks the whole pack; progress is stored per language so packs never mix.
+        viewModelScope.launch {
+            settings.effectiveLanguage().distinctUntilChanged().collect { language ->
+                val content = ContentLanguage.forInterface(language)
+                val puzzles = CrosswordPacks.forLanguage(content)
+                key = "$KEY_PREFIX${content.tag}"
+                _state.value = CrosswordUiState(loading = false, puzzles = puzzles.orEmpty(), language = content, unsupported = puzzles == null)
+                if (puzzles != null) open(games.store.levelIndex(key))
+            }
+        }
+    }
+
+    private suspend fun open(index: Int) {
+        val puzzles = _state.value.puzzles
+        if (index >= puzzles.size) {
+            _state.update { it.copy(index = puzzles.size, game = null, allDone = true, xpAwarded = 0, check = CheckResult.NONE) }
+            return
+        }
+        val puzzle = puzzles[index]
+        val game = CrosswordGame.restore(puzzle, games.store.state(key, puzzle.id))
+        startedAt = System.currentTimeMillis()
+        _state.update { it.copy(index = index, game = game, allDone = false, xpAwarded = 0, check = CheckResult.NONE) }
+    }
+
+    private fun update(sound: Sfx? = null, check: CheckResult = CheckResult.NONE, change: (CrosswordGame) -> CrosswordGame) {
+        val game = _state.value.game ?: return
+        if (game.solved) return
+        val next = change(game)
+        if (next == game && check == CheckResult.NONE) return
+        sound?.let { sfx.play(it) }
+        _state.update { it.copy(game = next, check = check) }
+        if (next.solved) finish(next) else viewModelScope.launch { games.store.saveState(key, next.puzzle.id, next.encode()) }
+    }
+
+    fun selectCell(cell: Int) = update(Sfx.CARD_SELECT) { it.select(cell) }
+
+    fun selectEntry(entry: CrosswordEntry) = update(Sfx.CARD_SELECT) { it.selectEntry(entry) }
+
+    fun letter(ch: Char) = update(Sfx.LETTER_INPUT) { it.input(ch) }
+
+    fun delete() = update(Sfx.LETTER_DELETE) { it.delete() }
+
+    fun checkWord() = check { it.checkWord() }
+
+    fun checkAll() = check { it.checkAll() }
+
+    private fun check(change: (CrosswordGame) -> CrosswordGame) {
+        val game = _state.value.game ?: return
+        if (game.solved) return
+        val next = change(game)
+        val result = if (next.wrong.isEmpty()) CheckResult.OK else CheckResult.MISTAKES
+        sfx.play(if (result == CheckResult.OK) Sfx.WORD_FOUND else Sfx.WRONG)
+        _state.update { it.copy(game = next, check = result) }
+    }
+
+    fun hintLetter() = update(Sfx.HINT) { it.hintLetter() }
+
+    fun hintWord() = update(Sfx.HINT) { it.hintWord() }
+
+    fun restart() {
+        val game = _state.value.game ?: return
+        if (game.solved) return
+        val next = game.restart()
+        _state.update { it.copy(game = next, check = CheckResult.NONE) }
+        viewModelScope.launch { games.store.saveState(key, next.puzzle.id, next.encode()) }
+    }
+
+    private fun finish(game: CrosswordGame) {
+        viewModelScope.launch {
+            games.store.clearState(key, game.puzzle.id)
+            val result = games.complete(game.puzzle.id, startedAt, game.hintsUsed)
+            _state.update { it.copy(xpAwarded = result.xpAwarded) }
+            sfx.play(Sfx.CORRECT)
+            if (result.xpAwarded > 0) sfx.play(Sfx.XP_GAIN)
+            if (result.after.level > result.before.level) sfx.play(Sfx.LEVEL_UP)
+        }
+    }
+
+    fun next() {
+        viewModelScope.launch {
+            val index = _state.value.index + 1
+            games.store.setLevelIndex(key, index)
+            open(index)
+        }
+    }
+
+    fun playAgain() {
+        viewModelScope.launch {
+            games.store.setLevelIndex(key, 0)
+            open(0)
+        }
+    }
+
+    private companion object { const val KEY_PREFIX = "mini_crossword_" }
+}

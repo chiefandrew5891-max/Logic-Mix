@@ -100,20 +100,26 @@ fun LogicMixPlayerHeader(
     maxWidth: Dp = 560.dp,
 ) {
     val logoId = rememberDrawableId("logo_logic_mix_player")
+    var kickTick by remember { mutableStateOf(0) }
+    var kickForward by remember { mutableStateOf(true) }
     BoxWithConstraints(modifier.widthIn(max = maxWidth).fillMaxWidth().aspectRatio(LogoPlayerGeometry.ASPECT)) {
         val w = this.maxWidth
         val h = this.maxHeight
         if (logoId != 0) {
             Image(painterResource(logoId), logoLabel, Modifier.fillMaxWidth(), contentScale = ContentScale.Fit)
         }
+        if (logoId != 0) {
+            LogicMixNeonOverlay(logoId, kickTick, Modifier.matchParentSize())
+            LogicMixGarlandOverlay(playing, kickTick, kickForward, Modifier.matchParentSize())
+        }
         val slots = listOf(
-            Triple(LogoPlayerGeometry.previous, R.drawable.ic_music_prev, Triple(previousLabel, onPrevious, Teal)),
+            Triple(LogoPlayerGeometry.previous, R.drawable.ic_music_prev, Triple(previousLabel, { kickForward = false; kickTick++; onPrevious() }, Teal)),
             Triple(
                 LogoPlayerGeometry.playPause,
                 if (playing) R.drawable.ic_music_pause else R.drawable.ic_play,
                 Triple(playPauseLabel, onTogglePlayback, Gold),
             ),
-            Triple(LogoPlayerGeometry.next, R.drawable.ic_music_next, Triple(nextLabel, onNext, Teal)),
+            Triple(LogoPlayerGeometry.next, R.drawable.ic_music_next, Triple(nextLabel, { kickForward = true; kickTick++; onNext() }, Teal)),
         )
         if (onSettings != null) {
             val gear = LogoPlayerGeometry.settings

@@ -1,4 +1,4 @@
-# Image assets (11 PNG files)
+# Image assets (12 PNG files)
 
 The app builds and runs **without** these files: missing images are replaced by a Compose-drawn placeholder
 (and the text title on the home screen). Once a correctly named file is added and the app is rebuilt,
@@ -21,6 +21,7 @@ the real image is used automatically — no Kotlin changes are needed. Lookup is
 | Fillwords | `game_fillwords.png` |
 | Sudoku | `game_sudoku.png` |
 | Orb Lines | `game_orb_lines.png` |
+| Two Dots | `game_two_dots.png` |
 | Arcade style | `mode_arcade.png` |
 | Trainer style | `mode_trainer.png` |
 | Individual categories style | `mode_categories.png` |

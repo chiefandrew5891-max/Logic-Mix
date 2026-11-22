@@ -1,6 +1,24 @@
 package io.github.chiefandrew5891max.logicmix.core.designsystem
 
 import io.github.chiefandrew5891max.logicmix.core.audio.withTap
+import android.provider.Settings
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.window.Popup
+import kotlinx.coroutines.delay
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -144,9 +162,17 @@ fun TitleCapsule(text: String, modifier: Modifier = Modifier, highlighted: Boole
     }
 }
 
+const val CATEGORY_ICON_FRACTION = 0.84f
+const val CATEGORY_PRESS_SCALE = 0.965f
+private const val CATEGORY_PRESS_MS = 120
+private const val CATEGORY_HINT_MS = 1600L
+
 /**
- * Category card in the Career/Endless style (card gradient, teal border): illustration on top, plain title below. Use with weight(1f).fillMaxHeight() inside an IntrinsicSize.Min row to equalise heights.
+ * Square category tile (card gradient, teal border) showing only the 3D icon, centred with ContentScale.Fit.
+ * The title is not drawn: it is the TalkBack description and a hint popup on long press. Size comes from the parent
+ * width (weight(1f)); the 1:1 ratio gives the height. Pressing scales it to ~96.5% and brightens the border.
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CategoryCard(
     category: GameCategory,
@@ -158,26 +184,48 @@ fun CategoryCard(
 ) {
     val shape = RoundedCornerShape(20.dp)
     val colors = LogicMixTokens.colors
+    val context = LocalContext.current
+    val animated = remember {
+        Settings.Global.getFloat(context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) > 0f
+    }
+    val interaction = remember { MutableInteractionSource() }
+    val pressed by interaction.collectIsPressedAsState()
+    val spec = if (animated) tween<Float>(CATEGORY_PRESS_MS) else snap()
+    val scale by animateFloatAsState(if (pressed) CATEGORY_PRESS_SCALE else 1f, spec, label = "categoryScale")
+    val glow by animateFloatAsState(if (pressed) 1f else 0f, spec, label = "categoryBorder")
+    var hint by remember { mutableStateOf(false) }
+    LaunchedEffect(hint) { if (hint) { delay(CATEGORY_HINT_MS); hint = false } }
     val borderWidth = if (selected == true) 3.dp else 2.dp
-    Column(
+    val tap = withTap(onClick)
+    Box(
         modifier
+            .aspectRatio(1f)
+            .graphicsLayer { scaleX = scale; scaleY = scale }
             .clip(shape)
             .background(colors.cardBrush)
-            .border(BorderStroke(borderWidth, colors.cardBorder), shape)
-            .then(if (selected != null) Modifier.semantics { this.selected = selected } else Modifier)
-            .clickable(role = role, onClick = withTap(onClick))
-            .padding(LogicMixTokens.spacingS),
-        horizontalAlignment = Alignment.CenterHorizontally,
+            .border(BorderStroke(borderWidth, lerp(colors.cardBorder, Color.White, 0.4f * glow)), shape)
+            .semantics(mergeDescendants = true) {
+                contentDescription = title
+                if (selected != null) this.selected = selected
+            }
+            .combinedClickable(
+                interactionSource = interaction, indication = null, role = role,
+                onClick = tap, onLongClick = { hint = true }, onLongClickLabel = title,
+            ),
+        contentAlignment = Alignment.Center,
     ) {
-        AssetImage(category.imageName, Modifier.fillMaxWidth().aspectRatio(1f))
-        Spacer(Modifier.height(LogicMixTokens.spacingS))
-        Spacer(Modifier.weight(1f))
-        Text(
-            title,
-            style = LogicMixTokens.typography.titleMedium,
-            color = if (selected == true) colors.gold else MaterialTheme.colorScheme.onSurface,
-            textAlign = TextAlign.Center,
-        )
+        AssetImage(category.imageName, Modifier.fillMaxSize(CATEGORY_ICON_FRACTION))
+        if (hint) {
+            Popup(alignment = Alignment.TopCenter, onDismissRequest = { hint = false }) {
+                Text(
+                    title,
+                    Modifier.clip(RoundedCornerShape(12.dp)).background(colors.cardBorder).padding(horizontal = 10.dp, vertical = 6.dp),
+                    style = LogicMixTokens.typography.labelMedium,
+                    color = Color.Black,
+                    textAlign = TextAlign.Center,
+                )
+            }
+        }
     }
 }
 

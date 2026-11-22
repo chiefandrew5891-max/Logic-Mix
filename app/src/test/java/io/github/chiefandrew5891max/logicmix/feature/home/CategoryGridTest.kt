@@ -11,20 +11,22 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class CategoryGridTest {
-    @Test fun eightCategoriesInApprovedOrderUseThreeColumnsWithoutFiller() {
+    @Test fun nineCategoriesInApprovedOrderUseThreeColumnsWithoutFiller() {
         val all = CategoryAvailability.ordered(AppLanguage.ENGLISH)
         assertEquals(
-            listOf("MATCHSTICK", "NUMBER_SEQUENCE", "WORD_LOGIC", "MINI_CROSSWORD", "VISUAL_LOGIC", "WORD_SEARCH", "SUDOKU", "ORB_LINES"),
+            listOf("MATCHSTICK", "NUMBER_SEQUENCE", "WORD_LOGIC", "MINI_CROSSWORD", "VISUAL_LOGIC", "WORD_SEARCH", "SUDOKU", "ORB_LINES", "TWO_DOTS"),
             all.map { it.name },
         )
-        assertEquals(listOf(3, 3, 2), categoryRows(all).map { it.size })
+        assertEquals(listOf(3, 3, 3), categoryRows(all).map { it.size })
     }
 
-    @Test fun chineseHidesFillwordsAndOthersRemain() {
+    @Test fun chineseHidesLetterGamesAndOthersRemain() {
         val zh = CategoryAvailability.ordered(AppLanguage.CHINESE_SIMPLIFIED)
         assertTrue(GameCategory.WORD_SEARCH !in zh)
+        assertTrue(GameCategory.MINI_CROSSWORD !in zh)
         assertEquals(7, zh.size)
         assertEquals(listOf(3, 3, 1), categoryRows(zh).map { it.size })
+        assertTrue(GameCategory.MINI_CROSSWORD in CategoryAvailability.ordered(AppLanguage.UKRAINIAN))
         assertTrue(GameCategory.WORD_SEARCH in CategoryAvailability.ordered(AppLanguage.FRENCH))
     }
 
@@ -33,7 +35,7 @@ class CategoryGridTest {
         assertEquals(
             setOf(
                 "game_matchsticks", "game_number_sequences", "game_word_logic", "game_mini_crosswords",
-                "game_visual_logic", "game_fillwords", "game_sudoku", "game_orb_lines", "mode_arcade", "mode_trainer", "mode_categories",
+                "game_visual_logic", "game_fillwords", "game_sudoku", "game_orb_lines", "game_two_dots", "mode_arcade", "mode_trainer", "mode_categories",
             ),
             names.toSet(),
         )
@@ -51,5 +53,16 @@ class CategoryGridTest {
         val fill = single.copy(preferredCategory = GameCategory.WORD_SEARCH)
         val zh = CategoryAvailability.available(AppLanguage.CHINESE_SIMPLIFIED)
         assertEquals(StartTarget.Default, StartTarget.resolve(false, fill, zh))
+    }
+
+    @Test fun cardsAreSquareIconOnlyTilesWithAccessibleTitles() {
+        val card = java.io.File("src/main/java/io/github/chiefandrew5891max/logicmix/core/designsystem/NeonComponents.kt").readText()
+            .substringAfter("fun CategoryCard(").substringBefore("/** Wide card for a game style")
+        assertTrue(card.contains("aspectRatio(1f)") && card.contains("contentDescription = title") && card.contains("onLongClick"))
+        assertTrue(!card.contains("Text(\n                title") || card.contains("if (hint)"))
+        val grid = java.io.File("src/main/java/io/github/chiefandrew5891max/logicmix/feature/home/CategoryGrid.kt").readText()
+        assertTrue(!grid.contains("IntrinsicSize") && !grid.contains("fillMaxHeight"))
+        assertTrue(io.github.chiefandrew5891max.logicmix.core.designsystem.CATEGORY_ICON_FRACTION in 0.8f..0.85f)
+        assertTrue(io.github.chiefandrew5891max.logicmix.core.designsystem.CATEGORY_PRESS_SCALE in 0.96f..0.97f)
     }
 }

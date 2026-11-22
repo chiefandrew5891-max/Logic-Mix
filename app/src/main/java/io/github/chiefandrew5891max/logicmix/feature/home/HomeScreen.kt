@@ -13,6 +13,11 @@ import androidx.compose.ui.res.painterResource
 import io.github.chiefandrew5891max.logicmix.core.designsystem.rememberDrawableId
 import io.github.chiefandrew5891max.logicmix.core.designsystem.LogicMixPlayerHeader
 import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.layout.layout
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -141,6 +146,7 @@ fun HomeScreen(
             }
             SectionTitle(stringResource(R.string.home_categories_title))
             CategoryGrid(categories = GameCategory.entries.filter { it in state.categories }, onClick = onCategory)
+            BrandFooter()
         }
     }
 }
@@ -324,4 +330,27 @@ private fun CardSurface(
             .background(brush)
             .border(BorderStroke(CARD_BORDER, LogicMixTokens.colors.cardBorder), shape),
     ) { content() }
+}
+
+/** Copyright footer inside the scrolling content; the gap above it is half the height of one (square) category card. */
+@Composable
+private fun BrandFooter() {
+    val muted = MaterialTheme.colorScheme.onSurfaceVariant
+    // The parent column adds its own item spacing above and padding below; cancel them so only the gaps below remain.
+    BoxWithConstraints(
+        Modifier.fillMaxWidth().layout { measurable, constraints ->
+            val cut = LogicMixTokens.spacing.roundToPx()
+            val placeable = measurable.measure(constraints)
+            layout(placeable.width, (placeable.height - 2 * cut).coerceAtLeast(0)) { placeable.place(0, -cut) }
+        },
+    ) {
+        val card = (maxWidth - LogicMixTokens.spacingS * (CATEGORY_COLUMNS - 1)) / CATEGORY_COLUMNS
+        Column(
+            Modifier.fillMaxWidth().padding(top = card / 5).windowInsetsPadding(WindowInsets.navigationBars).padding(bottom = LogicMixTokens.spacingS),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text("© 2026 AKYneX studio™", color = muted.copy(alpha = 0.9f), fontSize = 12.sp, textAlign = TextAlign.Center)
+            Text(stringResource(R.string.footer_rights), color = muted.copy(alpha = 0.65f), fontSize = 11.sp, textAlign = TextAlign.Center)
+        }
+    }
 }
