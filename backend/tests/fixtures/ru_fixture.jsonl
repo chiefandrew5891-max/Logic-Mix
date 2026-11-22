@@ -1,0 +1,10 @@
+{"word": "яблоко", "pos": "noun", "definitions": ["Круглый плод, растущий на дереве."], "freq": 4.6, "categories": ["фрукты"], "relations": [["instance_of", "фрукт"]]}
+{"word": "река", "pos": "noun", "definitions": ["Большой естественный водный поток."], "freq": 5.0, "categories": ["география"]}
+{"word": "стол", "pos": "noun", "definitions": ["Предмет мебели с плоской поверхностью и ножками."], "freq": 5.2}
+{"word": "зелёный", "pos": "adj", "definitions": ["Цвета травы."], "freq": 4.9}
+{"word": "облако", "pos": "noun", "definitions": ["Видимое скопление капель воды в небе."], "freq": 4.4, "categories": ["погода"]}
+{"word": "ёлка", "pos": "noun", "definitions": ["Хвойное дерево."], "freq": 4.2}
+{"word": "hello", "pos": "noun", "definitions": ["Латиница в русском словаре — должна быть отклонена."]}
+{"word": "кот", "pos": "noun", "definitions": ["Домашнее животное семейства кошачьих."], "freq": 4.8}
+{"word": "сад", "pos": "noun", "definitions": ["Сад — это место с растениями."], "freq": 4.9}
+{"word": "ПТИЦА", "pos": "noun", "definitions": ["Позвоночное животное с перьями и крыльями."], "freq": 4.5}
