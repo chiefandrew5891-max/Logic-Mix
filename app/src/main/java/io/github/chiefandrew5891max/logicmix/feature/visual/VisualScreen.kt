@@ -42,6 +42,9 @@ import io.github.chiefandrew5891max.logicmix.core.designsystem.GameToolRow
 import io.github.chiefandrew5891max.logicmix.core.designsystem.LogicMixTokens
 import io.github.chiefandrew5891max.logicmix.core.designsystem.XpLine
 import io.github.chiefandrew5891max.logicmix.domain.visual.ShapeKind
+import io.github.chiefandrew5891max.logicmix.domain.visual.geo.Figure
+import io.github.chiefandrew5891max.logicmix.domain.visual.geo.GeoFamily
+import io.github.chiefandrew5891max.logicmix.domain.visual.geo.GeoGame
 import io.github.chiefandrew5891max.logicmix.domain.visual.Tile
 import io.github.chiefandrew5891max.logicmix.domain.visual.VisualRule
 import io.github.chiefandrew5891max.logicmix.feature.game.ActionButton
@@ -67,9 +70,9 @@ fun VisualRoute(onBack: () -> Unit, viewModel: VisualViewModel = hiltViewModel()
         GameHeader(
             title = stringResource(R.string.category_visual_logic),
             onBack = onBack,
-            subtitle = if (game != null) stringResource(R.string.cat_level, state.index + 1, state.total) else null,
+            subtitle = if (game != null || state.geo != null) stringResource(R.string.cat_level, state.index + 1, state.total) else null,
             onRestart = viewModel::restart,
-            restartEnabled = game != null && !game.solved,
+            restartEnabled = (game != null && !game.solved) || (state.geo != null && !state.geo.solved),
         )
         if (state.allDone) {
             Card {
@@ -78,6 +81,7 @@ fun VisualRoute(onBack: () -> Unit, viewModel: VisualViewModel = hiltViewModel()
             }
             ActionButton(stringResource(R.string.cat_play_again), viewModel::playAgain, filled = true)
         }
+        state.geo?.let { GeoContent(it, state.xpAwarded, viewModel::choose, viewModel::hint, viewModel::next) }
         if (game != null) {
             val puzzle = game.puzzle
             Text(stringResource(R.string.vl_prompt), style = LogicMixTokens.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
@@ -194,4 +198,109 @@ private fun arrowPath(c: Offset, s: Float) = Path().apply {
     lineTo(c.x - w, c.y)
     lineTo(c.x - s / 2, c.y)
     close()
+}
+
+private fun GeoFamily.prompt(): Int = when (this) {
+    GeoFamily.MATRIX -> R.string.vlg_matrix
+    GeoFamily.ROTATION -> R.string.vlg_rotation
+    GeoFamily.MIRROR -> R.string.vlg_mirror
+    GeoFamily.SILHOUETTE -> R.string.vlg_silhouette
+    GeoFamily.ABSTRACT -> R.string.vlg_abstract
+    GeoFamily.KEYHOLE -> R.string.vlg_keyhole
+    GeoFamily.FRAGMENT -> R.string.vlg_fragment
+    GeoFamily.SPATIAL -> R.string.vlg_spatial
+    GeoFamily.PAPER_FOLD -> R.string.vlg_fold
+    GeoFamily.CUBE_NET -> R.string.vlg_net
+    GeoFamily.COMPOSE -> R.string.vlg_compose
+    GeoFamily.ODD_ONE -> R.string.vlg_odd
+    GeoFamily.SEQUENCE -> R.string.vlg_sequence
+}
+
+@Composable
+private fun GeoContent(game: GeoGame, xp: Int, onChoose: (String) -> Unit, onHint: () -> Unit, onNext: () -> Unit) {
+    val puzzle = game.puzzle
+    Text(stringResource(puzzle.family.prompt()), style = LogicMixTokens.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+    if (puzzle.stimulus.isNotEmpty()) {
+        Card {
+            if (puzzle.badge.isNotEmpty()) {
+                Text(puzzle.badge, style = LogicMixTokens.typography.headlineMedium, color = LogicMixTokens.colors.gold, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+            }
+            val wide = puzzle.family == GeoFamily.SEQUENCE
+            Column(Modifier.widthIn(max = if (wide) 360.dp else 72.dp * puzzle.columns.coerceAtLeast(2)).fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingXs)) {
+                puzzle.stimulus.indices.chunked(puzzle.columns).forEach { row ->
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingXs)) {
+                        row.forEach { i ->
+                            val shown = if (i == puzzle.gapIndex) puzzle.stimulus[i].takeIf { game.solved } else puzzle.stimulus[i]
+                            GeoPanel(shown, Modifier.weight(1f))
+                        }
+                    }
+                }
+            }
+        }
+    }
+    puzzle.options.chunked(2).forEachIndexed { r, pair ->
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM)) {
+            pair.forEachIndexed { c, option ->
+                val id = puzzle.optionIds[r * 2 + c]
+                val choice = when {
+                    game.solved && id == puzzle.correctId -> ChoiceState.CORRECT
+                    id in game.wrong -> ChoiceState.WRONG
+                    id in game.eliminated || game.solved -> ChoiceState.DISABLED
+                    else -> ChoiceState.IDLE
+                }
+                ChoiceCard(choice, { onChoose(id) }, Modifier.weight(1f)) {
+                    FigureCanvas(option, Modifier.widthIn(max = 120.dp).fillMaxWidth().aspectRatio(1f))
+                }
+            }
+        }
+    }
+    if (game.solved) {
+        Card {
+            Text(stringResource(R.string.game_correct), style = LogicMixTokens.typography.headlineMedium, color = LogicMixTokens.colors.success, textAlign = TextAlign.Center)
+            XpLine(xp)
+        }
+        ActionButton(stringResource(R.string.game_next), onNext, filled = true)
+    } else {
+        GameToolRow(listOf(GameTool(stringResource(R.string.cat_hint), onHint)))
+    }
+}
+
+@Composable
+private fun GeoPanel(figure: Figure?, modifier: Modifier) {
+    Box(
+        modifier.aspectRatio(1f).clip(LogicMixTokens.radii.small)
+            .border(BorderStroke(1.dp, LogicMixTokens.colors.cardBorder), LogicMixTokens.radii.small)
+            .background(Color.White.copy(alpha = 0.06f)),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (figure != null) FigureCanvas(figure, Modifier.fillMaxWidth().aspectRatio(1f).padding(4.dp))
+        else Text("?", style = LogicMixTokens.typography.headlineMedium, color = LogicMixTokens.colors.gold)
+    }
+}
+
+/** Draws a [Figure] centred in a square, one rounded square per filled cell. Marker values use fixed colours. */
+@Composable
+private fun FigureCanvas(figure: Figure, modifier: Modifier = Modifier) {
+    val outline = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f)
+    val dark = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f)
+    Canvas(modifier) {
+        val cell = size.minDimension / maxOf(figure.w, figure.h)
+        val left = (size.width - cell * figure.w) / 2
+        val top = (size.height - cell * figure.h) / 2
+        val gap = cell * 0.06f
+        for (y in 0 until figure.h) for (x in 0 until figure.w) {
+            val v = figure[x, y]
+            if (v == 0) continue
+            val color = when (v) {
+                Figure.DARK -> dark
+                Figure.HIDDEN -> Color.Gray.copy(alpha = 0.35f)
+                else -> Palette[(v - 1).coerceIn(0, Palette.lastIndex)]
+            }
+            val tl = Offset(left + x * cell + gap, top + y * cell + gap)
+            val sz = Size(cell - 2 * gap, cell - 2 * gap)
+            drawRoundRect(if (v == Figure.HOLE) Palette[0] else color, tl, sz, CornerRadius(cell * 0.12f))
+            drawRoundRect(outline, tl, sz, CornerRadius(cell * 0.12f), style = Stroke(width = cell * 0.04f))
+            if (v == Figure.HOLE) drawCircle(dark, sz.minDimension * 0.3f, Offset(tl.x + sz.width / 2, tl.y + sz.height / 2))
+        }
+    }
 }

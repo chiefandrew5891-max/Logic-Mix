@@ -7,7 +7,9 @@ import io.github.chiefandrew5891max.logicmix.core.audio.Sfx
 import io.github.chiefandrew5891max.logicmix.core.audio.SoundEffectsController
 import io.github.chiefandrew5891max.logicmix.core.data.CategoryGames
 import io.github.chiefandrew5891max.logicmix.domain.visual.VisualGame
-import io.github.chiefandrew5891max.logicmix.domain.visual.VisualPacks
+import io.github.chiefandrew5891max.logicmix.domain.visual.geo.GeoGame
+import io.github.chiefandrew5891max.logicmix.domain.visual.geo.VisualCareer
+import io.github.chiefandrew5891max.logicmix.domain.visual.geo.VisualLevel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,9 +19,10 @@ import kotlinx.coroutines.launch
 
 data class VisualUiState(
     val loading: Boolean = true,
-    val total: Int = VisualPacks.all.size,
+    val total: Int = VisualCareer.total,
     val index: Int = 0,
     val game: VisualGame? = null,
+    val geo: GeoGame? = null,
     val allDone: Boolean = false,
     val xpAwarded: Int = 0,
 )
@@ -29,7 +32,6 @@ class VisualViewModel @Inject constructor(
     private val games: CategoryGames,
     private val sfx: SoundEffectsController,
 ) : ViewModel() {
-    private val puzzles = VisualPacks.all
     private val _state = MutableStateFlow(VisualUiState())
     val state: StateFlow<VisualUiState> = _state.asStateFlow()
     private var startedAt = System.currentTimeMillis()
@@ -39,20 +41,29 @@ class VisualViewModel @Inject constructor(
     }
 
     private suspend fun open(index: Int) {
-        if (index >= puzzles.size) {
-            _state.value = VisualUiState(loading = false, index = puzzles.size, allDone = true)
+        val level = VisualCareer.levelAt(index)
+        if (level == null) {
+            _state.value = VisualUiState(loading = false, index = VisualCareer.total, allDone = true)
             return
         }
-        val puzzle = puzzles[index]
         startedAt = System.currentTimeMillis()
-        _state.value = VisualUiState(loading = false, index = index, game = VisualGame.restore(puzzle, games.store.state(KEY, puzzle.id)))
+        val saved = games.store.state(KEY, level.id)
+        _state.value = when (level) {
+            is VisualLevel.Classic -> VisualUiState(loading = false, index = index, game = VisualGame.restore(level.puzzle, saved))
+            is VisualLevel.Generated -> VisualUiState(loading = false, index = index, geo = GeoGame.restore(level.puzzle, saved))
+        }
     }
 
     private fun persist(game: VisualGame) {
         viewModelScope.launch { games.store.saveState(KEY, game.puzzle.id, game.encode()) }
     }
 
+    private fun persist(game: GeoGame) {
+        viewModelScope.launch { games.store.saveState(KEY, game.puzzle.id, game.encode()) }
+    }
+
     fun choose(optionId: String) {
+        _state.value.geo?.let { return chooseGeo(it, optionId) }
         val game = _state.value.game ?: return
         val next = game.choose(optionId)
         if (next === game) return
@@ -65,6 +76,7 @@ class VisualViewModel @Inject constructor(
     }
 
     fun hint() {
+        _state.value.geo?.let { return hintGeo(it) }
         val game = _state.value.game ?: return
         val next = game.hint()
         if (next === game) return
@@ -74,6 +86,7 @@ class VisualViewModel @Inject constructor(
     }
 
     fun restart() {
+        _state.value.geo?.let { return restartGeo(it) }
         val game = _state.value.game ?: return
         if (game.solved) return
         val next = game.restart()
@@ -81,10 +94,38 @@ class VisualViewModel @Inject constructor(
         persist(next)
     }
 
-    private fun finish(game: VisualGame) {
+    private fun chooseGeo(game: GeoGame, optionId: String) {
+        val next = game.choose(optionId)
+        if (next === game) return
+        sfx.play(Sfx.CARD_SELECT)
+        _state.update { it.copy(geo = next) }
+        if (next.solved) finish(next.puzzle.id, next.hintsUsed) else {
+            sfx.play(Sfx.WRONG)
+            persist(next)
+        }
+    }
+
+    private fun hintGeo(game: GeoGame) {
+        val next = game.hint()
+        if (next === game) return
+        sfx.play(Sfx.HINT)
+        _state.update { it.copy(geo = next) }
+        persist(next)
+    }
+
+    private fun restartGeo(game: GeoGame) {
+        if (game.solved) return
+        val next = game.restart()
+        _state.update { it.copy(geo = next) }
+        persist(next)
+    }
+
+    private fun finish(game: VisualGame) = finish(game.puzzle.id, game.hintsUsed)
+
+    private fun finish(puzzleId: String, hintsUsed: Int) {
         viewModelScope.launch {
-            games.store.clearState(KEY, game.puzzle.id)
-            val result = games.complete(game.puzzle.id, startedAt, game.hintsUsed)
+            games.store.clearState(KEY, puzzleId)
+            val result = games.complete(puzzleId, startedAt, hintsUsed)
             _state.update { it.copy(xpAwarded = result.xpAwarded) }
             sfx.play(Sfx.CORRECT)
             if (result.xpAwarded > 0) sfx.play(Sfx.XP_GAIN)
