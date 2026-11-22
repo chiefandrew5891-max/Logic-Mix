@@ -66,13 +66,14 @@ private fun VisualRule.hint(): Int = when (this) {
 fun VisualRoute(onBack: () -> Unit, viewModel: VisualViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsState()
     val game = state.game
+    val geoState = state.geo
     CategoryScaffold {
         GameHeader(
             title = stringResource(R.string.category_visual_logic),
             onBack = onBack,
             subtitle = if (game != null || state.geo != null) stringResource(R.string.cat_level, state.index + 1, state.total) else null,
             onRestart = viewModel::restart,
-            restartEnabled = (game != null && !game.solved) || (state.geo != null && !state.geo.solved),
+            restartEnabled = (game != null && !game.solved) || (geoState != null && !geoState.solved),
         )
         if (state.allDone) {
             Card {
