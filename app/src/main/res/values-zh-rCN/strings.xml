@@ -355,4 +355,8 @@
         <item quantity="other">消除 %1$d 条线 — %2$d/%1$d</item>
     </plurals>
     <string name="arcade_goal_score">目标：获得 %1$d 分 — %2$d/%1$d</string>
+    <string name="player_level_up_title">等级提升！</string>
+    <string name="xp_gain_compact">+%1$d XP</string>
+    <string name="xp_gain_none">没有新的经验</string>
+    <string name="arcade_points_compact">+%1$d 分</string>
 </resources>

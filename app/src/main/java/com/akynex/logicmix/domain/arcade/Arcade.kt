@@ -63,6 +63,8 @@ data class StageReport(
     val mistakes: Int,
     val durationMs: Long,
     val difficultyTier: Int? = null,
+    /** Player XP the finished puzzle paid into the shared ledger (0 for a repeat). */
+    val xp: Int = 0,
 )
 
 data class StageAward(val base: Int, val difficultyBonus: Int, val noHintBonus: Int, val streakBonus: Int) {

@@ -1,5 +1,6 @@
 package com.akynex.logicmix.feature.orb
 
+import com.akynex.logicmix.domain.content.GameCategory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -165,13 +166,12 @@ class OrbViewModel @Inject constructor(
             progress.ensureProgress(profileId)
             val result = progress.recordAttempt(
                 profileId, "orb-$seed", GameMode.CAREER, AttemptOutcome.CORRECT,
-                startedAt, System.currentTimeMillis(), game.hintsUsed,
+                startedAt, System.currentTimeMillis(), game.hintsUsed, GameCategory.ORB_LINES,
             )
             _state.update { it.copy(xpAwarded = result.xpAwarded) }
             analytics.completed(result.xpAwarded)
             if (result.xpAwarded > 0) {
                 sfx.play(Sfx.XP_GAIN)
-                if (result.after.level > result.before.level) sfx.play(Sfx.LEVEL_UP)
             }
         }
     }

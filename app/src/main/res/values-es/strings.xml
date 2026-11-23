@@ -357,4 +357,8 @@
         <item quantity="other">Forma %1$d líneas — %2$d/%1$d</item>
     </plurals>
     <string name="arcade_goal_score">Objetivo: lograr %1$d puntos — %2$d/%1$d</string>
+    <string name="player_level_up_title">¡NUEVO NIVEL!</string>
+    <string name="xp_gain_compact">+%1$d XP</string>
+    <string name="xp_gain_none">Sin XP nuevo</string>
+    <string name="arcade_points_compact">+%1$d puntos</string>
 </resources>

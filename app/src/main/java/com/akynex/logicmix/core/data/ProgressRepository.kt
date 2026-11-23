@@ -6,11 +6,14 @@ import com.akynex.logicmix.core.database.LogicMixDatabase
 import com.akynex.logicmix.core.database.ProgressEntity
 import com.akynex.logicmix.core.database.SolvedPuzzleEntity
 import com.akynex.logicmix.core.database.XpTransactionEntity
+import com.akynex.logicmix.domain.arcade.ArcadeRules
+import com.akynex.logicmix.domain.content.GameCategory
 import com.akynex.logicmix.domain.game.AttemptOutcome
 import com.akynex.logicmix.domain.game.GameMode
 import com.akynex.logicmix.domain.progression.AttemptResult
 import com.akynex.logicmix.domain.progression.PlayerProgress
 import com.akynex.logicmix.domain.progression.Progression
+import com.akynex.logicmix.domain.progression.XpConfig
 import com.akynex.logicmix.domain.progression.XpReason
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
@@ -62,6 +65,8 @@ class ProgressRepository internal constructor(
         startedAt: Long,
         finishedAt: Long,
         hintsUsed: Int,
+        category: GameCategory? = null,
+        difficulty: String? = null,
     ): AttemptResult {
         require(profileId.isNotBlank()) { "profileId is blank" }
         require(puzzleId.isNotBlank()) { "puzzleId is blank" }
@@ -86,7 +91,12 @@ class ProgressRepository internal constructor(
                 return@withTransaction noAward
             }
 
-            val award = Progression.awardFor(hintsUsed)
+            val tier = category?.let { ArcadeRules.tierOf(it, difficulty) } ?: 0
+            val full = Progression.awardFor(category, tier, hintsUsed)
+            // Endless games pay a limited number of confirmed results per rolling day; the solve itself is still recorded.
+            val capped = XpConfig.isEndless(category) &&
+                xpDao.countPaid(profileId, XpReason.FIRST_SOLVE, puzzleId.substringBefore('-') + "-", now() - XpConfig.DAY_MS) >= XpConfig.ENDLESS_DAILY_CAP
+            val award = if (capped) com.akynex.logicmix.domain.progression.XpAward(0, 0) else full
             val inserted = solvedDao.insertIfAbsent(
                 SolvedPuzzleEntity(profileId, puzzleId, solvedAt = finishedAt, hintsUsed = hintsUsed, firstSolveXp = award.total),
             )
@@ -120,15 +130,41 @@ class ProgressRepository internal constructor(
         if (amount == 0) return 0
         return database.withTransaction {
             val timestamp = now()
+            val paid = xpDao.sumFor(profileId, XpReason.EXTRA_WORD, levelId)
+            val grant = minOf(amount, (XpConfig.EXTRA_WORD_LEVEL_CAP - paid).coerceAtLeast(0))
+            if (grant == 0) return@withTransaction 0
             val inserted = xpDao.insertIfAbsent(
                 XpTransactionEntity(
                     id = "$profileId:$levelId:${XpReason.EXTRA_WORD.name}:${word.uppercase()}",
                     profileId = profileId,
                     puzzleId = levelId,
-                    amount = amount,
+                    amount = grant,
                     reason = XpReason.EXTRA_WORD,
                     createdAt = timestamp,
                 ),
+            )
+            if (inserted == -1L) return@withTransaction 0
+            val existing = progressDao.get(profileId)
+            val after = PlayerProgress.fromTotalXp((existing?.totalXp ?: 0) + grant)
+            progressDao.upsert(
+                ProgressEntity(profileId, after.level, after.totalXp, streak = existing?.streak ?: 0, updatedAt = timestamp),
+            )
+            grant
+        }
+    }
+
+    /**
+     * Generic one-time XP grant (for example a rewarded ad). [key] is the dedup key: the same key never pays twice,
+     * also after a restart, and goes through the same ledger and total as puzzle XP.
+     */
+    suspend fun awardOnce(profileId: String, key: String, amount: Int, reason: XpReason = XpReason.AD_REWARD): Int {
+        require(amount >= 0) { "amount must not be negative" }
+        require(key.isNotBlank()) { "key is blank" }
+        if (amount == 0) return 0
+        return database.withTransaction {
+            val timestamp = now()
+            val inserted = xpDao.insertIfAbsent(
+                XpTransactionEntity("$profileId:$key:${reason.name}", profileId, key, amount, reason, timestamp),
             )
             if (inserted == -1L) return@withTransaction 0
             val existing = progressDao.get(profileId)

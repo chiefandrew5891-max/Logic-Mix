@@ -113,7 +113,7 @@ class WordLogicViewModel @Inject constructor(
     private fun finish(game: WordLogicGame) {
         viewModelScope.launch {
             games.store.clearState(KEY, game.puzzle.id)
-            val result = games.complete(game.puzzle.id, startedAt, game.hintsUsed)
+            val result = games.complete(game.puzzle.id, startedAt, game.hintsUsed, GameCategory.WORD_LOGIC, game.puzzle.difficulty.toString())
             // Same effect as the Next button, so the following Arcade stage gets a new puzzle.
             val served = _state.value.index
             if (arcade != null && games.store.levelIndex(KEY) == served) games.store.setLevelIndex(KEY, served + 1)
@@ -121,7 +121,6 @@ class WordLogicViewModel @Inject constructor(
             analytics.completed(result.xpAwarded)
             sfx.play(Sfx.CORRECT)
             if (result.xpAwarded > 0) sfx.play(Sfx.XP_GAIN)
-            if (result.after.level > result.before.level) sfx.play(Sfx.LEVEL_UP)
         }
     }
 

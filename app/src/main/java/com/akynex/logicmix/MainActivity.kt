@@ -69,7 +69,10 @@ class MainActivity : AppCompatActivity() {
             LogicMixTheme(themeMode) {
                 val gameStyle by settings.gameStyle.collectAsState(initial = null)
                 CompositionLocalProvider(LocalUiFeedback provides sfx) {
-                    LogicMixNavigation(rememberNavController(), gameStyle, sfx)
+                    androidx.compose.foundation.layout.Box {
+                        LogicMixNavigation(rememberNavController(), gameStyle, sfx)
+                        com.akynex.logicmix.feature.levelup.LevelUpHost()
+                    }
                 }
             }
         }

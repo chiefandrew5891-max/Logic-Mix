@@ -78,7 +78,7 @@ fun ArcadeRoute(onBack: () -> Unit, onEditCategories: () -> Unit, viewModel: Arc
                 if (run.outcome == com.akynex.logicmix.domain.arcade.StageOutcome.NONE) StageContent(stage, leave)
             }
         }
-        state.celebration?.let { ArcadeCelebration(it, viewModel) }
+        state.celebration?.let { ArcadeResultToast(it, viewModel) }
     }
 }
 

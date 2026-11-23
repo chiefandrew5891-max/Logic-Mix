@@ -1,5 +1,6 @@
 package com.akynex.logicmix.core.data
 
+import com.akynex.logicmix.domain.content.GameCategory
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -60,9 +61,9 @@ class CategoryGames @Inject constructor(
         return progress.solvedPuzzleIds(profileId).toSet()
     }
 
-    suspend fun complete(puzzleId: String, startedAt: Long, hintsUsed: Int): AttemptResult {
+    suspend fun complete(puzzleId: String, startedAt: Long, hintsUsed: Int, category: GameCategory? = null, difficulty: String? = null): AttemptResult {
         profiles.ensureProfile()
         progress.ensureProgress(profileId)
-        return progress.recordAttempt(profileId, puzzleId, GameMode.CAREER, AttemptOutcome.CORRECT, startedAt, System.currentTimeMillis(), hintsUsed)
+        return progress.recordAttempt(profileId, puzzleId, GameMode.CAREER, AttemptOutcome.CORRECT, startedAt, System.currentTimeMillis(), hintsUsed, category, difficulty)
     }
 }

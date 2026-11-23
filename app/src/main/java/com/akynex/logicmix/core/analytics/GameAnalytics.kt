@@ -74,12 +74,18 @@ class GameAnalytics(
         cur = null
         val attempts = (a.attempts + 1).toLong()
         val duration = (clock() - a.startedAt).coerceAtLeast(0)
-        onCompleted(StageReport(a.ctx.category, a.hints, a.attempts, duration, ArcadeRules.tierOf(a.ctx.category, a.ctx.difficulty)))
+        onCompleted(StageReport(a.ctx.category, a.hints, a.attempts, duration, ArcadeRules.tierOf(a.ctx.category, a.ctx.difficulty), xp))
         log(Ev.PUZZLE_COMPLETE, a.ctx, mapOf(
             P.DURATION_MS to (clock() - a.startedAt).coerceAtLeast(0), P.ATTEMPT_COUNT to attempts,
             P.HINT_COUNT to a.hints.toLong(), P.RESULT to PuzzleResult.SOLVED.key,
         ))
-        if (xp > 0) log(Ev.XP_EARNED, a.ctx, mapOf(P.XP to xp.toLong()))
+        if (xp > 0) log(Ev.XP_EARNED, a.ctx, mapOf(P.XP to xp.toLong(), P.XP_SOURCE to "puzzle"))
+    }
+
+    /** XP that does not come from finishing a puzzle (bonus words): xp_earned with its own source. */
+    fun bonusXp(xp: Int, source: String) {
+        val ctx = cur?.ctx ?: sessionCtx ?: return
+        if (xp > 0) log(Ev.XP_EARNED, ctx, mapOf(P.XP to xp.toLong(), P.XP_SOURCE to source))
     }
 
     fun skipped() {

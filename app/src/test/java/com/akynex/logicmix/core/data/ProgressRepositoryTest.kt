@@ -10,11 +10,13 @@ import com.akynex.logicmix.core.database.LogicMixDatabase
 import com.akynex.logicmix.core.database.LogicMixMigrations
 import com.akynex.logicmix.core.database.Profile
 import com.akynex.logicmix.core.database.XpTransactionEntity
+import com.akynex.logicmix.domain.content.GameCategory
 import com.akynex.logicmix.domain.game.AttemptOutcome
 import com.akynex.logicmix.domain.game.GameMode
 import com.akynex.logicmix.domain.progression.LevelProgress
 import com.akynex.logicmix.domain.progression.PlayerProgress
 import com.akynex.logicmix.domain.progression.Progression
+import com.akynex.logicmix.domain.progression.XpConfig
 import com.akynex.logicmix.domain.progression.XpReason
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -240,6 +242,42 @@ class ProgressRepositoryTest {
         val migratedRepo = ProgressRepository(migrated) { 1_000L }
         assertEquals(25, solve("p1", repository = migratedRepo).xpAwarded)
         migrated.close()
+    }
+
+    private fun solveIn(category: GameCategory, puzzle: String, hints: Int = 0, difficulty: String? = null) =
+        runBlocking { repo.recordAttempt(pid, puzzle, GameMode.CAREER, AttemptOutcome.CORRECT, 100L, 600L, hints, category, difficulty) }
+
+    @Test
+    fun xpDependsOnCategoryDifficultyAndHints() {
+        assertEquals(30, solveIn(GameCategory.SUDOKU, "s1").xpAwarded) // 25 + no-hint 5
+        assertEquals(35, solveIn(GameCategory.NUMBER_SEQUENCE, "n1", difficulty = "3").xpAwarded) // 20 + 5 medium + 5
+        assertEquals(30, solveIn(GameCategory.NUMBER_SEQUENCE, "n2", hints = 1, difficulty = "5").xpAwarded) // 20 + 10 hard
+        assertEquals(0, solveIn(GameCategory.NUMBER_SEQUENCE, "n1", difficulty = "3").xpAwarded) // repeat pays nothing
+    }
+
+    @Test
+    fun endlessGamesPayOnlyUpToTheDailyCapButStillRecordTheSolve() {
+        val paid = (1..XpConfig.ENDLESS_DAILY_CAP + 2).map { solveIn(GameCategory.ORB_LINES, "orb-$it").xpAwarded }
+        assertTrue(paid.take(XpConfig.ENDLESS_DAILY_CAP).all { it > 0 })
+        assertTrue(paid.drop(XpConfig.ENDLESS_DAILY_CAP).all { it == 0 })
+        // The cap is per game family: Two Dots is unaffected.
+        assertTrue(solveIn(GameCategory.TWO_DOTS, "twodots-classic-1").xpAwarded > 0)
+    }
+
+    @Test
+    fun extraWordBonusesAreCappedPerLevelAndPaidOnce() {
+        val words = listOf("A1", "B2", "C3", "D4", "E5", "F6", "G7")
+        val paid = words.map { runBlocking { repo.awardExtraWord(pid, "ws-1", it, XpConfig.EXTRA_WORD_XP) } }
+        assertEquals(XpConfig.EXTRA_WORD_LEVEL_CAP, paid.sum())
+        assertEquals(0, runBlocking { repo.awardExtraWord(pid, "ws-1", "A1", XpConfig.EXTRA_WORD_XP) })
+    }
+
+    @Test
+    fun awardOnceNeverPaysTheSameKeyTwiceAndSharesTheTotal() {
+        assertEquals(50, runBlocking { repo.awardOnce(pid, "ad-1", 50) })
+        assertEquals(0, runBlocking { repo.awardOnce(pid, "ad-1", 50) })
+        solveIn(GameCategory.MATCHSTICK, "m1") // 25
+        assertEquals(75, runBlocking { repo.getProgress(pid).totalXp })
     }
 
     private companion object {

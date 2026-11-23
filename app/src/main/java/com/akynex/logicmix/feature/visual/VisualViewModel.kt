@@ -147,7 +147,7 @@ class VisualViewModel @Inject constructor(
     private fun finish(puzzleId: String, hintsUsed: Int) {
         viewModelScope.launch {
             games.store.clearState(KEY, puzzleId)
-            val result = games.complete(puzzleId, startedAt, hintsUsed)
+            val result = games.complete(puzzleId, startedAt, hintsUsed, GameCategory.VISUAL_LOGIC)
             // Same effect as the Next button, so the following Arcade stage gets a new puzzle.
             val served = _state.value.index
             if (arcade != null && games.store.levelIndex(KEY) == served) games.store.setLevelIndex(KEY, served + 1)
@@ -155,7 +155,6 @@ class VisualViewModel @Inject constructor(
             analytics.completed(result.xpAwarded)
             sfx.play(Sfx.CORRECT)
             if (result.xpAwarded > 0) sfx.play(Sfx.XP_GAIN)
-            if (result.after.level > result.before.level) sfx.play(Sfx.LEVEL_UP)
         }
     }
 

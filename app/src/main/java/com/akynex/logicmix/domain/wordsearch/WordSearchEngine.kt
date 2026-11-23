@@ -365,5 +365,5 @@ object WordSearchLevels {
 /** Reward settings of the word search. The extra-word bonus is a temporary value pending approval of the final rule. */
 object WordSearchRewards {
     const val MAX_HINTS = 3
-    const val EXTRA_WORD_XP = 2
+    const val EXTRA_WORD_XP = com.akynex.logicmix.domain.progression.XpConfig.EXTRA_WORD_XP
 }

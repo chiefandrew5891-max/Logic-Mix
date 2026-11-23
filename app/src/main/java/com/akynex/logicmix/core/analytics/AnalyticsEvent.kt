@@ -35,6 +35,7 @@ object Ev {
     const val GAME_MODE_SELECT = "game_mode_select"
     const val LEVEL_RESTART = "level_restart"
     const val XP_EARNED = "xp_earned"
+    const val PLAYER_LEVEL_UP = "player_level_up"
     const val SESSION_END = "session_end"
 
     val game = setOf(
@@ -59,6 +60,9 @@ object P {
     const val IS_RESUME = "is_resume"
     const val EXIT_REASON = "exit_reason"
     const val XP = "xp"
+    const val XP_SOURCE = "xp_source"
+    const val PLAYER_LEVEL = "player_level"
+    const val TOTAL_XP = "total_xp"
     const val PUZZLES_PLAYED = "puzzles_played"
 }
 

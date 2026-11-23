@@ -1,5 +1,6 @@
 package com.akynex.logicmix.core.database
 
+import com.akynex.logicmix.domain.progression.XpReason
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -59,6 +60,13 @@ interface XpTransactionDao {
 
     @Query("SELECT COALESCE(SUM(amount), 0) FROM xp_transactions WHERE profileId = :profileId")
     suspend fun totalAmount(profileId: String): Int
+
+    // Paid transactions of one reason for puzzle ids starting with [prefix], optionally only since a time (rolling caps).
+    @Query("SELECT COUNT(*) FROM xp_transactions WHERE profileId = :profileId AND reason = :reason AND puzzleId LIKE :prefix || '%' AND createdAt >= :since AND amount > 0")
+    suspend fun countPaid(profileId: String, reason: XpReason, prefix: String, since: Long): Int
+
+    @Query("SELECT COALESCE(SUM(amount), 0) FROM xp_transactions WHERE profileId = :profileId AND reason = :reason AND puzzleId = :puzzleId")
+    suspend fun sumFor(profileId: String, reason: XpReason, puzzleId: String): Int
 
     @Query("SELECT COUNT(*) FROM xp_transactions WHERE profileId = :profileId")
     suspend fun count(profileId: String): Int

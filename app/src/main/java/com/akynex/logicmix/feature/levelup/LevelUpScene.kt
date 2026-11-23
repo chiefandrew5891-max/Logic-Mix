@@ -1,4 +1,4 @@
-package com.akynex.logicmix.feature.arcade
+package com.akynex.logicmix.feature.levelup
 
 import android.provider.Settings
 import androidx.compose.animation.core.Animatable
@@ -33,7 +33,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.akynex.logicmix.R
 import com.akynex.logicmix.core.designsystem.LogicMixTokens
-import com.akynex.logicmix.domain.arcade.ArcadeAchievement
+import com.akynex.logicmix.core.data.LevelUpEvent
+import com.akynex.logicmix.feature.arcade.TitleFont
+import com.akynex.logicmix.feature.arcade.VictoryVariant
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.offset
@@ -84,53 +86,46 @@ private const val REDUCED_MS = 1800
 private const val GRAVITY = 1.7f
 
 /**
- * Victory scene: the artwork pops in, two horns shoot confetti/sparks/stars that fall under gravity, the localized
- * title is fitted into the empty ribbon and the matching WAV starts with the animation (see ArcadeViewModel).
- * The reward is already booked before this overlay appears, so skipping (tap) or re-composition never re-awards it.
+ * Player Level Up scene: the artwork pops in, two horns shoot confetti/sparks/stars that fall under gravity, the localized
+ * "LEVEL UP!" title is fitted into the empty ribbon and the player's new level is shown below it. The matching WAV is started
+ * by [onShown] together with the animation. Only [LevelUpHost] shows it, and only for a new player level.
  */
 @Composable
-fun ArcadeCelebration(c: Celebration, viewModel: ArcadeViewModel) {
+fun LevelUpScene(event: LevelUpEvent, variant: VictoryVariant, onShown: suspend () -> Unit, onDone: () -> Unit) {
     val context = LocalContext.current
     val reduced = remember { Settings.Global.getFloat(context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f }
-    val progress = remember(c.id) { Animatable(0f) }
-    val pop = remember(c.id) { Animatable(if (reduced) 1f else 0f) }
-    val points = remember(c.id) { Animatable(0f) }
-    LaunchedEffect(c.id) { viewModel.playCelebrationSounds(c) }
-    LaunchedEffect(c.id) { if (!reduced) pop.animateTo(1f, spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow)) }
+    val id = event.id
+    val progress = remember(id) { Animatable(0f) }
+    val pop = remember(id) { Animatable(if (reduced) 1f else 0f) }
+    LaunchedEffect(id) { onShown() }
+    LaunchedEffect(id) { if (!reduced) pop.animateTo(1f, spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow)) }
     // The title fades in after the artwork has popped, swells a little and settles.
-    val titleAlpha = remember(c.id) { Animatable(if (reduced) 1f else 0f) }
-    val titleScale = remember(c.id) { Animatable(if (reduced) 1f else 0.8f) }
-    LaunchedEffect(c.id) {
+    val titleAlpha = remember(id) { Animatable(if (reduced) 1f else 0f) }
+    val titleScale = remember(id) { Animatable(if (reduced) 1f else 0.8f) }
+    LaunchedEffect(id) {
         if (reduced) return@LaunchedEffect
         delay(300)
         launch { titleAlpha.animateTo(1f, tween(350)) }
         titleScale.animateTo(1.08f, tween(300))
         titleScale.animateTo(1f, spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium))
     }
-    LaunchedEffect(c.id) { points.animateTo(c.award.toFloat(), tween(if (reduced) 1 else 900)) }
-    LaunchedEffect(c.id) {
-        val ms = if (reduced) REDUCED_MS else if (c.levelUp) SCENE_MS + 600 else SCENE_MS
-        progress.animateTo(1f, tween(ms, easing = LinearEasing))
-        viewModel.celebrationDone(c.id)
+    LaunchedEffect(id) {
+        progress.animateTo(1f, tween(if (reduced) REDUCED_MS else SCENE_MS, easing = LinearEasing))
+        onDone()
     }
-    val particles = remember(c.id) { if (reduced || c.skipped) emptyList() else buildParticles(c.id.hashCode(), if (c.levelUp) 50 else 34) }
+    val particles = remember(id) { if (reduced) emptyList() else buildParticles(id.hashCode(), 50) }
     val starPath = remember { unitStar() }
-    var imageRect by remember(c.id) { mutableStateOf<Rect?>(null) }
+    var imageRect by remember(id) { mutableStateOf<Rect?>(null) }
     var origin by remember { mutableStateOf(Offset.Zero) }
-    val totalSeconds = (if (c.levelUp) SCENE_MS + 600 else SCENE_MS) / 1000f
+    val totalSeconds = SCENE_MS / 1000f
     Box(
         Modifier
             .fillMaxSize()
             .onGloballyPositioned { origin = it.positionInRoot() }
-            .clickable(onClick = { viewModel.celebrationDone(c.id) })
-            .background(Brush.radialGradient(listOf(Gold.copy(alpha = if (c.skipped) 0f else 0.30f), Color(0xCC050B1F)))),
+            .clickable(onClick = onDone)
+            .background(Brush.radialGradient(listOf(Gold.copy(alpha = 0.30f), Color(0xCC050B1F)))),
         contentAlignment = Alignment.Center,
     ) {
-        val variant = c.variant
-        if (c.skipped || variant == null) {
-            Text(stringResource(R.string.arcade_stage_skipped), style = LogicMixTokens.typography.headlineMedium, color = Color.White, textAlign = TextAlign.Center, modifier = Modifier.padding(LogicMixTokens.spacingL))
-            return@Box
-        }
         BoxWithConstraints(Modifier.fillMaxSize().safeDrawingPadding()) {
             val imgW = minOf(maxWidth * 0.94f, maxHeight * 0.5f * variant.aspect)
             val imgH = imgW / variant.aspect
@@ -144,24 +139,20 @@ fun ArcadeCelebration(c: Celebration, viewModel: ArcadeViewModel) {
                     Image(painterResource(variant.drawable()), contentDescription = null, contentScale = ContentScale.Fit, modifier = Modifier.fillMaxSize())
                     val r = variant.ribbon
                     FitText(
-                        stringResource(R.string.victory_level_complete),
+                        stringResource(R.string.player_level_up_title),
                         Modifier
                             .offset(imgW * r.left, imgH * r.top)
                             .size(imgW * (r.right - r.left), imgH * (r.bottom - r.top))
                             .graphicsLayer { alpha = titleAlpha.value; scaleX = titleScale.value; scaleY = titleScale.value },
                     )
                 }
-                Column(Modifier.padding(top = LogicMixTokens.spacingS).graphicsLayer { alpha = pop.value }, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS)) {
-                    Text("+${points.value.toInt()}", style = LogicMixTokens.typography.headlineMedium, color = Color.White)
-                    if (c.bonus > 0) Text(stringResource(R.string.arcade_bonus, c.bonus), style = LogicMixTokens.typography.titleMedium, color = GoldSoft)
-                    if (c.levelUp) {
-                        Text(stringResource(R.string.arcade_level_up), style = LogicMixTokens.typography.headlineMedium, color = Gold, textAlign = TextAlign.Center)
-                        Text(stringResource(R.string.arcade_level_n, c.level), style = LogicMixTokens.typography.titleMedium, color = Color.White)
-                    }
-                    c.achievements.forEach {
-                        Text(stringResource(R.string.arcade_achievement_unlocked, stringResource(it.nameRes())), style = LogicMixTokens.typography.labelMedium, color = GoldSoft, textAlign = TextAlign.Center)
-                    }
-                }
+                Text(
+                    stringResource(R.string.arcade_level_n, event.level),
+                    style = LogicMixTokens.typography.headlineMedium,
+                    color = Color.White,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(top = LogicMixTokens.spacingS).graphicsLayer { alpha = pop.value },
+                )
             }
         }
         if (particles.isNotEmpty()) {
@@ -288,14 +279,4 @@ private fun DrawScope.drawParticles(list: List<Particle>, v: VictoryVariant, rec
             }
         }
     }
-}
-
-private fun ArcadeAchievement.nameRes(): Int = when (this) {
-    ArcadeAchievement.STREAK_3 -> R.string.arcade_ach_streak_3
-    ArcadeAchievement.STREAK_5 -> R.string.arcade_ach_streak_5
-    ArcadeAchievement.STREAK_10 -> R.string.arcade_ach_streak_10
-    ArcadeAchievement.FIRST_CYCLE -> R.string.arcade_ach_first_cycle
-    ArcadeAchievement.FULL_SET_CYCLE -> R.string.arcade_ach_full_set
-    ArcadeAchievement.NO_HINTS -> R.string.arcade_ach_no_hints
-    ArcadeAchievement.NEW_RECORD -> R.string.arcade_ach_record
 }

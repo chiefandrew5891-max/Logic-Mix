@@ -1,5 +1,6 @@
 package com.akynex.logicmix.feature.sudoku
 
+import com.akynex.logicmix.domain.content.GameCategory
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.ViewModel
@@ -191,11 +192,12 @@ class SudokuViewModel @Inject constructor(
             val result = progress.recordAttempt(
                 profileId, game.puzzle.id, GameMode.CAREER, AttemptOutcome.CORRECT,
                 now - s.elapsedSec * 1000, now, game.hintsUsed,
+                GameCategory.SUDOKU, game.puzzle.difficulty.name.lowercase(),
             )
             _state.update { it.copy(xpAwarded = result.xpAwarded) }
             analytics.completed(result.xpAwarded)
             if (result.xpAwarded > 0) sfx.play(Sfx.XP_GAIN)
-            sfx.play(if (result.after.level > result.before.level) Sfx.LEVEL_UP else Sfx.LEVEL_COMPLETE)
+            sfx.play(Sfx.LEVEL_COMPLETE)
         }
     }
 }

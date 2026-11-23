@@ -356,4 +356,8 @@
         <item quantity="other">Bilde %1$d Linien — %2$d/%1$d</item>
     </plurals>
     <string name="arcade_goal_score">Ziel: %1$d Punkte erreichen — %2$d/%1$d</string>
+    <string name="player_level_up_title">NEUES LEVEL!</string>
+    <string name="xp_gain_compact">+%1$d XP</string>
+    <string name="xp_gain_none">Kein neues XP</string>
+    <string name="arcade_points_compact">+%1$d Punkte</string>
 </resources>

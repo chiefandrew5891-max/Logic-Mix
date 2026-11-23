@@ -1,6 +1,6 @@
 package com.akynex.logicmix.domain.progression
 
-enum class XpReason { FIRST_SOLVE, EXTRA_WORD }
+enum class XpReason { FIRST_SOLVE, EXTRA_WORD, AD_REWARD }
 
 // totalXp is the source of truth; level and xpIntoLevel are always derived from it with the B1 rules.
 data class PlayerProgress(val totalXp: Int, val level: Int, val xpIntoLevel: Int) {

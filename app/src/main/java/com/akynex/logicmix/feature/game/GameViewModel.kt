@@ -137,12 +137,13 @@ class GameViewModel @Inject constructor(
                     val result = progress.recordAttempt(
                         profileId, puzzle.id, GameMode.CAREER, AttemptOutcome.CORRECT,
                         s.startedAt, System.currentTimeMillis(), s.hintsUsed,
+                        GameCategory.NUMBER_SEQUENCE, puzzle.difficulty.toString(),
                     )
                     sessions.clear()
                     _state.update { it.copy(xpAwarded = result.xpAwarded) }
                     analytics.completed(result.xpAwarded)
                     if (result.xpAwarded > 0) sfx.play(Sfx.XP_GAIN)
-                    sfx.play(if (result.after.level > result.before.level) Sfx.LEVEL_UP else Sfx.LEVEL_COMPLETE)
+                    sfx.play(Sfx.LEVEL_COMPLETE)
                 }
             }
         }

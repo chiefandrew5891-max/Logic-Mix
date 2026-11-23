@@ -356,4 +356,8 @@
         <item quantity="other">Collect %1$d lines — %2$d/%1$d</item>
     </plurals>
     <string name="arcade_goal_score">Goal: score %1$d points — %2$d/%1$d</string>
+    <string name="player_level_up_title">LEVEL UP!</string>
+    <string name="xp_gain_compact">+%1$d XP</string>
+    <string name="xp_gain_none">No new XP</string>
+    <string name="arcade_points_compact">+%1$d points</string>
 </resources>

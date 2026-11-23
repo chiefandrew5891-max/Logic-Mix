@@ -1,5 +1,6 @@
 package com.akynex.logicmix.feature.twodots
 
+import com.akynex.logicmix.domain.content.GameCategory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -185,13 +186,12 @@ class TwoDotsViewModel @Inject constructor(
             profiles.ensureProfile()
             progress.ensureProgress(profileId)
             val result = progress.recordAttempt(
-                profileId, game.xpId, GameMode.CAREER, AttemptOutcome.CORRECT, started, System.currentTimeMillis(), game.hintsUsed,
+                profileId, game.xpId, GameMode.CAREER, AttemptOutcome.CORRECT, started, System.currentTimeMillis(), game.hintsUsed, GameCategory.TWO_DOTS,
             )
             analytics.completed(result.xpAwarded)
             if (result.xpAwarded > 0) {
                 _state.update { it.copy(xpAwarded = result.xpAwarded) }
                 sfx.play(Sfx.XP_GAIN)
-                if (result.after.level > result.before.level) sfx.play(Sfx.LEVEL_UP)
             }
         }
     }

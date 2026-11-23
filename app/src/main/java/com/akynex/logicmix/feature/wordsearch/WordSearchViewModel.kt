@@ -172,6 +172,7 @@ class WordSearchViewModel @Inject constructor(
                     is WordCheck.Extra -> {
                         // XP first: it is idempotent, so a crash before addWord cannot cause a second payout.
                         val xp = progress.awardExtraWord(profileId, level.id, result.word, WordSearchRewards.EXTRA_WORD_XP)
+                        analytics.bonusXp(xp, "extra_word")
                         sfx.play(Sfx.WORD_FOUND)
                         if (xp > 0) sfx.play(Sfx.XP_GAIN)
                         store.addWord(level, result.word, main = false)
@@ -213,12 +214,14 @@ class WordSearchViewModel @Inject constructor(
             startedAt = s.startedAt,
             finishedAt = System.currentTimeMillis(),
             hintsUsed = s.hintsUsed,
+            category = GameCategory.WORD_SEARCH,
+            difficulty = level.difficulty.toString(),
         )
         store.complete(level, result.xpAwarded)
         if (arcade != null && store.currentIndex(level.language) == level.index) store.setCurrentIndex(level.language, level.index + 1)
         analytics.completed(result.xpAwarded)
         if (result.xpAwarded > 0) sfx.play(Sfx.XP_GAIN)
-        sfx.play(if (result.after.level > result.before.level) Sfx.LEVEL_UP else Sfx.LEVEL_COMPLETE)
+        sfx.play(Sfx.LEVEL_COMPLETE)
         _state.update { it.copy(completed = true, xpAwarded = result.xpAwarded) }
     }
 

@@ -358,4 +358,8 @@
         <item quantity="other">Соберите %1$d линии — %2$d/%1$d</item>
     </plurals>
     <string name="arcade_goal_score">Цель: набрать %1$d очков — %2$d/%1$d</string>
+    <string name="player_level_up_title">НОВЫЙ УРОВЕНЬ!</string>
+    <string name="xp_gain_compact">+%1$d XP</string>
+    <string name="xp_gain_none">XP без изменений</string>
+    <string name="arcade_points_compact">+%1$d очков</string>
 </resources>

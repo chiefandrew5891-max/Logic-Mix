@@ -1,5 +1,6 @@
 package com.akynex.logicmix.feature.matchstick
 
+import com.akynex.logicmix.domain.content.GameCategory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -121,13 +122,13 @@ class MatchstickViewModel @Inject constructor(
         viewModelScope.launch {
             val result = progress.recordAttempt(
                 profileId, game.puzzle.id, GameMode.CAREER, AttemptOutcome.CORRECT,
-                started, System.currentTimeMillis(), game.hintsUsed,
+                started, System.currentTimeMillis(), game.hintsUsed, GameCategory.MATCHSTICK,
             )
             _state.update { it.copy(xpAwarded = result.xpAwarded) }
             analytics.completed(result.xpAwarded)
             sfx.play(Sfx.CORRECT)
             if (result.xpAwarded > 0) sfx.play(Sfx.XP_GAIN)
-            sfx.play(if (result.after.level > result.before.level) Sfx.LEVEL_UP else Sfx.LEVEL_COMPLETE)
+            sfx.play(Sfx.LEVEL_COMPLETE)
         }
     }
 }
