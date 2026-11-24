@@ -1,5 +1,6 @@
 package com.akynex.logicmix.feature.matchstick
 
+import com.akynex.logicmix.core.designsystem.BrandFooter
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -206,6 +207,7 @@ private fun MatchstickScreen(state: MatchUiState, onBack: () -> Unit, vm: Matchs
                     )
                 }
             }
+            BrandFooter()
         }
     }
 }

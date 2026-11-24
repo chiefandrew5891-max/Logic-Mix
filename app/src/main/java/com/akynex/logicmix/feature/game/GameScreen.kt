@@ -1,5 +1,6 @@
 package com.akynex.logicmix.feature.game
 
+import com.akynex.logicmix.core.designsystem.BrandFooter
 import com.akynex.logicmix.core.audio.withTap
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
@@ -168,6 +169,7 @@ fun GameScreen(
                     }
                 }
             }
+            BrandFooter()
         }
     }
 }

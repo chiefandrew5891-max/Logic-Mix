@@ -1,5 +1,6 @@
 package com.akynex.logicmix.feature.orb
 
+import com.akynex.logicmix.core.designsystem.BrandFooter
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -103,6 +104,7 @@ private fun OrbScreen(state: OrbUiState, onBack: () -> Unit, vm: OrbViewModel) {
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
+            BrandFooter()
         }
     }
 }

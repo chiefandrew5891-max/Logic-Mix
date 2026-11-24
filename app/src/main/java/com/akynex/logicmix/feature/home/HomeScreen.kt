@@ -1,5 +1,6 @@
 package com.akynex.logicmix.feature.home
 
+import com.akynex.logicmix.core.designsystem.BrandFooter
 import com.akynex.logicmix.core.audio.withTap
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
@@ -163,6 +164,7 @@ fun HomeScreen(
             }
             SectionTitle(stringResource(R.string.home_categories_title))
             CategoryGrid(categories = GameCategory.entries.filter { it in state.categories }, onClick = onCategory)
+            BrandFooter()
         }
     }
 }

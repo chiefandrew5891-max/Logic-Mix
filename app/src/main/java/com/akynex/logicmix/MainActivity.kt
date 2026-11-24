@@ -4,15 +4,6 @@ import com.akynex.logicmix.core.audio.LocalUiFeedback
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.ime
-import androidx.compose.foundation.layout.navigationBars
-import com.akynex.logicmix.core.designsystem.BrandFooter
-import com.akynex.logicmix.core.designsystem.LogicMixTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -81,17 +72,7 @@ class MainActivity : AppCompatActivity() {
                 val gameStyle by settings.gameStyle.collectAsState(initial = null)
                 CompositionLocalProvider(LocalUiFeedback provides sfx) {
                     androidx.compose.foundation.layout.Box {
-                        // App shell: content on top, the single global footer pinned below it on every screen.
-                        androidx.compose.foundation.layout.Column(
-                            androidx.compose.ui.Modifier.fillMaxSize().background(LogicMixTokens.colors.backgroundBrush),
-                        ) {
-                            androidx.compose.foundation.layout.Box(
-                                androidx.compose.ui.Modifier.weight(1f).fillMaxWidth()
-                                    .consumeWindowInsets(WindowInsets.navigationBars),
-                            ) { LogicMixNavigation(rememberNavController(), gameStyle, sfx, review) }
-                            val keyboardOpen = WindowInsets.ime.getBottom(androidx.compose.ui.platform.LocalDensity.current) > 0
-                            if (!keyboardOpen) BrandFooter()
-                        }
+                        LogicMixNavigation(rememberNavController(), gameStyle, sfx, review)
                         com.akynex.logicmix.feature.levelup.LevelUpHost()
                     }
                 }

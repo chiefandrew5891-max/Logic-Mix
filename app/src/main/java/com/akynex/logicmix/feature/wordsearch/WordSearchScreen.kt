@@ -1,5 +1,6 @@
 package com.akynex.logicmix.feature.wordsearch
 
+import com.akynex.logicmix.core.designsystem.BrandFooter
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.animation.core.Animatable
@@ -172,6 +173,7 @@ fun WordSearchScreen(
                     }
                 }
             }
+            BrandFooter()
         }
     }
 }

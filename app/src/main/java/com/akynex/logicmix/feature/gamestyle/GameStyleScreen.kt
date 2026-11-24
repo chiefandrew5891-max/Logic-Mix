@@ -1,5 +1,6 @@
 package com.akynex.logicmix.feature.gamestyle
 
+import com.akynex.logicmix.core.designsystem.BrandFooter
 import com.akynex.logicmix.core.audio.withBack
 import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
@@ -181,6 +182,7 @@ internal fun GameStyleFlow(
                     }
                 }
             }
+            BrandFooter()
         }
     }
 }

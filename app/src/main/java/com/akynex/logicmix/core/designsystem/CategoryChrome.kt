@@ -83,7 +83,7 @@ fun CategoryScaffold(content: @Composable ColumnScope.() -> Unit) {
                 .widthIn(max = 560.dp)
                 .align(Alignment.TopCenter),
             verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM),
-            content = content,
+            content = { content(); BrandFooter() },
         )
     }
 }

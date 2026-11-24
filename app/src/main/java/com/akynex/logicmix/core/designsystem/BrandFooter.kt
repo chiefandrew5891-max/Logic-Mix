@@ -16,8 +16,8 @@ import androidx.compose.ui.unit.sp
 import com.akynex.logicmix.R
 
 /**
- * The one AKYneX studio footer. It is mounted once by the app shell (MainActivity), pinned under every screen, so
- * no screen draws its own. Text, size and colours are the approved design; do not duplicate it per screen.
+ * The one AKYneX studio footer: the last element of every page, scrolling with the content (not pinned to the
+ * device screen). Every screen's scrolling column ends with this component; never re-implement it.
  */
 @Composable
 fun BrandFooter(modifier: Modifier = Modifier) {

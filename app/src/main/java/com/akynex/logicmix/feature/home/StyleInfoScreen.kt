@@ -1,5 +1,6 @@
 package com.akynex.logicmix.feature.home
 
+import com.akynex.logicmix.core.designsystem.BrandFooter
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -56,5 +57,6 @@ fun StyleInfoScreen(style: GameStyle, onHome: () -> Unit, onPlayAvailable: () ->
         )
         Button(onPlayAvailable, Modifier.fillMaxWidth()) { Text(stringResource(R.string.style_info_play)) }
         OutlinedButton(onHome, Modifier.fillMaxWidth()) { Text(stringResource(R.string.style_info_home)) }
+        BrandFooter()
     }
 }

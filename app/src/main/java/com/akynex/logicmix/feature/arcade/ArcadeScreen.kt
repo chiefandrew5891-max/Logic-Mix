@@ -1,5 +1,6 @@
 package com.akynex.logicmix.feature.arcade
 
+import com.akynex.logicmix.core.designsystem.BrandFooter
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -193,6 +194,7 @@ private fun ArcadeLobby(
                 Text(stringResource(R.string.arcade_edit))
             }
             StatsCard(state)
+            BrandFooter()
         }
     }
 }

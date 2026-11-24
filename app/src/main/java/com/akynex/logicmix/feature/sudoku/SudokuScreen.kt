@@ -1,5 +1,6 @@
 package com.akynex.logicmix.feature.sudoku
 
+import com.akynex.logicmix.core.designsystem.BrandFooter
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -143,6 +144,7 @@ private fun SudokuScreen(state: SudokuUiState, onBack: () -> Unit, vm: SudokuVie
                     }
                 }
             }
+            BrandFooter()
         }
     }
 }

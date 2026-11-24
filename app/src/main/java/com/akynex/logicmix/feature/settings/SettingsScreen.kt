@@ -1,5 +1,6 @@
 package com.akynex.logicmix.feature.settings
 
+import com.akynex.logicmix.core.designsystem.BrandFooter
 import com.akynex.logicmix.core.audio.withTap
 import androidx.annotation.DrawableRes
 import androidx.compose.material3.OutlinedButton
@@ -199,6 +200,7 @@ internal fun SettingsContent(
                 InfoRow(stringResource(R.string.settings_help), stringResource(R.string.settings_planned))
                 InfoRow(stringResource(R.string.settings_privacy), null, onClick = onPrivacyPolicy)
             }
+            BrandFooter()
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.akynex.logicmix.feature.privacy
 
+import com.akynex.logicmix.core.designsystem.BrandFooter
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -93,6 +94,7 @@ fun PrivacyPolicyScreen(onBack: () -> Unit, viewModel: PrivacyPolicyViewModel = 
                     }
                 }
             }
+            BrandFooter()
         }
     }
 }

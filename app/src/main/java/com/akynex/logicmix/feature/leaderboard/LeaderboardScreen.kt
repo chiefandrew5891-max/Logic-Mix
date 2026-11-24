@@ -1,5 +1,6 @@
 package com.akynex.logicmix.feature.leaderboard
 
+import com.akynex.logicmix.core.designsystem.BrandFooter
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -140,6 +141,7 @@ fun LeaderboardScreen(onBack: () -> Unit, viewModel: LeaderboardViewModel = hilt
                     selected?.let { key -> BoardDetails(key, ui, onOpen = { viewModel.openFull(key) }, onRefresh = viewModel::refresh) }
                 }
             }
+            BrandFooter()
         }
     }
 }
