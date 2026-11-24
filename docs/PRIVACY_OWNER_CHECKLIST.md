@@ -2,7 +2,7 @@
 
 Nothing below was invented by the code; each item **needs your input**.
 
-- [ ] OWNER ACTION REQUIRED: set a real `contactEmail` in `app/src/main/assets/privacy/config.properties`.
+- [x] DONE (info@akynexstudio.com): `contactEmail` in `app/src/main/assets/privacy/config.properties`.
 - [ ] OWNER ACTION REQUIRED: publish `privacy-site/` and set `policyUrl` (HTTPS) in the same file; the in-app "View online" button stays disabled until then.
 - [ ] Replace `version=1.0-DRAFT` with a final version after review; run `python3 tools/build_privacy_site.py`.
 - [ ] Legal review of the text (publisher identity/address, legal bases, retention, children's age limit).
