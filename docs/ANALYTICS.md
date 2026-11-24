@@ -26,6 +26,12 @@
 4. Remote Config: ключи из `AppConfig.Keys` (все необязательны, есть дефолты).
 5. BigQuery export включать только после подтверждения владельца (платный).
 
+## Оценка приложения (Google Play In-App Review)
+События: `review_eligible` (раз за запуск, когда условия выполнены), `review_request_attempt`, `review_flow_finished`, `review_request_error` (`error_type`), `rate_app_clicked`, `review_store_opened` (`store_target`: market/web). Параметры: `review_moment` (task_completed / level_up_closed / main_menu), `review_attempt_no`.
+Google не сообщает, показано ли окно, какая оценка и был ли отзыв, поэтому событий `review_submitted` / `rating_received` нет и быть не должно; `review_flow_finished` означает только возврат из API.
+Лимиты (Remote Config, безопасные локальные значения в скобках): `review_enabled` (true), `review_min_days` (3), `review_min_tasks` (15), `review_min_sessions` (3), `review_cooldown_days` (60), `review_max_per_year` (3).
+Тест реального окна: Google Play Internal Testing (https://developer.android.com/guide/playcore/in-app-review/test); в автотестах — FakeReviewManager.
+
 ## DebugView
 ```
 adb shell setprop debug.firebase.analytics.app com.akynex.logicmix

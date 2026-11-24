@@ -359,4 +359,6 @@
     <string name="xp_gain_compact">+%1$d XP</string>
     <string name="xp_gain_none">没有新的经验</string>
     <string name="arcade_points_compact">+%1$d 分</string>
+    <string name="settings_rate_app">为应用评分</string>
+    <string name="settings_rate_app_desc">在 Google Play 上评分或写评论</string>
 </resources>

@@ -38,6 +38,15 @@ object Ev {
     const val PLAYER_LEVEL_UP = "player_level_up"
     const val SESSION_END = "session_end"
 
+    // Review events. Google Play does not report whether the dialog was shown or what the user did, so there is deliberately
+    // no review_submitted / rating_received.
+    const val REVIEW_ELIGIBLE = "review_eligible"
+    const val REVIEW_REQUEST_ATTEMPT = "review_request_attempt"
+    const val REVIEW_FLOW_FINISHED = "review_flow_finished"
+    const val RATE_APP_CLICKED = "rate_app_clicked"
+    const val REVIEW_STORE_OPENED = "review_store_opened"
+    const val REVIEW_REQUEST_ERROR = "review_request_error"
+
     val game = setOf(
         CATEGORY_OPEN, GAME_START, PUZZLE_START, PUZZLE_COMPLETE, PUZZLE_FAIL, PUZZLE_SKIP, PUZZLE_ABANDON,
         HINT_REQUEST, HINT_USED, DIFFICULTY_SELECT, GAME_MODE_SELECT, LEVEL_RESTART, XP_EARNED, SESSION_END,
@@ -64,6 +73,10 @@ object P {
     const val PLAYER_LEVEL = "player_level"
     const val TOTAL_XP = "total_xp"
     const val PUZZLES_PLAYED = "puzzles_played"
+    const val REVIEW_MOMENT = "review_moment"
+    const val REVIEW_ATTEMPT_NO = "review_attempt_no"
+    const val STORE_TARGET = "store_target"
+    const val ERROR_TYPE = "error_type"
 }
 
 /**

@@ -63,10 +63,40 @@ class Monetization @Inject constructor(@ApplicationContext context: android.cont
 
     val arcade = ArcadeBridge()
 
-    fun newGameAnalytics() = GameAnalytics(tracker, onCompleted = arcade::report)
+    /** Persistent review counters (completed tasks, sessions, attempt history); fed from the same game events as analytics. */
+    val reviewGate = com.akynex.logicmix.domain.review.ReviewGate(
+        com.akynex.logicmix.core.review.SharedPrefsReviewStorage(app),
+        installTimeMs = { runCatching { app.packageManager.getPackageInfo(app.packageName, 0).firstInstallTime }.getOrNull() },
+    ).also { it.ensureFirstLaunch() }
+
+    /** Set by ReviewCoordinator; null until it exists. */
+    @Volatile var reviewListener: com.akynex.logicmix.core.review.ReviewEvents? = null
+
+    /** True while the UMP consent form or privacy options may be on screen. */
+    @Volatile var umpBusy = false
+        private set
+
+    fun newGameAnalytics() = GameAnalytics(
+        tracker,
+        onCompleted = { report ->
+            arcade.report(report)
+            runCatching { reviewGate.onTaskCompleted(); reviewListener?.onTaskCompleted() }
+        },
+        onPuzzleStarted = {
+            runCatching { reviewGate.onGameActivity(); reviewListener?.onGameActivity() }
+        },
+    )
 
     /** Из MainActivity.onCreate: форма согласия показывается, только если она требуется. */
-    fun gatherConsent(activity: Activity) = ump.gather(activity) { can, personalized ->
+    fun gatherConsent(activity: Activity) {
+        umpBusy = true
+        ump.gather(activity) { can, personalized ->
+            umpBusy = false
+            onGathered(can, personalized)
+        }
+    }
+
+    private fun onGathered(can: Boolean, personalized: Boolean) {
         consent.onUmpResult(can, personalized)
         if (can) rewarded.prepare("startup")
     }

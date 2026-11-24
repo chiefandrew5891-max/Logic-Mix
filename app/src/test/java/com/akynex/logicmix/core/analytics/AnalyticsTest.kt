@@ -195,6 +195,15 @@ class AnalyticsTest {
         assertEquals(AppConfig.UNCHANGED, AppConfig.DEFAULT.freeHintsPerPuzzle)
     }
 
+    @Test fun reviewLimitsComeFromRemoteConfigWithSafeLocalFallback() {
+        val d = AppConfig.DEFAULT.review
+        assertEquals(listOf(3, 15, 3, 60, 3), listOf(d.minDaysSinceFirstLaunch, d.minCompletedTasks, d.minSessions, d.cooldownDays, d.maxAttemptsPerYear))
+        val r = AppConfig.sanitize(mapOf("review_min_days" to "7", "review_cooldown_days" to "90", "review_enabled" to "false",
+            "review_min_tasks" to "-1", "review_max_per_year" to "abc")).review
+        assertEquals(7, r.minDaysSinceFirstLaunch); assertEquals(90, r.cooldownDays); assertEquals(false, r.enabled)
+        assertEquals(15, r.minCompletedTasks); assertEquals(3, r.maxAttemptsPerYear)
+    }
+
     @Test fun consentDefaultsDeniedAndRefusalIsNormal() {
         val store = InMemoryConsentStore(); val seen = mutableListOf<ConsentState>()
         val c = ConsentController(store) { seen += it }

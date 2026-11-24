@@ -58,6 +58,7 @@ class MainActivity : AppCompatActivity() {
     @Inject lateinit var settings: SettingsRepository
     @Inject lateinit var sfx: SoundEffectsController
     @Inject lateinit var monetization: com.akynex.logicmix.core.monetization.Monetization
+    @Inject lateinit var review: com.akynex.logicmix.core.review.ReviewCoordinator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,12 +71,23 @@ class MainActivity : AppCompatActivity() {
                 val gameStyle by settings.gameStyle.collectAsState(initial = null)
                 CompositionLocalProvider(LocalUiFeedback provides sfx) {
                     androidx.compose.foundation.layout.Box {
-                        LogicMixNavigation(rememberNavController(), gameStyle, sfx)
+                        LogicMixNavigation(rememberNavController(), gameStyle, sfx, review)
                         com.akynex.logicmix.feature.levelup.LevelUpHost()
                     }
                 }
             }
         }
+    }
+
+    // The review flow may only start while this screen is in front (no ad, consent form or other activity on top).
+    override fun onResume() {
+        super.onResume()
+        review.attach(this)
+    }
+
+    override fun onPause() {
+        review.detach(this)
+        super.onPause()
     }
 }
 
@@ -124,7 +136,7 @@ object Routes {
 }
 
 @Composable
-private fun LogicMixNavigation(navController: NavHostController, gameStyle: GameStylePrefs?, sfx: SoundEffectsController) {
+private fun LogicMixNavigation(navController: NavHostController, gameStyle: GameStylePrefs?, sfx: SoundEffectsController, review: com.akynex.logicmix.core.review.ReviewCoordinator) {
     // The selector is pushed once per launch for installs that have not completed it yet.
     var onboardingShown by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(gameStyle?.onboardingDone) {
@@ -141,6 +153,9 @@ private fun LogicMixNavigation(navController: NavHostController, gameStyle: Game
         if (navController.previousBackStackEntry != null && navController.popBackStack()) sfx.play(Sfx.MENU_CLOSE)
     }
     val current by navController.currentBackStackEntryAsState()
+    // Keyed by the route, so recomposition and rotation (same route) never re-trigger it.
+    val route = current?.destination?.route
+    LaunchedEffect(route) { if (route == Routes.HOME) review.onMainMenu() }
     BackHandler(enabled = current?.destination?.route != Routes.HOME && navController.previousBackStackEntry != null, onBack = goBack)
     NavHost(navController = navController, startDestination = Routes.HOME) {
         composable(Routes.HOME) {

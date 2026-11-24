@@ -1,5 +1,7 @@
 package com.akynex.logicmix.core.config
 
+import com.akynex.logicmix.domain.review.ReviewPolicyConfig
+
 /**
  * Типизированная удалённая конфигурация. Безопасные значения по умолчанию = текущее поведение приложения:
  * без сети, без Firebase и при мусорных значениях игра работает как раньше. Конфигурация читается при старте
@@ -20,6 +22,7 @@ data class AppConfig(
     val experimentVariant: String = "control",
     val disabledFeatures: Set<String> = emptySet(),
     val logAdRevenueInApp: Boolean = false,
+    val review: ReviewPolicyConfig = ReviewPolicyConfig(),
 ) {
     fun featureEnabled(key: String) = key !in disabledFeatures
 
@@ -41,6 +44,12 @@ data class AppConfig(
             const val EXPERIMENT_VARIANT = "experiment_variant"
             const val DISABLED_FEATURES = "disabled_features"
             const val LOG_AD_REVENUE = "log_ad_revenue_in_app"
+            const val REVIEW_ENABLED = "review_enabled"
+            const val REVIEW_MIN_DAYS = "review_min_days"
+            const val REVIEW_MIN_TASKS = "review_min_tasks"
+            const val REVIEW_MIN_SESSIONS = "review_min_sessions"
+            const val REVIEW_COOLDOWN_DAYS = "review_cooldown_days"
+            const val REVIEW_MAX_PER_YEAR = "review_max_per_year"
         }
 
         private val variant = Regex("^[a-z0-9_]{1,40}$")
@@ -65,6 +74,14 @@ data class AppConfig(
                 disabledFeatures = raw[Keys.DISABLED_FEATURES].orEmpty().split(',').map { it.trim() }
                     .filter { variant.matches(it) }.take(20).toSet(),
                 logAdRevenueInApp = bool(Keys.LOG_AD_REVENUE, d.logAdRevenueInApp),
+                review = ReviewPolicyConfig(
+                    enabled = bool(Keys.REVIEW_ENABLED, d.review.enabled),
+                    minDaysSinceFirstLaunch = int(Keys.REVIEW_MIN_DAYS, d.review.minDaysSinceFirstLaunch, 0..365),
+                    minCompletedTasks = int(Keys.REVIEW_MIN_TASKS, d.review.minCompletedTasks, 0..10_000),
+                    minSessions = int(Keys.REVIEW_MIN_SESSIONS, d.review.minSessions, 0..1_000),
+                    cooldownDays = int(Keys.REVIEW_COOLDOWN_DAYS, d.review.cooldownDays, 1..730),
+                    maxAttemptsPerYear = int(Keys.REVIEW_MAX_PER_YEAR, d.review.maxAttemptsPerYear, 0..12),
+                ),
             )
         }
     }

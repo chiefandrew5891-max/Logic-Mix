@@ -21,6 +21,8 @@ class FirebaseConfigSource(context: Context) : AppConfigSource {
         AppConfig.Companion.Keys.AD_RETRY_S, AppConfig.Companion.Keys.INTERSTITIAL_MIN_INTERVAL_S, AppConfig.Companion.Keys.INTERSTITIAL_EVERY_N,
         AppConfig.Companion.Keys.FREE_HINTS, AppConfig.Companion.Keys.EXPERIMENT_VARIANT, AppConfig.Companion.Keys.DISABLED_FEATURES,
         AppConfig.Companion.Keys.LOG_AD_REVENUE,
+        AppConfig.Companion.Keys.REVIEW_ENABLED, AppConfig.Companion.Keys.REVIEW_MIN_DAYS, AppConfig.Companion.Keys.REVIEW_MIN_TASKS,
+        AppConfig.Companion.Keys.REVIEW_MIN_SESSIONS, AppConfig.Companion.Keys.REVIEW_COOLDOWN_DAYS, AppConfig.Companion.Keys.REVIEW_MAX_PER_YEAR,
     )
 
     init {
@@ -42,6 +44,12 @@ class FirebaseConfigSource(context: Context) : AppConfigSource {
                     AppConfig.Companion.Keys.EXPERIMENT_VARIANT to d.experimentVariant,
                     AppConfig.Companion.Keys.DISABLED_FEATURES to "",
                     AppConfig.Companion.Keys.LOG_AD_REVENUE to d.logAdRevenueInApp.toString(),
+                    AppConfig.Companion.Keys.REVIEW_ENABLED to d.review.enabled.toString(),
+                    AppConfig.Companion.Keys.REVIEW_MIN_DAYS to d.review.minDaysSinceFirstLaunch.toString(),
+                    AppConfig.Companion.Keys.REVIEW_MIN_TASKS to d.review.minCompletedTasks.toString(),
+                    AppConfig.Companion.Keys.REVIEW_MIN_SESSIONS to d.review.minSessions.toString(),
+                    AppConfig.Companion.Keys.REVIEW_COOLDOWN_DAYS to d.review.cooldownDays.toString(),
+                    AppConfig.Companion.Keys.REVIEW_MAX_PER_YEAR to d.review.maxAttemptsPerYear.toString(),
                 ))
                 refresh(r)                                   // ранее активированные значения (если есть)
                 r.fetchAndActivate().addOnCompleteListener { refresh(r) }

@@ -12,6 +12,8 @@ class GameAnalytics(
     private val clock: () -> Long = System::currentTimeMillis,
     /** Тот же момент завершения, но для Arcade: вызывается один раз на головоломку, независимо от согласия на аналитику. */
     private val onCompleted: (StageReport) -> Unit = {},
+    /** A puzzle really began (any category, Arcade included); used for session counting. */
+    private val onPuzzleStarted: () -> Unit = {},
 ) {
     private class Active(val key: String, val ctx: GameContext, val startedAt: Long) {
         var attempts = 0
@@ -44,6 +46,7 @@ class GameAnalytics(
         cur?.let { abandonActive(ExitReason.SWITCHED) }
         cur = Active(key, ctx, clock()).also { it.attempts = attempts; it.hints = hints }
         puzzlesPlayed++
+        runCatching(onPuzzleStarted)
         log(Ev.PUZZLE_START, ctx, mapOf(P.IS_RESUME to resumed))
     }
 

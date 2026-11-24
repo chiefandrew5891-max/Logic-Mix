@@ -97,6 +97,7 @@ fun SettingsScreen(
         onArcade = viewModel::selectArcade,
         onGameStyleStep = onGameStyleStep,
         onPrivacyPolicy = onPrivacyPolicy,
+        onRateApp = { activity?.let(viewModel::rateApp) },
     )
 }
 
@@ -121,6 +122,7 @@ internal fun SettingsContent(
     showAdOptions: Boolean = false,
     onAdOptions: () -> Unit = {},
     onPrivacyPolicy: () -> Unit = {},
+    onRateApp: () -> Unit = {},
 ) {
     val colors = LogicMixTokens.colors
     Box(Modifier.fillMaxSize().background(colors.backgroundBrush)) {
@@ -181,6 +183,8 @@ internal fun SettingsContent(
 
             Text(stringResource(R.string.settings_section_language), style = LogicMixTokens.typography.titleMedium, color = colors.gold)
             LanguageAccordion(language, onLanguage)
+
+            RateAppRow(onRateApp)
 
             Section(stringResource(R.string.settings_section_info)) {
                 InfoRow(stringResource(R.string.settings_version, BuildConfig.VERSION_NAME), null)
@@ -383,6 +387,30 @@ internal fun LanguageAccordion(selected: AppLanguage, onSelect: (AppLanguage) ->
                     )
                 }
             }
+        }
+    }
+}
+
+/** Permanent entry to the Google Play page; deliberately independent of the In-App Review API limits. */
+@Composable
+private fun RateAppRow(onClick: () -> Unit) {
+    val colors = LogicMixTokens.colors
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clip(LogicMixTokens.radii.large)
+            .background(colors.cardBrush)
+            .border(BorderStroke(1.dp, colors.cardBorder), LogicMixTokens.radii.large)
+            .clickable(role = Role.Button, onClick = onClick)
+            .heightIn(min = LogicMixTokens.minTouchTarget)
+            .padding(LogicMixTokens.spacingM),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM),
+    ) {
+        LogicMixIcon(R.drawable.ic_star, colors.gold)
+        Column(Modifier.weight(1f)) {
+            Text(stringResource(R.string.settings_rate_app), style = LogicMixTokens.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+            Text(stringResource(R.string.settings_rate_app_desc), style = LogicMixTokens.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }

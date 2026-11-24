@@ -20,6 +20,8 @@ Crash reporting follows the same setting as analytics: it is off until you switc
 ## 5. Remote configuration (Firebase Remote Config)
 The app fetches settings from Firebase Remote Config, for example how often a hint offer may appear. This request happens whether or not analytics is on, and Google receives technical data needed for it, such as an app-instance identifier and IP address.
 
+**Rating and reviews (Google Play In-App Review).** From time to time the app may ask Google Play to offer you its own rating dialog. The dialog is shown and handled entirely by Google Play; we do not see whether it appeared, your rating or your review text, and we give no rewards for reviews. To limit how often this happens, the app stores on the device the date of first launch, the number of completed puzzles and play sessions, and the dates of earlier requests. With analytics on, we log only that a request was attempted or failed. The "Rate the app" button in Settings simply opens the Google Play page.
+
 ## 6. Rewarded ads (Google AdMob and Google UMP)
 The app may offer an optional ad in exchange for an extra hint. Ads are requested only after Google's consent flow (User Messaging Platform) allows it. In regions where consent is required, such as the EEA and the UK, a consent form is shown first.
 Google AdMob may process your advertising identifier, IP address and device information to show and measure ads. Whether ads are personalized depends on your choice in that form. If a privacy options entry is required, it appears in Settings. Consent for ads is separate from the analytics setting.

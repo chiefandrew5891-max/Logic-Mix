@@ -18,11 +18,13 @@ class SettingsViewModel @Inject constructor(
     private val repository: SettingsRepository,
     private val sfx: SoundEffectsController,
     private val monetization: com.akynex.logicmix.core.monetization.Monetization,
+    private val review: com.akynex.logicmix.core.review.ReviewCoordinator,
 ) : ViewModel() {
     val consent = monetization.consentState
     fun setAnalyticsConsent(v: Boolean) = monetization.consent.setAnalytics(v)
     fun privacyOptionsRequired(a: android.app.Activity) = monetization.privacyOptionsRequired(a)
     fun showPrivacyOptions(a: android.app.Activity) = monetization.showPrivacyOptions(a)
+    fun rateApp(context: android.content.Context) = review.rateAppClicked(context, com.akynex.logicmix.BuildConfig.APPLICATION_ID)
     val audio = repository.audio
     val themeMode = repository.themeMode
     val language = repository.language

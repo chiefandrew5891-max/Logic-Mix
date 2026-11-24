@@ -362,4 +362,6 @@
     <string name="xp_gain_compact">+%1$d XP</string>
     <string name="xp_gain_none">XP без изменений</string>
     <string name="arcade_points_compact">+%1$d очков</string>
+    <string name="settings_rate_app">Оценить приложение</string>
+    <string name="settings_rate_app_desc">Поставьте оценку или оставьте отзыв в Google Play</string>
 </resources>

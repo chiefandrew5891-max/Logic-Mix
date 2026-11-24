@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.StateFlow
 class LevelUpViewModel @Inject constructor(
     private val coordinator: LevelUpCoordinator,
     private val sfx: SoundEffectsController,
+    private val review: com.akynex.logicmix.core.review.ReviewCoordinator,
 ) : ViewModel() {
     val pending: StateFlow<LevelUpEvent?> = coordinator.pending
     private var lastVariant: VictoryVariant? = null
@@ -42,6 +43,7 @@ class LevelUpViewModel @Inject constructor(
     fun done(event: LevelUpEvent) {
         VictoryVariant.entries.forEach { sfx.stop(it.sfx) }
         coordinator.dismiss(event.id)
+        review.onLevelUpClosed()
     }
 }
 

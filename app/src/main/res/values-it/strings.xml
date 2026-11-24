@@ -361,4 +361,6 @@
     <string name="xp_gain_compact">+%1$d XP</string>
     <string name="xp_gain_none">Nessun nuovo XP</string>
     <string name="arcade_points_compact">+%1$d punti</string>
+    <string name="settings_rate_app">Valuta l’app</string>
+    <string name="settings_rate_app_desc">Lascia una valutazione o una recensione su Google Play</string>
 </resources>
