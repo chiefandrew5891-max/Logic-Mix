@@ -42,6 +42,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -67,12 +68,16 @@ fun HomeRoute(
     onWordSearch: () -> Unit = {},
     onCategory: (GameCategory) -> Unit = {},
     onPrimary: (HomeUiState) -> Unit = { onPlay(GameMode.CAREER) },
+    onLeaderboards: () -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsState()
     val music by viewModel.music.collectAsState()
+    val games by viewModel.games.collectAsState()
     HomeScreen(
         state, onPlay, onRewards, onSettings, onWordSearch, onCategory, { onPrimary(state) },
+        onLeaderboards = onLeaderboards,
+        games = games,
         music = music,
         onPreviousTrack = viewModel::previousTrack,
         onTogglePlayback = viewModel::togglePlayback,
@@ -93,6 +98,8 @@ fun HomeScreen(
     onPreviousTrack: () -> Unit = {},
     onTogglePlayback: () -> Unit = {},
     onNextTrack: () -> Unit = {},
+    onLeaderboards: () -> Unit = {},
+    games: com.akynex.logicmix.core.games.GamesState = com.akynex.logicmix.core.games.GamesState(),
 ) {
     val colors = LogicMixTokens.colors
     Box(Modifier.fillMaxSize().background(colors.backgroundBrush)) {
@@ -107,7 +114,7 @@ fun HomeScreen(
             verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacing),
         ) {
             TopBar(onSettings, music, onPreviousTrack, onTogglePlayback, onNextTrack)
-            PlayerCard(state)
+            PlayerCard(state, games)
             PrimaryButton(
                 label = stringResource(
                     if (state.primaryAction == PrimaryAction.CONTINUE) R.string.home_continue else R.string.home_start_game,
@@ -133,6 +140,16 @@ fun HomeScreen(
                     gold = true,
                 )
             }
+            if (games.status != com.akynex.logicmix.core.games.GamesStatus.DISABLED) {
+                FeatureCard(
+                    icon = R.drawable.ic_rewards,
+                    art = "icon_leaderboards",
+                    title = stringResource(R.string.home_leaderboards),
+                    subtitle = stringResource(R.string.home_leaderboards_sub),
+                    onClick = onLeaderboards,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
             SectionTitle(stringResource(R.string.home_modes_title))
             EqualHeightRow {
                 ModeCard(
@@ -146,7 +163,6 @@ fun HomeScreen(
             }
             SectionTitle(stringResource(R.string.home_categories_title))
             CategoryGrid(categories = GameCategory.entries.filter { it in state.categories }, onClick = onCategory)
-            BrandFooter()
         }
     }
 }
@@ -169,11 +185,23 @@ private fun TopBar(onSettings: () -> Unit, music: MusicPanelState, onPrevious: (
 }
 
 @Composable
-private fun PlayerCard(state: HomeUiState) {
+private fun PlayerCard(state: HomeUiState, games: com.akynex.logicmix.core.games.GamesState) {
     val colors = LogicMixTokens.colors
     CardSurface(Modifier.fillMaxWidth(), LogicMixTokens.radii.large) {
         Row(Modifier.padding(LogicMixTokens.spacing), verticalAlignment = Alignment.CenterVertically) {
+            if (games.status == com.akynex.logicmix.core.games.GamesStatus.SIGNED_IN && games.avatar != null) {
+                Image(
+                    games.avatar.asImageBitmap(), null, contentScale = ContentScale.Crop,
+                    modifier = Modifier.padding(end = LogicMixTokens.spacingM).size(48.dp).clip(androidx.compose.foundation.shape.CircleShape),
+                )
+            }
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS)) {
+                if (games.status != com.akynex.logicmix.core.games.GamesStatus.DISABLED) {
+                    Text(
+                        text = if (games.status == com.akynex.logicmix.core.games.GamesStatus.SIGNED_IN && games.name != null) games.name else stringResource(R.string.games_profile_guest),
+                        style = LogicMixTokens.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1,
+                    )
+                }
                 Text(
                     text = stringResource(R.string.home_level, state.level),
                     style = LogicMixTokens.typography.titleLarge,
@@ -330,27 +358,4 @@ private fun CardSurface(
             .background(brush)
             .border(BorderStroke(CARD_BORDER, LogicMixTokens.colors.cardBorder), shape),
     ) { content() }
-}
-
-/** Copyright footer inside the scrolling content; the gap above it is half the height of one (square) category card. */
-@Composable
-private fun BrandFooter() {
-    val muted = MaterialTheme.colorScheme.onSurfaceVariant
-    // The parent column adds its own item spacing above and padding below; cancel them so only the gaps below remain.
-    BoxWithConstraints(
-        Modifier.fillMaxWidth().layout { measurable, constraints ->
-            val cut = LogicMixTokens.spacing.roundToPx()
-            val placeable = measurable.measure(constraints)
-            layout(placeable.width, (placeable.height - 2 * cut).coerceAtLeast(0)) { placeable.place(0, -cut) }
-        },
-    ) {
-        val card = (maxWidth - LogicMixTokens.spacingS * (CATEGORY_COLUMNS - 1)) / CATEGORY_COLUMNS
-        Column(
-            Modifier.fillMaxWidth().padding(top = card / 5).windowInsetsPadding(WindowInsets.navigationBars).padding(bottom = LogicMixTokens.spacingS),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text("© 2026 AKYneX studio™", color = muted.copy(alpha = 0.9f), fontSize = 12.sp, textAlign = TextAlign.Center)
-            Text(stringResource(R.string.footer_rights), color = muted.copy(alpha = 0.65f), fontSize = 11.sp, textAlign = TextAlign.Center)
-        }
-    }
 }

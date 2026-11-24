@@ -19,7 +19,11 @@ class SettingsViewModel @Inject constructor(
     private val sfx: SoundEffectsController,
     private val monetization: com.akynex.logicmix.core.monetization.Monetization,
     private val review: com.akynex.logicmix.core.review.ReviewCoordinator,
+    private val games: com.akynex.logicmix.core.games.GamesCoordinator,
 ) : ViewModel() {
+    val gamesState = games.state
+    val gamesEnabled get() = games.enabled
+    fun connectGames() = games.signIn()
     val consent = monetization.consentState
     fun setAnalyticsConsent(v: Boolean) = monetization.consent.setAnalytics(v)
     fun privacyOptionsRequired(a: android.app.Activity) = monetization.privacyOptionsRequired(a)

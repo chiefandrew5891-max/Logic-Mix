@@ -11,6 +11,8 @@
         android:theme="@style/Theme.LogicMix">
         <!-- Идентификатор приложения AdMob подставляется из Gradle (тестовый по умолчанию). -->
         <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="${admobAppId}" />
+        <!-- Google Play Games Services v2: the ID lives in res/values/game_services.xml. -->
+        <meta-data android:name="com.google.android.gms.games.APP_ID" android:value="@string/game_services_project_id" />
         <!-- Consent Mode: до согласия всё запрещено; аналитика включается программно после выбора пользователя. -->
         <meta-data android:name="firebase_analytics_collection_enabled" android:value="false" />
         <meta-data android:name="firebase_crashlytics_collection_enabled" android:value="false" />

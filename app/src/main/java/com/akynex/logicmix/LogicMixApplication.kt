@@ -18,6 +18,8 @@ class LogicMixApplication : Application() {
         music.start()
         effects.start()
         com.akynex.logicmix.core.monetization.AppServices.install(monetization)
+        // Play Games is initialized only when the owner has configured the project ID (otherwise: guest mode only).
+        if (getString(R.string.game_services_project_id).isNotBlank()) com.google.android.gms.games.PlayGamesSdk.initialize(this)
         ContentSyncWorker.schedule(this)
     }
 }

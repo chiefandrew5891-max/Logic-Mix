@@ -90,6 +90,7 @@ dependencies {
     implementation(libs.play.services.ads)
     implementation(libs.ump)
     implementation(libs.play.review)
+    implementation(libs.play.games)
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.lifecycle.process)
     implementation(libs.hilt.android)

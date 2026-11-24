@@ -27,7 +27,9 @@ class HomeViewModel @Inject constructor(
     sessions: ActiveSessionProvider,
     settings: SettingsRepository,
     private val musicController: MusicController,
+    games: com.akynex.logicmix.core.games.GamesCoordinator,
 ) : ViewModel() {
+    val games = games.state
     val uiState: StateFlow<HomeUiState> = combine(
         progress.observeProgress(LocalProfileRepository.LOCAL_PROFILE_ID),
         progress.observeStreak(LocalProfileRepository.LOCAL_PROFILE_ID),

@@ -77,7 +77,10 @@ fun SettingsScreen(
     val language by viewModel.language.collectAsState(initial = AppLanguage.SYSTEM)
     val consent by viewModel.consent.collectAsState()
     val activity = androidx.compose.ui.platform.LocalContext.current as? android.app.Activity
+    val gamesState by viewModel.gamesState.collectAsState()
     SettingsContent(
+        gamesState = if (viewModel.gamesEnabled) gamesState else null,
+        onGamesConnect = viewModel::connectGames,
         analyticsConsent = consent.analytics,
         onAnalyticsConsent = viewModel::setAnalyticsConsent,
         showAdOptions = activity != null && viewModel.privacyOptionsRequired(activity),
@@ -123,6 +126,8 @@ internal fun SettingsContent(
     onAdOptions: () -> Unit = {},
     onPrivacyPolicy: () -> Unit = {},
     onRateApp: () -> Unit = {},
+    gamesState: com.akynex.logicmix.core.games.GamesState? = null,
+    onGamesConnect: () -> Unit = {},
 ) {
     val colors = LogicMixTokens.colors
     Box(Modifier.fillMaxSize().background(colors.backgroundBrush)) {
@@ -184,6 +189,7 @@ internal fun SettingsContent(
             Text(stringResource(R.string.settings_section_language), style = LogicMixTokens.typography.titleMedium, color = colors.gold)
             LanguageAccordion(language, onLanguage)
 
+            if (gamesState != null) GamesRow(gamesState, onGamesConnect)
             RateAppRow(onRateApp)
 
             Section(stringResource(R.string.settings_section_info)) {
@@ -392,6 +398,33 @@ internal fun LanguageAccordion(selected: AppLanguage, onSelect: (AppLanguage) ->
 }
 
 /** Permanent entry to the Google Play page; deliberately independent of the In-App Review API limits. */
+@Composable
+private fun GamesRow(state: com.akynex.logicmix.core.games.GamesState, onConnect: () -> Unit) {
+    val colors = LogicMixTokens.colors
+    val signedIn = state.status == com.akynex.logicmix.core.games.GamesStatus.SIGNED_IN
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clip(LogicMixTokens.radii.large)
+            .background(colors.cardBrush)
+            .border(BorderStroke(1.dp, colors.cardBorder), LogicMixTokens.radii.large)
+            .clickable(enabled = !signedIn, role = Role.Button, onClick = onConnect)
+            .heightIn(min = LogicMixTokens.minTouchTarget)
+            .padding(LogicMixTokens.spacingM),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM),
+    ) {
+        LogicMixIcon(R.drawable.ic_rewards, colors.gold)
+        Column(Modifier.weight(1f)) {
+            Text(stringResource(R.string.games_settings_title), style = LogicMixTokens.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+            Text(
+                if (signedIn) stringResource(R.string.games_signed_in_as, state.name.orEmpty()) else stringResource(R.string.games_settings_desc),
+                style = LogicMixTokens.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
 @Composable
 private fun RateAppRow(onClick: () -> Unit) {
     val colors = LogicMixTokens.colors

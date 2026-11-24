@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Play Games project ID (numeric "Application ID" from Play Console > Play Games Services > Configuration).
+         Left blank on purpose: while blank, Google Play Games is switched off and the app runs in guest mode. -->
+    <string name="game_services_project_id" translatable="false"></string>
+</resources>

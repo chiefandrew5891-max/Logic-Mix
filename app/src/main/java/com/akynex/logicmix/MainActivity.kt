@@ -4,6 +4,15 @@ import com.akynex.logicmix.core.audio.LocalUiFeedback
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.navigationBars
+import com.akynex.logicmix.core.designsystem.BrandFooter
+import com.akynex.logicmix.core.designsystem.LogicMixTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -58,6 +67,7 @@ class MainActivity : AppCompatActivity() {
     @Inject lateinit var settings: SettingsRepository
     @Inject lateinit var sfx: SoundEffectsController
     @Inject lateinit var monetization: com.akynex.logicmix.core.monetization.Monetization
+    @Inject lateinit var games: com.akynex.logicmix.core.games.GamesCoordinator
     @Inject lateinit var review: com.akynex.logicmix.core.review.ReviewCoordinator
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,7 +81,17 @@ class MainActivity : AppCompatActivity() {
                 val gameStyle by settings.gameStyle.collectAsState(initial = null)
                 CompositionLocalProvider(LocalUiFeedback provides sfx) {
                     androidx.compose.foundation.layout.Box {
-                        LogicMixNavigation(rememberNavController(), gameStyle, sfx, review)
+                        // App shell: content on top, the single global footer pinned below it on every screen.
+                        androidx.compose.foundation.layout.Column(
+                            androidx.compose.ui.Modifier.fillMaxSize().background(LogicMixTokens.colors.backgroundBrush),
+                        ) {
+                            androidx.compose.foundation.layout.Box(
+                                androidx.compose.ui.Modifier.weight(1f).fillMaxWidth()
+                                    .consumeWindowInsets(WindowInsets.navigationBars),
+                            ) { LogicMixNavigation(rememberNavController(), gameStyle, sfx, review) }
+                            val keyboardOpen = WindowInsets.ime.getBottom(androidx.compose.ui.platform.LocalDensity.current) > 0
+                            if (!keyboardOpen) BrandFooter()
+                        }
                         com.akynex.logicmix.feature.levelup.LevelUpHost()
                     }
                 }
@@ -83,10 +103,12 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         review.attach(this)
+        games.attach(this)
     }
 
     override fun onPause() {
         review.detach(this)
+        games.detach(this)
         super.onPause()
     }
 }
@@ -109,6 +131,7 @@ object Routes {
     const val STYLE_INFO = "style_info/{style}"
     const val ARCADE = "arcade"
     const val PRIVACY_POLICY = "privacy_policy"
+    const val LEADERBOARDS = "leaderboards"
 
     fun gameStyle(start: StyleStep) = "game_style/${start.name}"
     fun styleInfo(style: GameStyle) = "style_info/${style.name}"
@@ -166,6 +189,7 @@ private fun LogicMixNavigation(navController: NavHostController, gameStyle: Game
                 },
                 onRewards = { sfx.play(Sfx.BUTTON_TAP); navController.navigate(Routes.COMING_SOON) },
                 onSettings = { sfx.play(Sfx.BUTTON_TAP); navController.navigate(Routes.SETTINGS) },
+                onLeaderboards = { sfx.play(Sfx.BUTTON_TAP); navController.navigate(Routes.LEADERBOARDS) },
                 onCategory = { sfx.play(Sfx.BUTTON_TAP); navController.navigate(Routes.forCategory(it)) },
                 onPrimary = { state ->
                     sfx.play(Sfx.BUTTON_TAP)
@@ -232,6 +256,9 @@ private fun LogicMixNavigation(navController: NavHostController, gameStyle: Game
                 onGameStyleStep = { navController.navigate(Routes.gameStyle(it)) },
                 onPrivacyPolicy = { navController.navigate(Routes.PRIVACY_POLICY) },
             )
+        }
+        composable(Routes.LEADERBOARDS) {
+            com.akynex.logicmix.feature.leaderboard.LeaderboardScreen(onBack = goBack)
         }
         composable(Routes.PRIVACY_POLICY) {
             PrivacyPolicyScreen(onBack = goBack)

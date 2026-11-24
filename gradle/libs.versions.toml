@@ -13,6 +13,7 @@ firebaseBom = "34.4.0"
 playServicesAds = "24.6.0"
 ump = "3.2.0"
 playReview = "2.0.2"
+playGames = "20.0.0"
 googleServices = "4.4.3"
 crashlyticsPlugin = "3.0.5"
 media3 = "1.8.0"
@@ -45,6 +46,7 @@ firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
 firebase-config = { module = "com.google.firebase:firebase-config" }
 play-services-ads = { module = "com.google.android.gms:play-services-ads", version.ref = "playServicesAds" }
+play-games = { module = "com.google.android.gms:play-services-games-v2", version.ref = "playGames" }
 play-review = { module = "com.google.android.play:review", version.ref = "playReview" }
 ump = { module = "com.google.android.ump:user-messaging-platform", version.ref = "ump" }
 androidx-work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }

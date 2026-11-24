@@ -26,6 +26,9 @@ class ProgressRepository internal constructor(
     @Inject
     constructor(database: LogicMixDatabase) : this(database, System::currentTimeMillis)
 
+    /** Called after a first-solve XP award is committed (category may be null for unclassified callers). */
+    @Volatile var onXpAwarded: ((GameCategory?, Int) -> Unit)? = null
+
     private val progressDao = database.progressDao()
     private val solvedDao = database.solvedPuzzleDao()
     private val attemptDao = database.attemptDao()
@@ -72,7 +75,7 @@ class ProgressRepository internal constructor(
         require(puzzleId.isNotBlank()) { "puzzleId is blank" }
         require(hintsUsed >= 0) { "hintsUsed must not be negative" }
 
-        return database.withTransaction {
+        val result = database.withTransaction {
             attemptDao.insert(
                 AttemptEntity(
                     profileId = profileId,
@@ -119,6 +122,8 @@ class ProgressRepository internal constructor(
             )
             AttemptResult(award.total, firstSolve = true, before = before, after = after)
         }
+        if (result.firstSolve && result.xpAwarded > 0) runCatching { onXpAwarded?.invoke(category, result.xpAwarded) }
+        return result
     }
 
     /**
