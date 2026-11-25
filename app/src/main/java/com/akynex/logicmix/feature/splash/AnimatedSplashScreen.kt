@@ -86,7 +86,7 @@ fun AnimatedSplashScreen(onFinished: () -> Unit) {
             translate((size.width - side) / 2f, (size.height - side) / 2f) {
                 scale(k, k, pivot = Offset.Zero) {
                     drawScene(motionT, alpha, core, top, left, right, bottom, orbitBack, orbitFront)
-                    drawLogo(if (reduced) 1f else SplashMotion.logoProgress(t), logo, alpha)
+                    drawLogo(if (reduced) 1f else SplashMotion.logoProgress(t), SplashMotion.logoPulse(motionT), logo, alpha)
                 }
             }
         }
@@ -153,12 +153,12 @@ private fun DrawScope.drawScene(
 
 private const val LOGO_WIDTH = 780f // layer units; the height follows the image proportions
 
-private fun DrawScope.drawLogo(p: Float, logo: ImageBitmap, alpha: Float) {
+private fun DrawScope.drawLogo(p: Float, pulse: Float, logo: ImageBitmap, alpha: Float) {
     val a = SplashMotion.logoAlpha(p) * alpha
     if (a <= 0f) return
     val c = Offset(LAYER / 2f, LAYER / 2f)
     val h = LOGO_WIDTH * logo.height / logo.width
-    val sc = SplashMotion.logoScale(p)
+    val sc = SplashMotion.logoScale(p) * pulse
     rotate(SplashMotion.logoAngle(p), pivot = c) {
         scale(sc, sc, pivot = c) {
             drawImage(
@@ -171,21 +171,23 @@ private fun DrawScope.drawLogo(p: Float, logo: ImageBitmap, alpha: Float) {
     }
 }
 
-private const val PULSES = 3
-private const val TAIL = 16
+private const val PULSES = 6
+private const val TAIL = 24
 
 private fun DrawScope.drawOrbitPulses(t: Float, energy: Float, alpha: Float, front: Boolean) {
     if (energy <= 0f) return
     val turns = SplashMotion.orbitTurns(t)
+    // The tail stretches with speed; at top speed neighbouring pulses overlap into one continuous glow.
+    val span = 0.04f + 0.11f * SplashMotion.orbitSpeed(t)
     val twoPi = (2.0 * PI).toFloat()
     for (p in 0 until PULSES) {
         val headTurn = turns + p / PULSES.toFloat()
         for (j in 0 until TAIL) {
-            val theta = (headTurn - j * 0.012f * (1f + turns * 0.15f)) * twoPi
+            val theta = (headTurn - j * span / TAIL) * twoPi
             if (SplashMotion.isFront(theta) != front) continue
             val (x, y) = SplashMotion.orbitPoint(theta)
             val fall = 1f - j / TAIL.toFloat()
-            val a = energy * alpha * fall * fall
+            val a = energy * alpha * fall * fall * 0.7f
             val r = 9f + 20f * fall
             drawCircle(
                 Brush.radialGradient(

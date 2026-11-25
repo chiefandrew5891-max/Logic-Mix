@@ -23,23 +23,33 @@ class SplashMotionTest {
     @Test fun fadesInAndOut() {
         assertEquals(0f, SplashMotion.appear(0f), 0f)
         assertEquals(1f, SplashMotion.appear(0.5f), 0f)
-        assertEquals(1f, SplashMotion.overlayAlpha(3.4f), 0f)
+        assertEquals(1f, SplashMotion.overlayAlpha(5.0f), 0f)
         assertEquals(0f, SplashMotion.overlayAlpha(SplashMotion.DURATION), 1e-6f)
     }
 
-    @Test fun orbitAcceleratesMonotonically() {
-        var prev = -1f
-        var prevStep = 0f
-        var t = 1.5f
-        while (t < 3.3f) {
+    @Test fun orbitAcceleratesSmoothlyToTopSpeed() {
+        assertEquals(0f, SplashMotion.orbitTurns(0.4f), 0f)
+        assertEquals(SplashMotion.ORBIT_START_SPEED, SplashMotion.orbitSpeed(0.5f), 1e-6f)
+        assertEquals(SplashMotion.ORBIT_TOP_SPEED, SplashMotion.orbitSpeed(3.5f), 1e-6f)
+        var prevTurns = 0f
+        var prevSpeed = 0f
+        var t = 0.5f
+        while (t < 6f) {
             val turns = SplashMotion.orbitTurns(t)
-            assertTrue(turns >= prev)
-            if (t < 3.2f) { val step = turns - prev; if (prev >= 0f && t > 1.55f) assertTrue(step >= prevStep - 1e-4f); prevStep = step }
-            prev = turns; t += 0.01f
+            val v = SplashMotion.orbitSpeed(t)
+            assertTrue(turns >= prevTurns && v >= prevSpeed)
+            assertTrue(v <= SplashMotion.ORBIT_TOP_SPEED + 1e-4f)
+            prevTurns = turns; prevSpeed = v; t += 0.01f
         }
-        assertEquals(0f, SplashMotion.orbitTurns(1f), 0f)
-        // Calmer than before: never faster than 1.1 rev/s.
-        assertTrue((SplashMotion.orbitTurns(3.3f) - SplashMotion.orbitTurns(3.2f)) / 0.1f <= 1.11f)
+    }
+
+    @Test fun logoSizeFollowsTheCubePulse() {
+        val t = 5.0f
+        val logo = SplashMotion.logoPulse(t) - 1f
+        val cube = SplashMotion.breathScale(t) - 1f
+        assertTrue(logo * cube >= 0f)
+        assertTrue(kotlin.math.abs(logo) <= 0.025f + 1e-6f)
+        assertEquals(1f, SplashMotion.logoPulse(3.5f), 0f)
     }
 
     @Test fun orbitPointsLieOnScreenAndFrontIsLowerHalf() {

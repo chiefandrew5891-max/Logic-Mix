@@ -6,14 +6,14 @@ import kotlin.math.sin
 
 /** Pure timeline math of the startup splash (no Android types), so it can be unit-tested. All times are seconds. */
 object SplashMotion {
-    /** Cube motion ends at 4.0 s; the logo reveal, hold and final fade extend the splash to [DURATION]. */
-    const val CUBE_END = 4.0f
-    const val DURATION = 4.5f
+    /** 0-3.5 s energy build-up, 3.5-4.5 s logo reveal, 4.5-6 s final composition and fade. */
+    const val CUBE_END = 6.0f
+    const val DURATION = 6.0f
     const val REDUCED_DURATION = 1.2f
     const val FADE_IN_END = 0.5f
     const val RAMP_END = 1.5f
-    const val HOLD_END = 3.2f
-    const val FADE_OUT_START = 4.1f
+    const val HOLD_END = 5.5f
+    const val FADE_OUT_START = 5.5f
 
     /** Segment travel as a fraction of the cube size (3-7%). */
     const val MIN_AMPLITUDE = 0.03f
@@ -34,8 +34,8 @@ object SplashMotion {
         Bottom(0f, 1f, 0.36f, 5.1f),
     }
 
-    const val LOGO_START = 2.7f
-    const val LOGO_DURATION = 0.8f // reveal; held until FADE_OUT_START (0.6 s), then the overlay fades
+    const val LOGO_START = 3.5f
+    const val LOGO_DURATION = 1.0f // reveal; then the composition is held until FADE_OUT_START and the overlay fades
     const val LOGO_START_SCALE = 0.07f
     const val LOGO_START_ANGLE = -180f
 
@@ -62,7 +62,7 @@ object SplashMotion {
     fun overlayAlpha(t: Float, total: Float = DURATION): Float =
         1f - smooth((t - (total - (DURATION - FADE_OUT_START))) / (DURATION - FADE_OUT_START))
 
-    /** 0 -> 1 during 0.5-1.5 s, hold until 3.2 s, back to 0 at 4.0 s. */
+    /** 0 -> 1 during 0.5-1.5 s, hold until 5.5 s, back to 0 at 6.0 s. */
     fun amplitude(t: Float): Float = when {
         t < FADE_IN_END -> 0f
         t < RAMP_END -> smooth((t - FADE_IN_END) / (RAMP_END - FADE_IN_END))
@@ -90,18 +90,32 @@ object SplashMotion {
 
     fun coreScale(t: Float): Float = 1f + 0.035f * amplitude(t) * (0.5f + 0.5f * sin(2.0 * PI * t * 1.6).toFloat())
     fun coreGlow(t: Float): Float = amplitude(t) * (0.5f + 0.5f * sin(2.0 * PI * t * 1.6 - PI / 2).toFloat())
-    fun breathScale(t: Float): Float = 1f + 0.015f * amplitude(t) * sin(2.0 * PI * t * 0.8).toFloat()
+    /** The single shared pulse in [-1, 1] driving the cube breathing and the logo size, so the two are always in sync. */
+    fun pulse(t: Float): Float = sin(2.0 * PI * t * 0.8).toFloat()
+    fun breathScale(t: Float): Float = 1f + 0.015f * amplitude(t) * pulse(t)
 
-    /** Energy-pulse strength: ramps in at 1.5 s, off again by the end. */
-    fun orbitEnergy(t: Float): Float = smooth((t - RAMP_END) / 0.3f) * (1f - smooth((t - HOLD_END) / (CUBE_END - HOLD_END)))
+    /** Logo size factor (+-2.5%) from the shared [pulse]; blended in once the logo has settled at 4.5 s. */
+    fun logoPulse(t: Float): Float =
+        1f + 0.025f * amplitude(t) * smooth((t - (LOGO_START + LOGO_DURATION)) / 0.3f) * pulse(t)
 
-    const val ORBIT_START_SPEED = 0.2f // revolutions per second at 1.5 s
-    const val ORBIT_TOP_SPEED = 1.1f // revolutions per second from 3.2 s on
+    const val ORBIT_START = 0.5f
+    const val ORBIT_FULL = 3.5f
+    const val ORBIT_START_SPEED = 0.2f // revolutions per second at ORBIT_START
+    const val ORBIT_TOP_SPEED = 3.0f // revolutions per second from ORBIT_FULL on
 
-    /** Revolutions completed at time t. Speed eases from [ORBIT_START_SPEED] to [ORBIT_TOP_SPEED] quadratically, so it never decreases. */
+    /** Energy-pulse strength: ramps in from 0.5 s, off again with the final fade. */
+    fun orbitEnergy(t: Float): Float = smooth((t - ORBIT_START) / 0.4f) * (1f - smooth((t - FADE_OUT_START) / (DURATION - FADE_OUT_START)))
+
+    /** Revolutions per second: eases quadratically from the start speed to the top speed and never decreases. */
+    fun orbitSpeed(t: Float): Float {
+        val s = ((t - ORBIT_START) / (ORBIT_FULL - ORBIT_START)).coerceIn(0f, 1f)
+        return ORBIT_START_SPEED + (ORBIT_TOP_SPEED - ORBIT_START_SPEED) * s * s
+    }
+
+    /** Revolutions completed at time t (the integral of [orbitSpeed]). */
     fun orbitTurns(t: Float): Float {
-        val d = HOLD_END - RAMP_END
-        val tau = (t - RAMP_END).coerceAtLeast(0f)
+        val d = ORBIT_FULL - ORBIT_START
+        val tau = (t - ORBIT_START).coerceAtLeast(0f)
         val inRamp = tau.coerceAtMost(d)
         val ramp = ORBIT_START_SPEED * inRamp + (ORBIT_TOP_SPEED - ORBIT_START_SPEED) * inRamp * inRamp * inRamp / (3f * d * d)
         return ramp + ORBIT_TOP_SPEED * (tau - inRamp)
