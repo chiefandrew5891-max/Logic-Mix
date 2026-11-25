@@ -53,4 +53,15 @@ class SplashMotionTest {
         assertTrue(SplashMotion.isFront(-1.5f) && !SplashMotion.isFront(1.5f))
         assertTrue(yFront > yBack)
     }
+
+    @Test fun logoRevealsFromCentreWithOvershoot() {
+        assertEquals(0f, SplashMotion.logoAlpha(SplashMotion.logoProgress(0f)), 0f)
+        assertEquals(-180f, SplashMotion.logoAngle(0f), 0f)
+        assertEquals(0.07f, SplashMotion.logoScale(0f), 1e-6f)
+        assertEquals(0f, SplashMotion.logoAngle(1f), 0f)
+        assertEquals(1f, SplashMotion.logoScale(1f), 1e-6f)
+        val peak = (0..100).maxOf { SplashMotion.logoScale(it / 100f) }
+        assertTrue(peak in 1.05f..1.08f)
+        assertTrue(SplashMotion.LOGO_START + SplashMotion.LOGO_DURATION + 0.5f <= SplashMotion.FADE_OUT_START)
+    }
 }

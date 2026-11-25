@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.input.pointer.pointerInput
@@ -59,6 +60,7 @@ fun AnimatedSplashScreen(onFinished: () -> Unit) {
     val bottom = ImageBitmap.imageResource(R.drawable.splash_cube_bottom)
     val orbitBack = ImageBitmap.imageResource(R.drawable.splash_orbit_back)
     val orbitFront = ImageBitmap.imageResource(R.drawable.splash_orbit_front)
+    val logo = ImageBitmap.imageResource(R.drawable.splash_logo_text)
 
     val progress = remember { Animatable(0f) }
     LaunchedEffect(Unit) {
@@ -84,6 +86,7 @@ fun AnimatedSplashScreen(onFinished: () -> Unit) {
             translate((size.width - side) / 2f, (size.height - side) / 2f) {
                 scale(k, k, pivot = Offset.Zero) {
                     drawScene(motionT, alpha, core, top, left, right, bottom, orbitBack, orbitFront)
+                    drawLogo(if (reduced) 1f else SplashMotion.logoProgress(t), logo, alpha)
                 }
             }
         }
@@ -144,6 +147,26 @@ private fun DrawScope.drawScene(
 
             layer(orbitFront, alpha)
             drawOrbitPulses(t, energy, alpha, front = true)
+        }
+    }
+}
+
+private const val LOGO_WIDTH = 780f // layer units; the height follows the image proportions
+
+private fun DrawScope.drawLogo(p: Float, logo: ImageBitmap, alpha: Float) {
+    val a = SplashMotion.logoAlpha(p) * alpha
+    if (a <= 0f) return
+    val c = Offset(LAYER / 2f, LAYER / 2f)
+    val h = LOGO_WIDTH * logo.height / logo.width
+    val sc = SplashMotion.logoScale(p)
+    rotate(SplashMotion.logoAngle(p), pivot = c) {
+        scale(sc, sc, pivot = c) {
+            drawImage(
+                logo,
+                dstOffset = androidx.compose.ui.unit.IntOffset((c.x - LOGO_WIDTH / 2f).toInt(), (c.y - h / 2f).toInt()),
+                dstSize = IntSize(LOGO_WIDTH.toInt(), h.toInt()),
+                alpha = a, filterQuality = FilterQuality.High,
+            )
         }
     }
 }

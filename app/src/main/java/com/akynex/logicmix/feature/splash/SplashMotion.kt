@@ -6,12 +6,14 @@ import kotlin.math.sin
 
 /** Pure timeline math of the startup splash (no Android types), so it can be unit-tested. All times are seconds. */
 object SplashMotion {
-    const val DURATION = 4.0f
+    /** Cube motion ends at 4.0 s; the logo reveal, hold and final fade extend the splash to [DURATION]. */
+    const val CUBE_END = 4.0f
+    const val DURATION = 4.5f
     const val REDUCED_DURATION = 1.2f
     const val FADE_IN_END = 0.5f
     const val RAMP_END = 1.5f
     const val HOLD_END = 3.2f
-    const val FADE_OUT_START = 3.5f
+    const val FADE_OUT_START = 4.1f
 
     /** Segment travel as a fraction of the cube size (3-7%). */
     const val MIN_AMPLITUDE = 0.03f
@@ -32,6 +34,25 @@ object SplashMotion {
         Bottom(0f, 1f, 0.36f, 5.1f),
     }
 
+    const val LOGO_START = 2.7f
+    const val LOGO_DURATION = 0.8f // reveal; held until FADE_OUT_START (0.6 s), then the overlay fades
+    const val LOGO_START_SCALE = 0.07f
+    const val LOGO_START_ANGLE = -180f
+
+    fun logoProgress(t: Float): Float = ((t - LOGO_START) / LOGO_DURATION).coerceIn(0f, 1f)
+
+    /** Grows from 7% through a ~106% overshoot back to 100%. */
+    fun logoScale(p: Float): Float {
+        val u = p - 1f
+        val back = 1f + 2.4f * u * u * u + 1.4f * u * u
+        return LOGO_START_SCALE + (1f - LOGO_START_SCALE) * back
+    }
+
+    /** Turns from -180 degrees to exactly 0; only the logo rotates. */
+    fun logoAngle(p: Float): Float { val u = 1f - p; return LOGO_START_ANGLE * u * u * u }
+
+    fun logoAlpha(p: Float): Float = smooth(p / 0.2f)
+
     fun smooth(x: Float): Float { val t = x.coerceIn(0f, 1f); return t * t * (3 - 2 * t) }
 
     /** Overall opacity of the artwork: fades in over 0.5 s. */
@@ -46,7 +67,7 @@ object SplashMotion {
         t < FADE_IN_END -> 0f
         t < RAMP_END -> smooth((t - FADE_IN_END) / (RAMP_END - FADE_IN_END))
         t < HOLD_END -> 1f
-        else -> 1f - smooth((t - HOLD_END) / (DURATION - HOLD_END))
+        else -> 1f - smooth((t - HOLD_END) / (CUBE_END - HOLD_END))
     }
 
     /** Signed travel factor in [0, 1] of a segment (breathes apart and back, never past its own amplitude). */
@@ -72,7 +93,7 @@ object SplashMotion {
     fun breathScale(t: Float): Float = 1f + 0.015f * amplitude(t) * sin(2.0 * PI * t * 0.8).toFloat()
 
     /** Energy-pulse strength: ramps in at 1.5 s, off again by the end. */
-    fun orbitEnergy(t: Float): Float = smooth((t - RAMP_END) / 0.3f) * (1f - smooth((t - HOLD_END) / (DURATION - HOLD_END)))
+    fun orbitEnergy(t: Float): Float = smooth((t - RAMP_END) / 0.3f) * (1f - smooth((t - HOLD_END) / (CUBE_END - HOLD_END)))
 
     const val ORBIT_START_SPEED = 0.2f // revolutions per second at 1.5 s
     const val ORBIT_TOP_SPEED = 1.1f // revolutions per second from 3.2 s on
