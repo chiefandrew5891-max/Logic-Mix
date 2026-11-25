@@ -13,6 +13,7 @@ import com.akynex.logicmix.core.designsystem.PremiumTone
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.remember
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import com.akynex.logicmix.core.audio.withTap
