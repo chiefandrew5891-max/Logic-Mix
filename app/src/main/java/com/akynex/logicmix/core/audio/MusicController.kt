@@ -19,7 +19,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -38,6 +40,9 @@ class MusicController @Inject constructor(
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val foreground = MutableStateFlow(false)
+    private val splashDone = MutableStateFlow(false)
+    private var fadePending = false
+    private var fadeJob: Job? = null
     private var player: ExoPlayer? = null
     private var started = false
     private val prefs = context.getSharedPreferences("music_state", Context.MODE_PRIVATE)
@@ -57,9 +62,17 @@ class MusicController @Inject constructor(
             override fun onStop(owner: LifecycleOwner) { foreground.value = false }
         })
         scope.launch {
-            combine(settings.audio, foreground) { audio, fg -> audio to fg }
+            // Nothing plays until the startup splash is over; the existing settings still decide afterwards.
+            combine(settings.audio, foreground, splashDone) { audio, fg, done -> audio to (fg && done) }
                 .collect { (audio, fg) -> apply(audio, fg) }
         }
+    }
+
+    /** Idempotent: opens the gate once the splash has finished; the first start then fades in. */
+    fun releaseAfterSplash() {
+        if (splashDone.value) return
+        fadePending = true
+        splashDone.value = true
     }
 
     /** Play/Pause is the existing music switch, so the settings screen and the player never disagree. */
@@ -98,7 +111,21 @@ class MusicController @Inject constructor(
             return
         }
         val exo = player ?: createPlayer().also { player = it }
-        exo.volume = musicPlayerVolume(audio.musicVolume)
+        if (fadePending) {
+            fadePending = false
+            exo.volume = 0f
+            exo.play()
+            fadeJob = scope.launch {
+                val steps = FADE_MS / FADE_STEP_MS
+                for (i in 1..steps) {
+                    delay(FADE_STEP_MS)
+                    exo.volume = musicPlayerVolume(settings.audio.first().musicVolume) * i / steps
+                }
+                fadeJob = null
+            }
+            return
+        }
+        if (fadeJob?.isActive != true) exo.volume = musicPlayerVolume(audio.musicVolume)
         exo.play()
     }
 
@@ -141,5 +168,7 @@ class MusicController @Inject constructor(
     private companion object {
         const val TAG = "MusicController"
         const val KEY_LAST = "last_track"
+        const val FADE_MS = 700L
+        const val FADE_STEP_MS = 35L
     }
 }

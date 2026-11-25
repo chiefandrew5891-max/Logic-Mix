@@ -21,7 +21,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.input.pointer.pointerInput
@@ -108,7 +107,7 @@ private fun DrawScope.drawScene(
 
     val s = SplashMotion.breathScale(t)
     scale(s, s, pivot = c) {
-        rotate(SplashMotion.swayDegrees(t), pivot = c) {
+        run {
             // Soft halo behind the cube; breathes with the core.
             drawCircle(
                 Brush.radialGradient(
@@ -135,7 +134,8 @@ private fun DrawScope.drawScene(
             fun seg(img: ImageBitmap, seg: SplashMotion.Segment) {
                 val d = SplashMotion.spread(seg, t) * SplashMotion.amplitudeFor(seg) * CUBE_SIZE
                 val len = max(0.001f, kotlin.math.sqrt(seg.dx * seg.dx + seg.dy * seg.dy))
-                layer(img, alpha, seg.dx / len * d, seg.dy / len * d)
+                val z = SplashMotion.segmentScale(seg, t)
+                scale(z, z, pivot = c) { layer(img, alpha, seg.dx / len * d, seg.dy / len * d) }
             }
             seg(bottom, SplashMotion.Segment.Bottom)
             seg(left, SplashMotion.Segment.Left)

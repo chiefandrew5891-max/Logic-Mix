@@ -59,6 +59,7 @@ class MainActivity : AppCompatActivity() {
     @Inject lateinit var sfx: SoundEffectsController
     @Inject lateinit var monetization: com.akynex.logicmix.core.monetization.Monetization
     @Inject lateinit var games: com.akynex.logicmix.core.games.GamesCoordinator
+    @Inject lateinit var music: com.akynex.logicmix.core.audio.MusicController
     @Inject lateinit var review: com.akynex.logicmix.core.review.ReviewCoordinator
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,6 +67,7 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState == null) monetization.gatherConsent(this)
         // Cold start only: a recreated activity (rotation, process restore) has a saved state and skips the splash.
         val showSplashInitially = savedInstanceState == null
+        if (!showSplashInitially) music.releaseAfterSplash()
         setContent {
             var showSplash by rememberSaveable { mutableStateOf(showSplashInitially) }
             val themeMode by settings.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
@@ -79,7 +81,7 @@ class MainActivity : AppCompatActivity() {
                         com.akynex.logicmix.feature.levelup.LevelUpHost()
                         if (showSplash) {
                             BackHandler { }
-                            com.akynex.logicmix.feature.splash.AnimatedSplashScreen { showSplash = false }
+                            com.akynex.logicmix.feature.splash.AnimatedSplashScreen { showSplash = false; music.releaseAfterSplash() }
                         }
                     }
                 }

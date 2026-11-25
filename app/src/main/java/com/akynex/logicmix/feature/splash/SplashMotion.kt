@@ -64,21 +64,26 @@ object SplashMotion {
         Segment.Core -> 0f
     }
 
+    /** Size pulse of a segment about the cube centre (no rotation); the per-segment delay keeps them out of phase. */
+    fun segmentScale(segment: Segment, t: Float): Float = 1f + 0.03f * spread(segment, t)
+
     fun coreScale(t: Float): Float = 1f + 0.035f * amplitude(t) * (0.5f + 0.5f * sin(2.0 * PI * t * 1.6).toFloat())
     fun coreGlow(t: Float): Float = amplitude(t) * (0.5f + 0.5f * sin(2.0 * PI * t * 1.6 - PI / 2).toFloat())
     fun breathScale(t: Float): Float = 1f + 0.015f * amplitude(t) * sin(2.0 * PI * t * 0.8).toFloat()
-    fun swayDegrees(t: Float): Float = 1.2f * amplitude(t) * sin(2.0 * PI * t * 0.5).toFloat()
 
     /** Energy-pulse strength: ramps in at 1.5 s, off again by the end. */
     fun orbitEnergy(t: Float): Float = smooth((t - RAMP_END) / 0.3f) * (1f - smooth((t - HOLD_END) / (DURATION - HOLD_END)))
 
-    /** Revolutions completed at time t. Speed grows from 0.5 to 3 rev/s between 1.5 s and 3.2 s, so it is monotonic. */
+    const val ORBIT_START_SPEED = 0.2f // revolutions per second at 1.5 s
+    const val ORBIT_TOP_SPEED = 1.1f // revolutions per second from 3.2 s on
+
+    /** Revolutions completed at time t. Speed eases from [ORBIT_START_SPEED] to [ORBIT_TOP_SPEED] quadratically, so it never decreases. */
     fun orbitTurns(t: Float): Float {
         val d = HOLD_END - RAMP_END
         val tau = (t - RAMP_END).coerceAtLeast(0f)
         val inRamp = tau.coerceAtMost(d)
-        val ramp = 0.5f * inRamp + 2.5f * inRamp * inRamp * inRamp / (3f * d * d)
-        return ramp + 3f * (tau - inRamp)
+        val ramp = ORBIT_START_SPEED * inRamp + (ORBIT_TOP_SPEED - ORBIT_START_SPEED) * inRamp * inRamp * inRamp / (3f * d * d)
+        return ramp + ORBIT_TOP_SPEED * (tau - inRamp)
     }
 
     /** Position on the orbit ellipse for angle [theta] (radians). Returns x, y in layer space. */

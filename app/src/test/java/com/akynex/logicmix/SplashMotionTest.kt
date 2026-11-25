@@ -38,6 +38,8 @@ class SplashMotionTest {
             prev = turns; t += 0.01f
         }
         assertEquals(0f, SplashMotion.orbitTurns(1f), 0f)
+        // Calmer than before: never faster than 1.1 rev/s.
+        assertTrue((SplashMotion.orbitTurns(3.3f) - SplashMotion.orbitTurns(3.2f)) / 0.1f <= 1.11f)
     }
 
     @Test fun orbitPointsLieOnScreenAndFrontIsLowerHalf() {
