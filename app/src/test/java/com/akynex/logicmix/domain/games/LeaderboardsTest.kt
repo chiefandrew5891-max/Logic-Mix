@@ -4,6 +4,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.io.File
 
 class LeaderboardsTest {
     private val ids = LeaderboardIds.parse(
@@ -39,5 +40,14 @@ class LeaderboardsTest {
         val current = mapOf(LeaderboardKey.TOTAL_XP to 100L)
         assertEquals(1, ScorePlanner.plan(current, emptyMap(), ids).size)
         assertTrue(ScorePlanner.plan(current, mapOf(LeaderboardKey.TOTAL_XP to 120L), ids).isEmpty())
+    }
+
+    @Test fun shippedFileConfiguresAllElevenUniqueBoards() {
+        val dir = listOf("src/main/assets", "app/src/main/assets").map(::File).first { it.isDirectory }
+        val shipped = LeaderboardIds.parse(File(dir, "games/leaderboards.properties").readText())
+        assertEquals(LeaderboardKey.entries.size, shipped.configured.size)
+        val all = LeaderboardKey.entries.map { shipped.idOf(it)!! }
+        assertEquals(all.size, all.toSet().size)
+        assertTrue(all.all { it.startsWith("CgkI") })
     }
 }
