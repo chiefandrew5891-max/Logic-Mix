@@ -1,0 +1,8 @@
+<resources>
+    <!-- Android 12+ system splash: plain navy with no icon, so only the animated cube is visible. -->
+    <style name="Theme.LogicMix" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="android:windowBackground">@color/splash_background</item>
+        <item name="android:windowSplashScreenBackground">@color/splash_background</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@android:color/transparent</item>
+    </style>
+</resources>

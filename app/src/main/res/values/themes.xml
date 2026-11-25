@@ -1,3 +1,6 @@
 <resources>
-    <style name="Theme.LogicMix" parent="Theme.AppCompat.DayNight.NoActionBar" />
+    <style name="Theme.LogicMix" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <!-- Same navy as the Compose splash so there is no white flash between the window and the first frame. -->
+        <item name="android:windowBackground">@color/splash_background</item>
+    </style>
 </resources>

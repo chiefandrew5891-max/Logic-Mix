@@ -64,7 +64,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (savedInstanceState == null) monetization.gatherConsent(this)
+        // Cold start only: a recreated activity (rotation, process restore) has a saved state and skips the splash.
+        val showSplashInitially = savedInstanceState == null
         setContent {
+            var showSplash by rememberSaveable { mutableStateOf(showSplashInitially) }
             val themeMode by settings.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
             val language by settings.language.collectAsState(initial = null)
             LaunchedEffect(language) { language?.let { LocaleApplier.apply(it) } }
@@ -74,6 +77,10 @@ class MainActivity : AppCompatActivity() {
                     androidx.compose.foundation.layout.Box {
                         LogicMixNavigation(rememberNavController(), gameStyle, sfx, review)
                         com.akynex.logicmix.feature.levelup.LevelUpHost()
+                        if (showSplash) {
+                            BackHandler { }
+                            com.akynex.logicmix.feature.splash.AnimatedSplashScreen { showSplash = false }
+                        }
                     }
                 }
             }
