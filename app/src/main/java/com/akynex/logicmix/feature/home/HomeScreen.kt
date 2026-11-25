@@ -1,6 +1,20 @@
 package com.akynex.logicmix.feature.home
 
 import com.akynex.logicmix.core.designsystem.BrandFooter
+import com.akynex.logicmix.core.designsystem.PremiumAuroraBackground
+import com.akynex.logicmix.core.designsystem.PremiumAvatar
+import com.akynex.logicmix.core.designsystem.PremiumCard
+import com.akynex.logicmix.core.designsystem.PremiumGoldButton
+import com.akynex.logicmix.core.designsystem.PremiumIconButton
+import com.akynex.logicmix.core.designsystem.PremiumProgressBar
+import com.akynex.logicmix.core.designsystem.PremiumSectionHeader
+import com.akynex.logicmix.core.designsystem.PremiumTokens
+import com.akynex.logicmix.core.designsystem.PremiumTone
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.width
+import androidx.compose.runtime.remember
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.graphicsLayer
 import com.akynex.logicmix.core.audio.withTap
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
@@ -103,68 +117,77 @@ fun HomeScreen(
     games: com.akynex.logicmix.core.games.GamesState = com.akynex.logicmix.core.games.GamesState(),
 ) {
     val colors = LogicMixTokens.colors
-    Box(Modifier.fillMaxSize().background(colors.backgroundBrush)) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = LogicMixTokens.spacing, vertical = LogicMixTokens.spacing)
-                .padding(top = LogicMixTokens.spacingL)
-                .widthIn(max = 560.dp)
-                .align(Alignment.TopCenter),
-            verticalArrangement = com.akynex.logicmix.core.designsystem.stickyFooterArrangement(LogicMixTokens.spacing),
-        ) {
-            TopBar(onSettings, music, onPreviousTrack, onTogglePlayback, onNextTrack)
-            PlayerCard(state, games)
-            PrimaryButton(
-                label = stringResource(
-                    if (state.primaryAction == PrimaryAction.CONTINUE) R.string.home_continue else R.string.home_start_game,
-                ),
-                onClick = onPrimary,
-            )
-            EqualHeightRow {
-                FeatureCard(
-                    icon = R.drawable.ic_daily,
-                    art = "icon_daily_challenge",
-                    title = stringResource(R.string.home_daily_title),
-                    subtitle = stringResource(R.string.home_daily_subtitle),
-                    onClick = { onPlay(GameMode.DAILY) },
-                    modifier = Modifier.weight(1f).fillMaxHeight(),
-                )
-                FeatureCard(
-                    icon = R.drawable.ic_rewards,
-                    art = "icon_rewards_trophy",
-                    title = stringResource(R.string.home_rewards_title),
-                    subtitle = stringResource(R.string.home_rewards_subtitle),
-                    onClick = onRewards,
-                    modifier = Modifier.weight(1f).fillMaxHeight(),
-                    gold = true,
-                )
+    PremiumAuroraBackground(Modifier.fillMaxSize()) {
+        BoxWithConstraints(Modifier.fillMaxSize()) {
+            // All proportions derive from the usable width (capped like the column), never from pixel positions.
+            val pad = 12.dp
+            val w = minOf(maxWidth, 560.dp) - pad * 2
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = pad, vertical = LogicMixTokens.spacingS)
+                    .padding(top = LogicMixTokens.spacingL)
+                    .widthIn(max = 560.dp - pad * 2)
+                    .align(Alignment.TopCenter),
+                verticalArrangement = com.akynex.logicmix.core.designsystem.stickyFooterArrangement(LogicMixTokens.spacingM),
+            ) {
+                TopBar(onSettings, music, onPreviousTrack, onTogglePlayback, onNextTrack)
+                PlayerCard(state, games, w)
+                // The cube overlaps the top of the main button so the two read as one composition.
+                Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(-(w * 0.06f))) {
+                    HeroCube(Modifier.height(w * 0.42f))
+                    BoxWithConstraints(Modifier.fillMaxWidth(0.76f)) {
+                        PremiumGoldButton(
+                            label = stringResource(
+                                if (state.primaryAction == PrimaryAction.CONTINUE) R.string.home_continue else R.string.home_start_game,
+                            ),
+                            onClick = withTap(onPrimary),
+                            modifier = Modifier.fillMaxWidth(),
+                            minHeight = w * 0.155f,
+                            icon = { LogicMixIcon(R.drawable.ic_play, PremiumTokens.OnGold, size = 26.dp) },
+                        )
+                    }
+                }
+                EqualHeightRow {
+                    FeatureCard(
+                        icon = R.drawable.ic_daily,
+                        art = "icon_daily_challenge",
+                        title = stringResource(R.string.home_daily_title),
+                        subtitle = stringResource(R.string.home_daily_subtitle),
+                        onClick = { onPlay(GameMode.DAILY) },
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
+                        minHeight = w * 0.235f,
+                    )
+                    FeatureCard(
+                        icon = R.drawable.ic_rewards,
+                        art = "icon_rewards_trophy",
+                        title = stringResource(R.string.home_rewards_title),
+                        subtitle = stringResource(R.string.home_rewards_subtitle),
+                        onClick = onRewards,
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
+                        gold = true,
+                        minHeight = w * 0.235f,
+                    )
+                }
+                if (games.status != com.akynex.logicmix.core.games.GamesStatus.DISABLED) {
+                    LeaderboardCard(onLeaderboards)
+                }
+                PremiumSectionHeader(stringResource(R.string.home_modes_title))
+                EqualHeightRow {
+                    ModeCard(
+                        R.drawable.ic_career, "icon_career", stringResource(R.string.mode_career), stringResource(R.string.mode_career_subtitle),
+                        { onPlay(GameMode.CAREER) }, Modifier.weight(1f).fillMaxHeight(),
+                    )
+                    ModeCard(
+                        R.drawable.ic_endless, "icon_endless_mode", stringResource(R.string.mode_endless), stringResource(R.string.mode_endless_subtitle),
+                        { onPlay(GameMode.ENDLESS) }, Modifier.weight(1f).fillMaxHeight(),
+                    )
+                }
+                PremiumSectionHeader(stringResource(R.string.home_categories_title))
+                CategoryGrid(categories = GameCategory.entries.filter { it in state.categories }, onClick = onCategory)
+                BrandFooter()
             }
-            if (games.status != com.akynex.logicmix.core.games.GamesStatus.DISABLED) {
-                FeatureCard(
-                    icon = R.drawable.ic_rewards,
-                    art = "icon_leaderboards",
-                    title = stringResource(R.string.home_leaderboards),
-                    subtitle = stringResource(R.string.home_leaderboards_sub),
-                    onClick = onLeaderboards,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-            SectionTitle(stringResource(R.string.home_modes_title))
-            EqualHeightRow {
-                ModeCard(
-                    R.drawable.ic_career, "icon_career", stringResource(R.string.mode_career), stringResource(R.string.mode_career_subtitle),
-                    { onPlay(GameMode.CAREER) }, Modifier.weight(1f).fillMaxHeight(),
-                )
-                ModeCard(
-                    R.drawable.ic_endless, "icon_endless_mode", stringResource(R.string.mode_endless), stringResource(R.string.mode_endless_subtitle),
-                    { onPlay(GameMode.ENDLESS) }, Modifier.weight(1f).fillMaxHeight(),
-                )
-            }
-            SectionTitle(stringResource(R.string.home_categories_title))
-            CategoryGrid(categories = GameCategory.entries.filter { it in state.categories }, onClick = onCategory)
-            BrandFooter()
         }
     }
 }
@@ -186,104 +209,97 @@ private fun TopBar(onSettings: () -> Unit, music: MusicPanelState, onPrevious: (
     )
 }
 
+/** Compact horizontal profile: avatar | name, level, XP capsule | divider | streak. */
 @Composable
-private fun PlayerCard(state: HomeUiState, games: com.akynex.logicmix.core.games.GamesState) {
+private fun PlayerCard(state: HomeUiState, games: com.akynex.logicmix.core.games.GamesState, w: androidx.compose.ui.unit.Dp) {
     val colors = LogicMixTokens.colors
-    CardSurface(Modifier.fillMaxWidth(), LogicMixTokens.radii.large) {
-        Row(Modifier.padding(LogicMixTokens.spacing), verticalAlignment = Alignment.CenterVertically) {
-            if (games.status == com.akynex.logicmix.core.games.GamesStatus.SIGNED_IN && games.avatar != null) {
-                Image(
-                    games.avatar.asImageBitmap(), null, contentScale = ContentScale.Crop,
-                    modifier = Modifier.padding(end = LogicMixTokens.spacingM).size(48.dp).clip(androidx.compose.foundation.shape.CircleShape),
-                )
-            }
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS)) {
+    val signedIn = games.status == com.akynex.logicmix.core.games.GamesStatus.SIGNED_IN
+    PremiumCard(Modifier.fillMaxWidth()) {
+        Row(
+            Modifier.fillMaxWidth().defaultMinSize(minHeight = w * 0.17f).padding(horizontal = LogicMixTokens.spacingM, vertical = LogicMixTokens.spacingS),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            PremiumAvatar(w * 0.15f, image = if (signedIn) games.avatar?.asImageBitmap() else null)
+            Column(Modifier.weight(1f).padding(horizontal = LogicMixTokens.spacingM), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 if (games.status != com.akynex.logicmix.core.games.GamesStatus.DISABLED) {
                     Text(
-                        text = if (games.status == com.akynex.logicmix.core.games.GamesStatus.SIGNED_IN && games.name != null) games.name else stringResource(R.string.games_profile_guest),
+                        text = if (signedIn && games.name != null) games.name else stringResource(R.string.games_profile_guest),
                         style = LogicMixTokens.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                     )
                 }
                 Text(
                     text = stringResource(R.string.home_level, state.level),
-                    style = LogicMixTokens.typography.titleLarge,
-                    color = colors.gold,
+                    style = LogicMixTokens.typography.titleLarge, color = colors.gold, maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                 )
-                XpBar(state.xpFraction)
-                Text(
-                    text = state.xpForNextLevel?.let { stringResource(R.string.home_xp_progress, state.xpIntoLevel, it) }
-                        ?: stringResource(R.string.home_xp_max),
-                    style = LogicMixTokens.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                PremiumProgressBar(
+                    state.xpFraction, Modifier.fillMaxWidth(),
+                    label = state.xpForNextLevel?.let { stringResource(R.string.home_xp_progress, state.xpIntoLevel, it) } ?: stringResource(R.string.home_xp_max),
                 )
             }
-            Column(
-                Modifier.padding(start = LogicMixTokens.spacing),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
+            Box(Modifier.width(1.dp).height(w * 0.1f).background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.18f)))
+            Column(Modifier.width(w * 0.2f), horizontalAlignment = Alignment.CenterHorizontally) {
                 val fire = rememberDrawableId("icon_streak_fire")
                 if (fire != 0) {
-                    Image(painterResource(fire), null, contentScale = ContentScale.Fit, modifier = Modifier.size(32.dp))
+                    Image(painterResource(fire), null, contentScale = ContentScale.Fit, modifier = Modifier.size(30.dp))
                 } else {
                     LogicMixIcon(R.drawable.ic_streak, colors.gold, size = 28.dp)
                 }
+                Text(text = state.streak.toString(), style = LogicMixTokens.typography.titleLarge, color = colors.gold)
                 Text(
-                    text = state.streak.toString(),
-                    style = LogicMixTokens.typography.headlineMedium,
-                    color = colors.gold,
-                )
-                Text(
-                    text = stringResource(R.string.home_streak),
-                    style = LogicMixTokens.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    text = stringResource(R.string.home_streak), style = LogicMixTokens.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                 )
             }
         }
     }
 }
 
+/** The approved cube (pre-composed from the splash layers) with a soft glow, a very slow breathing pulse and a few light motes. */
 @Composable
-private fun XpBar(fraction: Float) {
-    val colors = LogicMixTokens.colors
-    val shape = RoundedCornerShape(50)
-    Box(Modifier.fillMaxWidth().height(12.dp).clip(shape).background(colors.xpTrack)) {
-        if (fraction > 0f) {
-            Box(Modifier.fillMaxWidth(fraction).height(12.dp).clip(shape).background(colors.xpFill))
-        }
-    }
-}
-
-@Composable
-private fun PrimaryButton(label: String, onClick: () -> Unit) {
-    val colors = LogicMixTokens.colors
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = LogicMixTokens.buttonHeight)
-            .clip(LogicMixTokens.radii.extraLarge)
-            .background(colors.primaryActionBrush)
-            .clickable(role = Role.Button, onClick = onClick)
-            .padding(horizontal = LogicMixTokens.spacingL, vertical = LogicMixTokens.spacingM),
-        contentAlignment = Alignment.Center,
-    ) {
-        Row(horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS), verticalAlignment = Alignment.CenterVertically) {
-            LogicMixIcon(R.drawable.ic_play, colors.onGold, size = 28.dp)
-            Text(
-                text = label.uppercase(),
-                style = LogicMixTokens.typography.headlineMedium,
-                color = colors.onGold,
-                textAlign = TextAlign.Center,
+private fun HeroCube(modifier: Modifier = Modifier) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val motion = remember { android.provider.Settings.Global.getFloat(context.contentResolver, android.provider.Settings.Global.ANIMATOR_DURATION_SCALE, 1f) > 0f }
+    val phase = if (motion) {
+        val t = androidx.compose.animation.core.rememberInfiniteTransition(label = "heroCube")
+        t.animateFloat(
+            0f, 1f,
+            androidx.compose.animation.core.infiniteRepeatable(androidx.compose.animation.core.tween(7000, easing = androidx.compose.animation.core.LinearEasing)),
+            label = "heroPhase",
+        ).value
+    } else 0f
+    Box(modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        androidx.compose.foundation.Canvas(Modifier.fillMaxSize()) {
+            val c = Offset(size.width / 2f, size.height * 0.5f)
+            drawCircle(
+                Brush.radialGradient(listOf(Color(0xFF00D8E8).copy(alpha = 0.28f), Color.Transparent), center = c, radius = size.height * 0.85f),
+                radius = size.height * 0.85f, center = c,
             )
+            for (i in 0 until 5) {
+                val a = (phase + i / 5f) % 1f
+                val ang = i * 1.9f
+                val x = c.x + kotlin.math.cos(ang) * size.height * (0.55f + 0.1f * i % 3)
+                val y = c.y - size.height * 0.45f + (i % 3) * size.height * 0.4f - a * size.height * 0.1f
+                drawCircle(Color.White.copy(alpha = 0.6f * kotlin.math.sin(a * Math.PI.toFloat())), radius = 1.6.dp.toPx() + (i % 2) * 0.8.dp.toPx(), center = Offset(x, y))
+            }
         }
+        Image(
+            painterResource(R.drawable.home_cube), null,
+            Modifier.fillMaxHeight().graphicsLayer { val s = 1f + 0.015f * kotlin.math.sin(phase * 2f * Math.PI.toFloat()); scaleX = s; scaleY = s },
+            contentScale = ContentScale.Fit,
+        )
     }
 }
 
 // Paired cards: equal width via weight(1f) and equal height via IntrinsicSize.Min + fillMaxHeight() on children.
 @Composable
 private fun EqualHeightRow(content: @Composable RowScope.() -> Unit) {
-    Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM), content = content)
+    Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS), content = content)
 }
 
+/** Compact card: art + title on top, short description and a round arrow below. */
 @Composable
 private fun FeatureCard(
     @DrawableRes icon: Int,
@@ -293,71 +309,63 @@ private fun FeatureCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     gold: Boolean = false,
+    minHeight: androidx.compose.ui.unit.Dp = 88.dp,
 ) {
-    val brush = if (gold) LogicMixTokens.colors.rewardBrush else LogicMixTokens.colors.cardBrush
-    CardSurface(modifier.clickable(role = Role.Button, onClick = onClick), LogicMixTokens.radii.large, brush) {
-        Column(Modifier.fillMaxSize().padding(LogicMixTokens.spacingM), verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingXs)) {
-            CardArt(art, icon, if (gold) LogicMixTokens.colors.gold else MaterialTheme.colorScheme.secondary)
-            Text(title, style = LogicMixTokens.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
-            Text(subtitle, style = LogicMixTokens.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    PremiumCard(modifier.defaultMinSize(minHeight = minHeight), tone = if (gold) PremiumTone.Violet else PremiumTone.Blue, onClick = onClick) {
+        Column(Modifier.fillMaxSize().padding(LogicMixTokens.spacingS + 2.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS)) {
+                CardArt(art, icon, if (gold) LogicMixTokens.colors.gold else MaterialTheme.colorScheme.secondary, 44.dp)
+                Text(title, Modifier.weight(1f), style = LogicMixTokens.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface, maxLines = 2)
+            }
+            Row(Modifier.weight(1f, fill = false), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingXs)) {
+                Text(subtitle, Modifier.weight(1f), style = LogicMixTokens.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 3)
+                PremiumIconButton(24.dp, gold = gold)
+            }
+        }
+    }
+}
+
+@Composable
+private fun LeaderboardCard(onClick: () -> Unit) {
+    PremiumCard(Modifier.fillMaxWidth(), tone = PremiumTone.Gold, onClick = onClick) {
+        Row(
+            Modifier.fillMaxWidth().padding(horizontal = LogicMixTokens.spacingM, vertical = LogicMixTokens.spacingS),
+            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM),
+        ) {
+            CardArt("icon_leaderboards", R.drawable.ic_rewards, LogicMixTokens.colors.gold, 48.dp)
+            Column(Modifier.weight(1f)) {
+                Text(stringResource(R.string.home_leaderboards), style = LogicMixTokens.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface, maxLines = 2)
+                Text(stringResource(R.string.home_leaderboards_sub), style = LogicMixTokens.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2)
+            }
+            PremiumIconButton(28.dp, gold = true)
         }
     }
 }
 
 @Composable
 private fun ModeCard(@DrawableRes icon: Int, art: String, title: String, subtitle: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    CardSurface(modifier.clickable(role = Role.Button, onClick = onClick), LogicMixTokens.radii.large) {
+    PremiumCard(modifier, onClick = onClick) {
         Column(
-            Modifier.fillMaxSize().padding(LogicMixTokens.spacingM),
+            Modifier.fillMaxSize().padding(horizontal = LogicMixTokens.spacingS, vertical = LogicMixTokens.spacingM),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingXs),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
-            CardArt(art, icon, MaterialTheme.colorScheme.primary)
+            CardArt(art, icon, MaterialTheme.colorScheme.primary, 52.dp)
             Text(title, style = LogicMixTokens.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface, textAlign = TextAlign.Center)
-            Text(subtitle, style = LogicMixTokens.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
+            Text(subtitle, style = LogicMixTokens.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
         }
     }
 }
 
 /** The 3D PNG from res/drawable-nodpi when it exists (untinted, proportions kept); otherwise the old tinted vector. */
 @Composable
-private fun CardArt(art: String, @DrawableRes fallback: Int, tint: Color) {
+private fun CardArt(art: String, @DrawableRes fallback: Int, tint: Color, size: androidx.compose.ui.unit.Dp) {
     val id = rememberDrawableId(art)
-    // Centered across the whole card width, not the text column.
-    Box(Modifier.fillMaxWidth().height(52.dp), contentAlignment = Alignment.Center) {
+    Box(Modifier.size(size), contentAlignment = Alignment.Center) {
         if (id != 0) {
-            Image(painterResource(id), contentDescription = null, contentScale = ContentScale.Fit, modifier = Modifier.size(52.dp))
+            Image(painterResource(id), contentDescription = null, contentScale = ContentScale.Fit, modifier = Modifier.size(size))
         } else {
-            LogicMixIcon(fallback, tint, size = 32.dp)
+            LogicMixIcon(fallback, tint, size = size * 0.62f)
         }
     }
-}
-
-@Composable
-private fun SectionTitle(text: String) {
-    Text(
-        text = text,
-        style = LogicMixTokens.typography.titleMedium,
-        color = MaterialTheme.colorScheme.onBackground,
-        modifier = Modifier.fillMaxWidth(),
-        textAlign = TextAlign.Center,
-    )
-}
-
-/** Shared by the progress block and the four feature/mode cards (was 1dp). */
-private val CARD_BORDER = 2.dp
-
-@Composable
-private fun CardSurface(
-    modifier: Modifier = Modifier,
-    shape: Shape = LogicMixTokens.radii.large,
-    brush: Brush = LogicMixTokens.colors.cardBrush,
-    content: @Composable () -> Unit,
-) {
-    Box(
-        modifier
-            .clip(shape)
-            .background(brush)
-            .border(BorderStroke(CARD_BORDER, LogicMixTokens.colors.cardBorder), shape),
-    ) { content() }
 }

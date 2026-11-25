@@ -221,7 +221,7 @@ fun CategoryCard(
                 }
             }
             .clip(shape)
-            .background(colors.cardBrush)
+            .premiumSurface(PremiumTone.Blue, 20.dp)
             .border(BorderStroke(borderWidth, frame), shape)
             .semantics(mergeDescendants = true) {
                 contentDescription = title

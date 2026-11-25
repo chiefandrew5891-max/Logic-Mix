@@ -7,3 +7,7 @@
 - Экраны на `CategoryScaffold` получают поведение без дополнительных действий.
 - Полноэкранная заставка (`AnimatedSplashScreen`) — оверлей над экраном и футер не показывает.
 - Не копировать футер и не задавать высоты вручную.
+
+## Premium-компоненты
+
+- Премиум-оформление — только общие компоненты `core/designsystem/PremiumDesign.kt`: `PremiumAuroraBackground`, `PremiumCard` (`premiumSurface`), `PremiumGoldButton`, `PremiumProgressBar`, `PremiumAvatar`, `PremiumIconButton`, `PremiumSectionHeader` и токены `PremiumTokens`. Эффекты рисуются через `drawWithCache` (без blur и offscreen-слоёв), размеры экрана считаются от доступной ширины. Игровые поля декором не перегружать.
