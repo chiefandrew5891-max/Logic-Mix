@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 /** Premium settings icon (96x96 viewport, transparent background). Decorative: the parent control carries the description. */
 @Composable
 fun LogicMixSettingsIcon(modifier: Modifier = Modifier, size: Dp = 48.dp) {
+    val dark = LogicMixTokens.colors.isDark
     Canvas(modifier = modifier.size(size)) {
         val factor = this.size.minDimension / 96f
         val gearPath = Path().apply {
@@ -56,18 +57,23 @@ fun LogicMixSettingsIcon(modifier: Modifier = Modifier, size: Dp = 48.dp) {
             lineTo(43f, 11f)
             close()
         }
+        // Light theme only: deep navy outline and violet core for contrast on a light background.
+        val light = !dark
+        val outline = if (light) listOf(Color(0xFF050B24), Color(0xFF142266)) else listOf(Color(0xFFE9E4FF), Color(0xFF9E79FF))
+        val ring = if (light) Color(0xFF7A1FE0) else Color(0xFF35D6CC)
+        val dot = if (light) Color(0xFF7A1FE0) else Color(0xFFE9E4FF)
         scale(factor, pivot = Offset.Zero) {
             drawPath(
                 path = gearPath,
                 brush = Brush.linearGradient(
-                    colors = listOf(Color(0xFFE9E4FF), Color(0xFF9E79FF)),
+                    colors = outline,
                     start = Offset(16f, 14f),
                     end = Offset(78f, 82f),
                 ),
                 style = Stroke(width = 4.5f, join = StrokeJoin.Round, cap = StrokeCap.Round),
             )
-            drawCircle(Color(0xFF35D6CC), radius = 16f, center = Offset(48f, 48f), style = Stroke(width = 5f))
-            drawCircle(Color(0xFFE9E4FF), radius = 5f, center = Offset(48f, 48f))
+            drawCircle(ring, radius = 16f, center = Offset(48f, 48f), style = Stroke(width = 5f))
+            drawCircle(dot, radius = 5f, center = Offset(48f, 48f))
         }
     }
 }

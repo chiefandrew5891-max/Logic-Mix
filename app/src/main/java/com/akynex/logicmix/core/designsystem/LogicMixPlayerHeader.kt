@@ -64,6 +64,12 @@ object LogoPlayerGeometry {
     /** Bottom-right corner, right of the plate and below the X of MIX. */
     val settings = Slot(0.91f, 0.84f, 0.1f)
 
+    /** Rightmost visible pixel of the logo (neon outline), as a fraction of the image width; the PNG has transparent margins. */
+    const val LOGO_RIGHT = 0.99f
+    /** Gear drawn at 1.5x its former 30dp; its outline spans 11..85 (+2.25 stroke) of the 96 viewport, so the centre sits this far from the right edge. */
+    const val GEAR_ICON_DP = 45f
+    const val GEAR_HALF_EXTENT_DP = GEAR_ICON_DP * 39.25f / 96f
+
     /** Rectangle actually painted by ContentScale.Fit inside a container; slots must be mapped into it. */
     data class Fit(val left: Float, val top: Float, val width: Float, val height: Float)
 
@@ -124,11 +130,12 @@ fun LogicMixPlayerHeader(
         if (onSettings != null) {
             val gear = LogoPlayerGeometry.settings
             val size = maxOf(48f, w.value * 0.08f).dp
+            val cx = w * LogoPlayerGeometry.LOGO_RIGHT - LogoPlayerGeometry.GEAR_HALF_EXTENT_DP.dp
             SettingsGear(
                 label = settingsLabel,
                 onClick = onSettings,
                 touch = size,
-                modifier = Modifier.offset(w * gear.cx - size / 2, h * gear.cy - size / 2),
+                modifier = Modifier.offset(cx - size / 2, h * gear.cy - size / 2),
             )
         }
         slots.forEachIndexed { index, (slot, icon, spec) ->
@@ -221,6 +228,6 @@ private fun SettingsGear(label: String, onClick: () -> Unit, touch: Dp, modifier
             .clickable(interactionSource = source, indication = null, role = Role.Button, onClick = tap),
         contentAlignment = Alignment.Center,
     ) {
-        Box(Modifier.scale(scale).alpha(if (pressed) 0.7f else 1f)) { LogicMixSettingsIcon(size = 30.dp) }
+        Box(Modifier.scale(scale).alpha(if (pressed) 0.7f else 1f)) { LogicMixSettingsIcon(size = LogoPlayerGeometry.GEAR_ICON_DP.dp) }
     }
 }
