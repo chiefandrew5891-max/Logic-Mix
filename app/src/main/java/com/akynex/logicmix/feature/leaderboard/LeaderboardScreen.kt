@@ -112,7 +112,7 @@ fun LeaderboardScreen(onBack: () -> Unit, viewModel: LeaderboardViewModel = hilt
         Column(
             Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(LogicMixTokens.spacing)
                 .widthIn(max = 560.dp).align(Alignment.TopCenter),
-            verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM),
+            verticalArrangement = com.akynex.logicmix.core.designsystem.stickyFooterArrangement(LogicMixTokens.spacingM),
         ) {
             GameHeader(stringResource(R.string.leaderboards_title), onBack)
             when {

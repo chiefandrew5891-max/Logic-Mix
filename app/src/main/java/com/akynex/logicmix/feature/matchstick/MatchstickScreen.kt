@@ -157,7 +157,7 @@ private fun MatchstickScreen(state: MatchUiState, onBack: () -> Unit, vm: Matchs
                 .padding(LogicMixTokens.spacing)
                 .widthIn(max = 560.dp)
                 .align(Alignment.TopCenter),
-            verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM),
+            verticalArrangement = com.akynex.logicmix.core.designsystem.stickyFooterArrangement(LogicMixTokens.spacingM),
         ) {
             GameHeader(
                 title = stringResource(R.string.match_title),

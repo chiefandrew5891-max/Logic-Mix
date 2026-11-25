@@ -112,7 +112,7 @@ fun HomeScreen(
                 .padding(top = LogicMixTokens.spacingL)
                 .widthIn(max = 560.dp)
                 .align(Alignment.TopCenter),
-            verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacing),
+            verticalArrangement = com.akynex.logicmix.core.designsystem.stickyFooterArrangement(LogicMixTokens.spacing),
         ) {
             TopBar(onSettings, music, onPreviousTrack, onTogglePlayback, onNextTrack)
             PlayerCard(state, games)

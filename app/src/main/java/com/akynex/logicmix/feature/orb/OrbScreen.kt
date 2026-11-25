@@ -59,7 +59,7 @@ private fun OrbScreen(state: OrbUiState, onBack: () -> Unit, vm: OrbViewModel) {
                 .padding(LogicMixTokens.spacing)
                 .widthIn(max = 560.dp)
                 .align(Alignment.TopCenter),
-            verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM),
+            verticalArrangement = com.akynex.logicmix.core.designsystem.stickyFooterArrangement(LogicMixTokens.spacingM),
         ) {
             GameHeader(stringResource(R.string.orb_title), onBack, onRestart = vm::newGame, restartEnabled = !state.busy)
             if (game != null) {

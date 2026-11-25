@@ -82,7 +82,7 @@ fun CategoryScaffold(content: @Composable ColumnScope.() -> Unit) {
                 .padding(LogicMixTokens.spacing)
                 .widthIn(max = 560.dp)
                 .align(Alignment.TopCenter),
-            verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM),
+            verticalArrangement = com.akynex.logicmix.core.designsystem.stickyFooterArrangement(LogicMixTokens.spacingM),
             content = { content(); BrandFooter() },
         )
     }

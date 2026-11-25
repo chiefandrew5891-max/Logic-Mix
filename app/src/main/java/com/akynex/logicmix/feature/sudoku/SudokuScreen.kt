@@ -88,7 +88,7 @@ private fun SudokuScreen(state: SudokuUiState, onBack: () -> Unit, vm: SudokuVie
                 .padding(LogicMixTokens.spacing)
                 .widthIn(max = 560.dp)
                 .align(Alignment.TopCenter),
-            verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM),
+            verticalArrangement = com.akynex.logicmix.core.designsystem.stickyFooterArrangement(LogicMixTokens.spacingM),
         ) {
             Header(state, onBack, vm::reset)
             val game = state.game

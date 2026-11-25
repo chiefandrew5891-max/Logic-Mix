@@ -86,7 +86,7 @@ fun GameScreen(
                 .padding(LogicMixTokens.spacing)
                 .widthIn(max = 560.dp)
                 .align(Alignment.TopCenter),
-            verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacing),
+            verticalArrangement = com.akynex.logicmix.core.designsystem.stickyFooterArrangement(LogicMixTokens.spacing),
         ) {
             Header(state, onBack, onRestart)
             when {

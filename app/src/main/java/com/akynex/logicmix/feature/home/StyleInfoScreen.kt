@@ -39,7 +39,7 @@ fun StyleInfoScreen(style: GameStyle, onHome: () -> Unit, onPlayAvailable: () ->
             .verticalScroll(rememberScrollState())
             .padding(LogicMixTokens.spacingL)
             .widthIn(max = 560.dp),
-        verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacing, Alignment.CenterVertically),
+        verticalArrangement = com.akynex.logicmix.core.designsystem.stickyFooterArrangement(LogicMixTokens.spacing),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         AssetImage(style.imageName, Modifier.widthIn(max = 160.dp).fillMaxWidth().padding(bottom = LogicMixTokens.spacingS))
