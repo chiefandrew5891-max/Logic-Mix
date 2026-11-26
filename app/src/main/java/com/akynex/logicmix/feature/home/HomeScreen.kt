@@ -2,6 +2,7 @@ package com.akynex.logicmix.feature.home
 
 import com.akynex.logicmix.core.designsystem.BrandFooter
 import com.akynex.logicmix.core.designsystem.PremiumAuroraBackground
+import com.akynex.logicmix.feature.splash.AnimatedCube
 import com.akynex.logicmix.core.designsystem.PremiumAvatar
 import com.akynex.logicmix.core.designsystem.PremiumCard
 import com.akynex.logicmix.core.designsystem.PremiumGoldButton
@@ -12,10 +13,6 @@ import com.akynex.logicmix.core.designsystem.PremiumTokens
 import com.akynex.logicmix.core.designsystem.PremiumTone
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.width
-import androidx.compose.runtime.remember
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.graphicsLayer
 import com.akynex.logicmix.core.audio.withTap
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
@@ -258,40 +255,10 @@ private fun PlayerCard(state: HomeUiState, games: com.akynex.logicmix.core.games
     }
 }
 
-/** The approved cube (pre-composed from the splash layers) with a soft glow, a very slow breathing pulse and a few light motes. */
+/** The splash cube, scaled down, with a third of the splash pulse amplitude. Its animation never changes the layout size. */
 @Composable
 private fun HeroCube(modifier: Modifier = Modifier) {
-    val context = androidx.compose.ui.platform.LocalContext.current
-    val motion = remember { android.provider.Settings.Global.getFloat(context.contentResolver, android.provider.Settings.Global.ANIMATOR_DURATION_SCALE, 1f) > 0f }
-    val phase = if (motion) {
-        val t = androidx.compose.animation.core.rememberInfiniteTransition(label = "heroCube")
-        t.animateFloat(
-            0f, 1f,
-            androidx.compose.animation.core.infiniteRepeatable(androidx.compose.animation.core.tween(7000, easing = androidx.compose.animation.core.LinearEasing)),
-            label = "heroPhase",
-        ).value
-    } else 0f
-    Box(modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        androidx.compose.foundation.Canvas(Modifier.fillMaxSize()) {
-            val c = Offset(size.width / 2f, size.height * 0.5f)
-            drawCircle(
-                Brush.radialGradient(listOf(Color(0xFF00D8E8).copy(alpha = 0.28f), Color.Transparent), center = c, radius = size.height * 0.85f),
-                radius = size.height * 0.85f, center = c,
-            )
-            for (i in 0 until 5) {
-                val a = (phase + i / 5f) % 1f
-                val ang = i * 1.9f
-                val x = c.x + kotlin.math.cos(ang) * size.height * (0.55f + 0.1f * i % 3)
-                val y = c.y - size.height * 0.45f + (i % 3) * size.height * 0.4f - a * size.height * 0.1f
-                drawCircle(Color.White.copy(alpha = 0.6f * kotlin.math.sin(a * Math.PI.toFloat())), radius = 1.6.dp.toPx() + (i % 2) * 0.8.dp.toPx(), center = Offset(x, y))
-            }
-        }
-        Image(
-            painterResource(R.drawable.home_cube), null,
-            Modifier.fillMaxHeight().graphicsLayer { val s = 1f + 0.015f * kotlin.math.sin(phase * 2f * Math.PI.toFloat()); scaleX = s; scaleY = s },
-            contentScale = ContentScale.Fit,
-        )
-    }
+    AnimatedCube(modifier.fillMaxWidth())
 }
 
 // Paired cards: equal width via weight(1f) and equal height via IntrinsicSize.Min + fillMaxHeight() on children.

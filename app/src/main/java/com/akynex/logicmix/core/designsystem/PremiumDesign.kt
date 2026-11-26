@@ -41,6 +41,8 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
@@ -72,7 +74,7 @@ object PremiumTokens {
 enum class PremiumTone { Blue, Violet, Gold }
 
 @Composable
-private fun rememberMotionEnabled(): Boolean {
+internal fun rememberMotionEnabled(): Boolean {
     val context = LocalContext.current
     return remember { Settings.Global.getFloat(context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) > 0f }
 }
@@ -174,76 +176,133 @@ fun PremiumCard(
     Box(m, contentAlignment = contentAlignment, content = content)
 }
 
+/** One drifting light ribbon: a filled band and its bright edge, built once around the layer origin. */
+private class AuroraRibbon(
+    val fill: Path, val fillBrush: Brush, val edge: Path, val edgeBrush: Brush,
+    val turnSeconds: Double, val wobbleDeg: Float, val wobbleSeconds: Double, val breathSeconds: Double, val phase: Double,
+    val edgeWidth: Float,
+)
+
+private class AuroraSpot(val brush: Brush, val radius: Float, val offsetX: Float, val turnSeconds: Double, val breathSeconds: Double, val phase: Double)
+
 /**
- * Deep-blue backdrop with layered curved light ribbons (bright edge on one side, soft falloff on the other), local light
- * spots and a gentle centre glow. Drawn once into cached brushes/paths; nothing animates. Light theme uses pale translucent waves.
+ * Living backdrop: one independent layer behind the whole screen. Light ribbons (cubic Bezier bands with a bright edge on
+ * one side and a soft falloff on the other) and soft spots are built once on a disc larger than the screen and then only
+ * rotated, drifted and modulated in the draw phase, as if a large slowly turning glass disc sat behind the interface.
+ * Rotation is a full turn per period, wobble and breathing are sines, and every period divides [LOOP_CLOCK_WRAP_SECONDS],
+ * so the loop has no seam. The disc radius covers the screen diagonal, so no corner is ever empty. Both themes share this
+ * mechanism and differ only in colours and intensity. Content scrolls over it; nothing in the backdrop is tied to content.
  */
 @Composable
 fun PremiumAuroraBackground(modifier: Modifier = Modifier, content: @Composable BoxScope.() -> Unit) {
     val dark = LogicMixTokens.colors.isDark
-    Box(
-        modifier.drawWithCache {
-            val w = size.width
-            val h = size.height
-            val base = if (dark) Brush.verticalGradient(listOf(PremiumTokens.Bg, PremiumTokens.BgDeep, PremiumTokens.Bg))
-            else Brush.verticalGradient(listOf(Color(0xFFEAF2FF), Color(0xFFF7FBFF), Color(0xFFE3F4F8)))
-            val k = if (dark) 1f else 0.35f
-            fun ribbon(ax: Float, ay: Float, c1x: Float, c1y: Float, c2x: Float, c2y: Float, bx: Float, by: Float, dx: Float, dy: Float): Pair<Path, Path> {
-                val edge = Path().apply { moveTo(ax * w, ay * h); cubicTo(c1x * w, c1y * h, c2x * w, c2y * h, bx * w, by * h) }
-                val fill = Path().apply {
-                    moveTo(ax * w, ay * h)
-                    cubicTo(c1x * w, c1y * h, c2x * w, c2y * h, bx * w, by * h)
-                    lineTo((bx + dx) * w, (by + dy) * h)
-                    cubicTo((c2x + dx) * w, (c2y + dy * 1.4f) * h, (c1x + dx) * w, (c1y + dy * 0.6f) * h, (ax + dx) * w, (ay + dy) * h)
-                    close()
+    val clock = rememberLoopClock()
+    Box(modifier) {
+        // Own render layer: the per-frame redraw is limited to the backdrop and never re-records the content above it.
+        Box(
+            Modifier.matchParentSize().graphicsLayer().drawWithCache {
+                val w = size.width
+                val h = size.height
+                val big = kotlin.math.hypot(w, h) / 2f * 1.1f
+                val base = if (dark) Brush.verticalGradient(listOf(PremiumTokens.Bg, PremiumTokens.BgDeep, PremiumTokens.Bg))
+                else Brush.verticalGradient(listOf(Color(0xFFEAF2FF), Color(0xFFF7FBFF), Color(0xFFE3F4F8)))
+                val k = if (dark) 1f else 0.35f
+                val tealC = if (dark) PremiumTokens.Teal else Color(0xFF4FC3D6)
+                val blueC = if (dark) PremiumTokens.Blue else Color(0xFF7FA8F0)
+                val violetC = if (dark) PremiumTokens.Violet else Color(0xFFA48CF0)
+                val centre = Brush.radialGradient(
+                    listOf((if (dark) PremiumTokens.BgLit else Color(0xFFBFE6F5)).copy(alpha = if (dark) 0.75f else 0.55f), Color.Transparent),
+                    center = Offset(w * 0.5f, h * 0.24f), radius = w * 0.85f,
+                )
+
+                fun deg(d: Float) = (d * kotlin.math.PI / 180.0).toFloat()
+                fun curve(p: Path, rs: FloatArray, a0: Float, a1: Float, move: Boolean, reverse: Boolean) {
+                    // Two cubic segments through a middle radius give the ribbon its S-shaped wave.
+                    val am = (a0 + a1) / 2f
+                    val angles = floatArrayOf(a0, am, a1)
+                    val order = if (reverse) intArrayOf(2, 1, 0) else intArrayOf(0, 1, 2)
+                    fun pt(i: Int) = Offset(rs[i] * kotlin.math.cos(angles[i]), rs[i] * kotlin.math.sin(angles[i]))
+                    val kk = 4f / 3f * kotlin.math.tan((a1 - a0) / 8f)
+                    fun tan(i: Int, sign: Float) = Offset(-kotlin.math.sin(angles[i]) * rs[i] * kk * sign, kotlin.math.cos(angles[i]) * rs[i] * kk * sign)
+                    val sgn = if (reverse) -1f else 1f
+                    val first = pt(order[0])
+                    if (move) p.moveTo(first.x, first.y) else p.lineTo(first.x, first.y)
+                    for (n in 0 until 2) {
+                        val i = order[n]
+                        val j = order[n + 1]
+                        val c1 = pt(i) + tan(i, sgn)
+                        val c2 = pt(j) - tan(j, sgn)
+                        val e = pt(j)
+                        p.cubicTo(c1.x, c1.y, c2.x, c2.y, e.x, e.y)
+                    }
                 }
-                return fill to edge
-            }
-            val tealC = if (dark) PremiumTokens.Teal else Color(0xFF4FC3D6)
-            val blueC = if (dark) PremiumTokens.Blue else Color(0xFF7FA8F0)
-            val violetC = if (dark) PremiumTokens.Violet else Color(0xFFA48CF0)
-            // Top-left teal ribbon.
-            val r1 = ribbon(-0.05f, 0.10f, 0.20f, 0.02f, 0.40f, 0.22f, 0.72f, 0.14f, 0f, 0.10f)
-            // Right-centre diagonal blue-violet wave.
-            val r2 = ribbon(1.05f, 0.30f, 0.80f, 0.34f, 0.62f, 0.55f, 0.30f, 0.62f, 0.05f, 0.14f)
-            // Lower-left deep blue wave.
-            val r3 = ribbon(-0.05f, 0.62f, 0.25f, 0.55f, 0.35f, 0.80f, 0.70f, 0.86f, 0f, 0.12f)
-            // Bottom-right teal accent.
-            val r4 = ribbon(1.05f, 0.82f, 0.90f, 0.80f, 0.85f, 0.95f, 0.60f, 1.02f, 0f, 0.10f)
-            val fills = listOf(
-                Triple(r1.first, Brush.verticalGradient(listOf(tealC.copy(alpha = 0.34f * k), Color.Transparent), 0f, h * 0.30f), 0f),
-                Triple(r2.first, Brush.linearGradient(listOf(violetC.copy(alpha = 0.30f * k), blueC.copy(alpha = 0.18f * k), Color.Transparent), Offset(w, h * 0.3f), Offset(0f, h * 0.8f)), 0f),
-                Triple(r3.first, Brush.verticalGradient(listOf(blueC.copy(alpha = 0.30f * k), Color.Transparent), h * 0.55f, h * 0.95f), 0f),
-                Triple(r4.first, Brush.verticalGradient(listOf(tealC.copy(alpha = 0.26f * k), Color.Transparent), h * 0.78f, h), 0f),
-            )
-            val edges = listOf(
-                r1.second to Brush.horizontalGradient(listOf(Color.Transparent, tealC.copy(alpha = 0.9f * k), tealC.copy(alpha = 0.2f * k)), 0f, w),
-                r2.second to Brush.linearGradient(listOf(violetC.copy(alpha = 0.75f * k), blueC.copy(alpha = 0.2f * k)), Offset(w, h * 0.3f), Offset(0f, h * 0.65f)),
-                r3.second to Brush.horizontalGradient(listOf(Color.Transparent, blueC.copy(alpha = 0.7f * k), Color.Transparent), 0f, w),
-                r4.second to Brush.horizontalGradient(listOf(Color.Transparent, tealC.copy(alpha = 0.8f * k)), w * 0.5f, w),
-            )
-            val centre = Brush.radialGradient(
-                listOf((if (dark) PremiumTokens.BgLit else Color(0xFFBFE6F5)).copy(alpha = if (dark) 0.75f else 0.55f), Color.Transparent),
-                center = Offset(w * 0.5f, h * 0.24f), radius = w * 0.85f,
-            )
-            val spotA = Brush.radialGradient(listOf(tealC.copy(alpha = 0.22f * k), Color.Transparent), Offset(w * 0.12f, h * 0.45f), w * 0.4f)
-            val spotB = Brush.radialGradient(listOf(violetC.copy(alpha = 0.22f * k), Color.Transparent), Offset(w * 0.9f, h * 0.62f), w * 0.45f)
-            val glowW = 6.dp.toPx()
-            val edgeW = 2.dp.toPx()
-            onDrawBehind {
-                drawRect(base)
-                drawRect(centre)
-                fills.forEach { drawPath(it.first, it.second) }
-                drawRect(spotA)
-                drawRect(spotB)
-                edges.forEach {
-                    drawPath(it.first, it.second, alpha = 0.25f, style = Stroke(glowW, cap = StrokeCap.Round))
-                    drawPath(it.first, it.second, style = Stroke(edgeW, cap = StrokeCap.Round))
+                fun ribbon(
+                    aDeg0: Float, aDeg1: Float, inner: FloatArray, thick: FloatArray, color: Color, fillA: Float, edgeA: Float,
+                    turn: Double, wobble: Float, wobbleS: Double, breathS: Double, phase: Double, edgeDp: Float,
+                ): AuroraRibbon {
+                    val a0 = deg(aDeg0)
+                    val a1 = deg(aDeg1)
+                    val rin = FloatArray(3) { inner[it] * big }
+                    val rout = FloatArray(3) { (inner[it] + thick[it]) * big }
+                    val edge = Path().also { curve(it, rin, a0, a1, true, false) }
+                    val fill = Path().also {
+                        curve(it, rin, a0, a1, true, false)
+                        curve(it, rout, a0, a1, false, true)
+                        it.close()
+                    }
+                    val outerMax = rout.max()
+                    val innerMin = rin.min()
+                    val fillBrush = Brush.radialGradient(
+                        0f to Color.Transparent, (innerMin / outerMax) to color.copy(alpha = fillA * k), 1f to Color.Transparent,
+                        center = Offset.Zero, radius = outerMax,
+                    )
+                    val n0 = a0 / (2f * kotlin.math.PI.toFloat())
+                    val n1 = a1 / (2f * kotlin.math.PI.toFloat())
+                    val edgeBrush = Brush.sweepGradient(
+                        0f to Color.Transparent, n0 to Color.Transparent, (n0 * 0.35f + n1 * 0.65f) to color.copy(alpha = edgeA * k),
+                        n1 to Color.Transparent, 1f to Color.Transparent,
+                        center = Offset.Zero,
+                    )
+                    return AuroraRibbon(fill, fillBrush, edge, edgeBrush, turn, wobble, wobbleS, breathS, phase, edgeDp.dp.toPx())
                 }
-            }
-        },
-        content = content,
-    )
+                val ribbons = listOf(
+                    ribbon(205f, 335f, floatArrayOf(0.50f, 0.64f, 0.58f), floatArrayOf(0.22f, 0.16f, 0.09f), tealC, 0.34f, 0.9f, 240.0, 12f, 40.0, 18.0, 0.0, 2f),
+                    ribbon(15f, 150f, floatArrayOf(0.78f, 0.70f, 0.90f), floatArrayOf(0.30f, 0.22f, 0.14f), violetC, 0.30f, 0.75f, -300.0, 10f, 50.0, 24.0, 1.7, 2f),
+                    ribbon(110f, 250f, floatArrayOf(0.28f, 0.44f, 0.36f), floatArrayOf(0.34f, 0.26f, 0.18f), blueC, 0.30f, 0.7f, 360.0, 15f, 60.0, 30.0, 3.1, 1.6f),
+                    ribbon(250f, 350f, floatArrayOf(0.96f, 1.02f, 0.94f), floatArrayOf(0.20f, 0.14f, 0.10f), tealC, 0.26f, 0.8f, -180.0, 8f, 72.0, 20.0, 4.4, 1.8f),
+                )
+                val spots = listOf(
+                    AuroraSpot(Brush.radialGradient(listOf(tealC.copy(alpha = 0.26f * k), Color.Transparent), Offset(big * 0.55f, 0f), w * 0.4f), w * 0.4f, big * 0.55f, 150.0, 30.0, 0.0),
+                    AuroraSpot(Brush.radialGradient(listOf(violetC.copy(alpha = 0.26f * k), Color.Transparent), Offset(big * 0.6f, 0f), w * 0.45f), w * 0.45f, big * 0.6f, -200.0, 24.0, 2.0),
+                )
+                val twoPi = 2.0 * kotlin.math.PI
+                onDrawBehind {
+                    val seconds = clock.doubleValue
+                    drawRect(base)
+                    drawRect(centre)
+                    translate(w / 2f, h / 2f) {
+                        for (s in spots) {
+                            val breath = (0.8 + 0.2 * kotlin.math.sin(twoPi * seconds / s.breathSeconds + s.phase)).toFloat()
+                            val ang = (360.0 * ((seconds / s.turnSeconds) % 1.0)).toFloat()
+                            rotate(ang, Offset.Zero) { drawCircle(s.brush, s.radius, Offset(s.offsetX, 0f), alpha = breath) }
+                        }
+                        for (r in ribbons) {
+                            val ang = (360.0 * ((seconds / r.turnSeconds) % 1.0)).toFloat() +
+                                r.wobbleDeg * kotlin.math.sin(twoPi * seconds / r.wobbleSeconds + r.phase).toFloat()
+                            val breath = kotlin.math.sin(twoPi * seconds / r.breathSeconds + r.phase).toFloat()
+                            rotate(ang, Offset.Zero) {
+                                drawPath(r.fill, r.fillBrush, alpha = 0.8f + 0.2f * breath)
+                                // The line widens and the soft glow around it swells and fades: the edge sharpens, then dissolves.
+                                drawPath(r.edge, r.edgeBrush, alpha = 0.18f + 0.12f * breath, style = Stroke(r.edgeWidth * (3f + 1.2f * breath), cap = StrokeCap.Round))
+                                drawPath(r.edge, r.edgeBrush, alpha = 0.75f + 0.25f * breath, style = Stroke(r.edgeWidth * (1f + 0.35f * breath), cap = StrokeCap.Round))
+                            }
+                        }
+                    }
+                }
+            },
+        )
+        content()
+    }
 }
 
 /** Capsule track with a teal-to-sky fill, top gloss and inner shade. [label] is drawn inside when given. */
@@ -333,9 +392,7 @@ fun PremiumGoldButton(label: String, onClick: () -> Unit, modifier: Modifier = M
                     0f to PremiumTokens.GoldTop, 0.45f to PremiumTokens.GoldMid, 1f to PremiumTokens.GoldLow, endY = body,
                 )
                 val gloss = Brush.verticalGradient(listOf(PremiumTokens.GoldHi.copy(alpha = 0.85f), Color.Transparent), 0f, body * 0.5f)
-                val halo = Brush.radialGradient(listOf(PremiumTokens.GoldMid.copy(alpha = 0.28f), Color.Transparent), center = Offset(size.width / 2f, size.height / 2f), radius = size.width * 0.62f)
                 onDrawBehind {
-                    drawRect(halo, topLeft = Offset(-size.width * 0.1f, -size.height * 0.6f), size = Size(size.width * 1.2f, size.height * 2.2f))
                     drawRoundRect(Color.Black.copy(alpha = 0.28f), topLeft = Offset(0f, lip + 3.dp.toPx()), size = Size(size.width, body), cornerRadius = CornerRadius(r))
                     drawRoundRect(PremiumTokens.GoldEdge, topLeft = Offset(0f, lip), size = Size(size.width, body), cornerRadius = CornerRadius(r))
                     drawRoundRect(fill, size = Size(size.width, body), cornerRadius = CornerRadius(r))
