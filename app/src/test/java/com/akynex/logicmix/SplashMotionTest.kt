@@ -74,4 +74,14 @@ class SplashMotionTest {
         assertTrue(peak in 1.05f..1.08f)
         assertTrue(SplashMotion.LOGO_START + SplashMotion.LOGO_DURATION + 0.5f <= SplashMotion.FADE_OUT_START)
     }
+
+    @Test fun pulseAmplitudeIsOneThirdOfTheOriginal() {
+        val t = 3.0f
+        val a = SplashMotion.amplitude(t)
+        assertEquals(0.035f * a / 3f * (0.5f + 0.5f * kotlin.math.sin(2.0 * Math.PI * t * 1.6).toFloat()), SplashMotion.coreScale(t) - 1f, 1e-6f)
+        assertEquals(0.015f * a / 3f * SplashMotion.pulse(t), SplashMotion.breathScale(t) - 1f, 1e-6f)
+        SplashMotion.Segment.values().filter { it != SplashMotion.Segment.Core }.forEach {
+            assertEquals(0.03f / 3f * SplashMotion.spread(it, t), SplashMotion.segmentScale(it, t) - 1f, 1e-6f)
+        }
+    }
 }

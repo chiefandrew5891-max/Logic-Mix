@@ -2,6 +2,7 @@ package com.akynex.logicmix.feature.home
 
 import com.akynex.logicmix.core.designsystem.BrandFooter
 import com.akynex.logicmix.core.designsystem.PremiumAuroraBackground
+import com.akynex.logicmix.core.designsystem.WordSafeText
 import com.akynex.logicmix.feature.splash.AnimatedCube
 import com.akynex.logicmix.core.designsystem.PremiumAvatar
 import com.akynex.logicmix.core.designsystem.PremiumCard
@@ -283,7 +284,7 @@ private fun FeatureCard(
         Column(Modifier.fillMaxSize().padding(LogicMixTokens.spacingS + 2.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingS)) {
                 CardArt(art, icon, if (gold) LogicMixTokens.colors.gold else MaterialTheme.colorScheme.secondary, 44.dp)
-                Text(title, Modifier.weight(1f), style = LogicMixTokens.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface, maxLines = 2)
+                WordSafeText(title, Modifier.weight(1f), style = LogicMixTokens.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface, maxLines = 2)
             }
             Row(Modifier.weight(1f, fill = false), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingXs)) {
                 Text(subtitle, Modifier.weight(1f), style = LogicMixTokens.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 3)
@@ -302,7 +303,7 @@ private fun LeaderboardCard(onClick: () -> Unit) {
         ) {
             CardArt("icon_leaderboards", R.drawable.ic_rewards, LogicMixTokens.colors.gold, 48.dp)
             Column(Modifier.weight(1f)) {
-                Text(stringResource(R.string.home_leaderboards), style = LogicMixTokens.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface, maxLines = 2)
+                WordSafeText(stringResource(R.string.home_leaderboards), style = LogicMixTokens.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface, maxLines = 2)
                 Text(stringResource(R.string.home_leaderboards_sub), style = LogicMixTokens.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2)
             }
             PremiumIconButton(28.dp, gold = true)
@@ -319,7 +320,7 @@ private fun ModeCard(@DrawableRes icon: Int, art: String, title: String, subtitl
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
             CardArt(art, icon, MaterialTheme.colorScheme.primary, 52.dp)
-            Text(title, style = LogicMixTokens.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface, textAlign = TextAlign.Center)
+            WordSafeText(title, style = LogicMixTokens.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface, textAlign = TextAlign.Center)
             Text(subtitle, style = LogicMixTokens.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
         }
     }

@@ -19,8 +19,8 @@ data class CubeMotionConfig(
     val orbitLights: Int = 3,
 ) {
     companion object {
-        /** Calmer permanent version for the home screen: amplitude exactly one third of the splash. */
-        val Home = CubeMotionConfig(pulseAmplitude = 1f / 3f)
+        /** Home screen: the amplitude is unchanged (one third of the original splash), pulse half as fast (20 s cycle), orbit lights twice as fast (5 s per turn). */
+        val Home = CubeMotionConfig(pulseAmplitude = 1f / 3f, pulseCycleSeconds = 20f, orbitSecondsPerTurn = 5f)
     }
 }
 

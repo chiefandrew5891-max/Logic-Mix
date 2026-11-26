@@ -167,7 +167,6 @@ fun TitleCapsule(text: String, modifier: Modifier = Modifier, highlighted: Boole
 
 const val CATEGORY_ICON_FRACTION = 0.84f
 const val CATEGORY_PRESS_SCALE = 0.965f
-private const val CATEGORY_PRESS_MS = 120
 private const val CATEGORY_HINT_MS = 1600L
 
 /**
@@ -193,7 +192,7 @@ fun CategoryCard(
     }
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
-    val spec = if (animated) tween<Float>(CATEGORY_PRESS_MS) else snap()
+    val spec = if (animated) tween<Float>(InteractiveTokens.TransitionMs) else snap()
     val scale by animateFloatAsState(if (pressed) CATEGORY_PRESS_SCALE else 1f, spec, label = "categoryScale")
     val glow by animateFloatAsState(if (pressed) 1f else 0f, spec, label = "categoryBorder")
     var hint by remember { mutableStateOf(false) }
@@ -201,7 +200,7 @@ fun CategoryCard(
     // Selection lists keep a constant 3 dp frame so cards never change size; only colour, halo and tick change.
     val borderWidth = if (selected != null) 3.dp else 2.dp
     val sel by animateFloatAsState(if (selected == true) 1f else 0f, if (animated) tween(180) else snap(), label = "categorySelected")
-    val frame = lerp(lerp(colors.cardBorder, Color.White, 0.4f * glow), colors.gold, sel)
+    val frame = lerp(lerp(colors.cardBorder, InteractiveTokens.neon(colors.isDark), glow), colors.gold, sel)
     val tap = withTap(onClick)
     Box(
         modifier
@@ -221,7 +220,7 @@ fun CategoryCard(
                 }
             }
             .clip(shape)
-            .premiumSurface(PremiumTone.Blue, 20.dp)
+            .premiumSurface(PremiumTone.Blue, 20.dp) { glow }
             .border(BorderStroke(borderWidth, frame), shape)
             .semantics(mergeDescendants = true) {
                 contentDescription = title
@@ -267,12 +266,14 @@ fun GameStyleCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val source = remember { MutableInteractionSource() }
     Row(
         modifier
             .fillMaxWidth()
             .neonFrame(RoundedCornerShape(20.dp), emphasis = selected)
+            .interactiveNeon(source, selected, 20.dp)
             .semantics { this.selected = selected }
-            .clickable(role = Role.RadioButton, onClick = withTap(onClick))
+            .clickable(interactionSource = source, indication = null, role = Role.RadioButton, onClick = withTap(onClick))
             .padding(LogicMixTokens.spacingM),
         horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM),
         verticalAlignment = Alignment.CenterVertically,
@@ -282,9 +283,12 @@ fun GameStyleCard(
             Text(
                 title,
                 style = LogicMixTokens.typography.titleMedium,
-                color = if (selected) LogicMixTokens.colors.gold else MaterialTheme.colorScheme.onSurface,
+                color = if (selected) InteractiveTokens.onSelected(LogicMixTokens.colors.isDark) else MaterialTheme.colorScheme.onSurface,
             )
-            Text(description, style = LogicMixTokens.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                description, style = LogicMixTokens.typography.bodyMedium,
+                color = if (selected) InteractiveTokens.onSelected(LogicMixTokens.colors.isDark) else MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
     }
 }

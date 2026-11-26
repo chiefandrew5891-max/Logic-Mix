@@ -116,6 +116,7 @@ fun Modifier.premiumSurface(tone: PremiumTone = PremiumTone.Blue, radius: Dp = P
         )
         val shadowColor = if (dark) Color.Black else Color(0xFF2C3E73)
         val stroke = Stroke(1.5.dp.toPx())
+        val neonColor = if (tone == PremiumTone.Gold) PremiumTokens.GoldMid else InteractiveTokens.neon(dark)
         val inset = 1.5.dp.toPx()
         onDrawBehind {
             for (i in 1..3) {
@@ -126,27 +127,13 @@ fun Modifier.premiumSurface(tone: PremiumTone = PremiumTone.Blue, radius: Dp = P
                 )
             }
             val g = glow() * PremiumTokens.GlowStrength
-            if (g > 0.01f) {
-                val ringColor = if (tone == PremiumTone.Gold) PremiumTokens.GoldMid else PremiumTokens.Teal
-                for (i in 1..4) {
-                    val s = i * 3.dp.toPx()
-                    drawRoundRect(
-                        ringColor.copy(alpha = (if (dark) 0.22f else 0.12f) * g * (5 - i) / 4f),
-                        topLeft = Offset(-s / 2f, -s / 2f), size = Size(w + s, h + s), cornerRadius = CornerRadius(r + s / 2f), style = Stroke(s),
-                    )
-                }
-            }
+            if (g > 0.01f) drawOuterNeon(g, r, neonColor, dark)
             drawRoundRect(base, cornerRadius = cr)
             drawRoundRect(corner, cornerRadius = cr)
             drawRoundRect(sheen, topLeft = Offset(inset, inset), size = Size(w - 2 * inset, h * 0.42f), cornerRadius = CornerRadius(r - inset))
             drawRoundRect(shade, cornerRadius = cr)
             drawRoundRect(rim, topLeft = Offset(stroke.width / 2f, stroke.width / 2f), size = Size(w - stroke.width, h - stroke.width), cornerRadius = CornerRadius(r), style = stroke)
-            if (g > 0.01f) {
-                drawRoundRect(
-                    (if (tone == PremiumTone.Gold) PremiumTokens.GoldTop else PremiumTokens.Teal).copy(alpha = 0.55f * g),
-                    topLeft = Offset(stroke.width / 2f, stroke.width / 2f), size = Size(w - stroke.width, h - stroke.width), cornerRadius = CornerRadius(r), style = Stroke(2.dp.toPx()),
-                )
-            }
+            if (g > 0.01f) drawInnerNeon(g, r, neonColor, dark)
         }
     }
 }
@@ -167,7 +154,7 @@ fun PremiumCard(
     val motion = rememberMotionEnabled()
     val source = remember { MutableInteractionSource() }
     val pressed by source.collectIsPressedAsState()
-    val spec = if (motion) tween<Float>(110) else snap()
+    val spec = if (motion) tween<Float>(InteractiveTokens.TransitionMs) else snap()
     val scale by animateFloatAsState(if (pressed) PremiumTokens.PressScale else 1f, spec, label = "premiumScale")
     val glow by animateFloatAsState(if (pressed) 1f else if (selected) 0.9f else 0f, spec, label = "premiumGlow")
     val shape = RoundedCornerShape(radius)
@@ -379,7 +366,7 @@ fun PremiumGoldButton(label: String, onClick: () -> Unit, modifier: Modifier = M
     val motion = rememberMotionEnabled()
     val source = remember { MutableInteractionSource() }
     val pressed by source.collectIsPressedAsState()
-    val sink by animateFloatAsState(if (pressed) 1f else 0f, if (motion) tween(90) else snap(), label = "goldSink")
+    val sink by animateFloatAsState(if (pressed) 1f else 0f, if (motion) tween(InteractiveTokens.TransitionMs) else snap(), label = "goldSink")
     var shrink by remember(label) { mutableFloatStateOf(1f) }
     Box(
         modifier
@@ -393,6 +380,7 @@ fun PremiumGoldButton(label: String, onClick: () -> Unit, modifier: Modifier = M
                 )
                 val gloss = Brush.verticalGradient(listOf(PremiumTokens.GoldHi.copy(alpha = 0.85f), Color.Transparent), 0f, body * 0.5f)
                 onDrawBehind {
+                    if (sink > 0.01f) drawOuterNeon(sink, size.height / 2f, PremiumTokens.GoldMid, true)
                     drawRoundRect(Color.Black.copy(alpha = 0.28f), topLeft = Offset(0f, lip + 3.dp.toPx()), size = Size(size.width, body), cornerRadius = CornerRadius(r))
                     drawRoundRect(PremiumTokens.GoldEdge, topLeft = Offset(0f, lip), size = Size(size.width, body), cornerRadius = CornerRadius(r))
                     drawRoundRect(fill, size = Size(size.width, body), cornerRadius = CornerRadius(r))

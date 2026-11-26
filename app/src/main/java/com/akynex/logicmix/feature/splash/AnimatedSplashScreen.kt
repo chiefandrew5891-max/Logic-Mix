@@ -33,7 +33,6 @@ import kotlin.math.PI
 import kotlin.math.max
 import kotlin.math.min
 
-private val SplashBackground = Color(0xFF08112C)
 private val Gold = Color(0xFFFFC94A)
 private val GoldHot = Color(0xFFFFF1B8)
 private const val LAYER = 1024f
@@ -62,6 +61,7 @@ fun AnimatedSplashScreen(onFinished: () -> Unit) {
     val orbitFront = ImageBitmap.imageResource(R.drawable.splash_orbit_front)
     val logo = ImageBitmap.imageResource(R.drawable.splash_logo_text)
 
+    val smoke = remember { SplashSmokeBrushes() }
     val progress = remember { Animatable(0f) }
     LaunchedEffect(Unit) {
         progress.animateTo(1f, tween((total * 1000).toInt(), easing = LinearEasing))
@@ -77,8 +77,9 @@ fun AnimatedSplashScreen(onFinished: () -> Unit) {
             // The timeline is read here, in the draw phase only, so no recomposition happens per frame.
             val t = progress.value * total
             val overlay = SplashMotion.overlayAlpha(t, total)
-            drawRect(SplashBackground, alpha = overlay)
+            drawRect(SplashBase, alpha = overlay)
             if (overlay <= 0f) return@Canvas
+            smoke.draw(this, if (reduced) 0f else t, SplashMotion.appear(t) * overlay)
             val motionT = if (reduced) 0f else t
             val alpha = SplashMotion.appear(t) * overlay
             val side = min(size.width, size.height) * 0.94f
@@ -135,7 +136,7 @@ private fun DrawScope.drawScene(
             }
 
             fun seg(img: ImageBitmap, seg: SplashMotion.Segment) {
-                val d = SplashMotion.spread(seg, t) * SplashMotion.amplitudeFor(seg) * CUBE_SIZE
+                val d = SplashMotion.spread(seg, t) * SplashMotion.amplitudeFor(seg) * SplashMotion.PULSE_AMPLITUDE * CUBE_SIZE
                 val len = max(0.001f, kotlin.math.sqrt(seg.dx * seg.dx + seg.dy * seg.dy))
                 val z = SplashMotion.segmentScale(seg, t)
                 scale(z, z, pivot = c) { layer(img, alpha, seg.dx / len * d, seg.dy / len * d) }

@@ -15,6 +15,9 @@ object SplashMotion {
     const val HOLD_END = 5.5f
     const val FADE_OUT_START = 5.5f
 
+    /** Pulse amplitude relative to the previous splash: one third (segments, their scale, core and cube breathing). */
+    const val PULSE_AMPLITUDE = 1f / 3f
+
     /** Segment travel as a fraction of the cube size (3-7%). */
     const val MIN_AMPLITUDE = 0.03f
     const val MAX_AMPLITUDE = 0.07f
@@ -86,13 +89,13 @@ object SplashMotion {
     }
 
     /** Size pulse of a segment about the cube centre (no rotation); the per-segment delay keeps them out of phase. */
-    fun segmentScale(segment: Segment, t: Float): Float = 1f + 0.03f * spread(segment, t)
+    fun segmentScale(segment: Segment, t: Float): Float = 1f + 0.03f * PULSE_AMPLITUDE * spread(segment, t)
 
-    fun coreScale(t: Float): Float = 1f + 0.035f * amplitude(t) * (0.5f + 0.5f * sin(2.0 * PI * t * 1.6).toFloat())
+    fun coreScale(t: Float): Float = 1f + 0.035f * PULSE_AMPLITUDE * amplitude(t) * (0.5f + 0.5f * sin(2.0 * PI * t * 1.6).toFloat())
     fun coreGlow(t: Float): Float = amplitude(t) * (0.5f + 0.5f * sin(2.0 * PI * t * 1.6 - PI / 2).toFloat())
     /** The single shared pulse in [-1, 1] driving the cube breathing and the logo size, so the two are always in sync. */
     fun pulse(t: Float): Float = sin(2.0 * PI * t * 0.8).toFloat()
-    fun breathScale(t: Float): Float = 1f + 0.015f * amplitude(t) * pulse(t)
+    fun breathScale(t: Float): Float = 1f + 0.015f * PULSE_AMPLITUDE * amplitude(t) * pulse(t)
 
     /** Logo size factor (+-2.5%) from the shared [pulse]; blended in once the logo has settled at 4.5 s. */
     fun logoPulse(t: Float): Float =

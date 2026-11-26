@@ -13,6 +13,11 @@ import com.akynex.logicmix.feature.gamestyle.titleRes
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import com.akynex.logicmix.core.designsystem.interactiveNeon
+import com.akynex.logicmix.core.designsystem.InteractiveTokens
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.runtime.remember
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
@@ -326,18 +331,24 @@ private fun VolumeRow(label: String, volume: Float, enabled: Boolean, onChange: 
 @Composable
 private fun ThemeTile(@DrawableRes icon: Int, label: Int, selected: Boolean, onClick: () -> Unit, modifier: Modifier) {
     val colors = LogicMixTokens.colors
-    val border = if (selected) MaterialTheme.colorScheme.primary else colors.cardBorder
+    val shape = LogicMixTokens.radii.medium
+    val source = remember { MutableInteractionSource() }
+    val sel by animateFloatAsState(if (selected) 1f else 0f, tween(InteractiveTokens.TransitionMs), label = "themeTileSelected")
+    // Constant 2 dp frame: the border colour changes, never the size.
+    val border = lerp(colors.cardBorder, InteractiveTokens.neon(colors.isDark), sel)
+    val onSelected = InteractiveTokens.onSelected(colors.isDark)
     Column(
         modifier
-            .clip(LogicMixTokens.radii.medium)
-            .border(BorderStroke(if (selected) 2.dp else 1.dp, border), LogicMixTokens.radii.medium)
-            .selectable(selected = selected, role = Role.RadioButton, onClick = onClick)
+            .clip(shape)
+            .interactiveNeon(source, selected, 20.dp)
+            .border(BorderStroke(2.dp, border), shape)
+            .selectable(selected = selected, interactionSource = source, indication = null, role = Role.RadioButton, onClick = onClick)
             .padding(vertical = LogicMixTokens.spacingM),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingXs),
     ) {
-        LogicMixIcon(icon, if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant, size = 28.dp)
-        Text(stringResource(label), style = LogicMixTokens.typography.labelMedium, color = MaterialTheme.colorScheme.onSurface, textAlign = TextAlign.Center)
+        LogicMixIcon(icon, lerp(MaterialTheme.colorScheme.onSurfaceVariant, onSelected, sel), size = 28.dp)
+        Text(stringResource(label), style = LogicMixTokens.typography.labelMedium, color = lerp(MaterialTheme.colorScheme.onSurface, onSelected, sel), textAlign = TextAlign.Center)
     }
 }
 
