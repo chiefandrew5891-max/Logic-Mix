@@ -1,6 +1,8 @@
 package com.akynex.logicmix.feature.gamestyle
 
 import com.akynex.logicmix.core.designsystem.BrandFooter
+import com.akynex.logicmix.core.designsystem.LogicMixBackdrop
+import com.akynex.logicmix.core.designsystem.LogicMixScreen
 import com.akynex.logicmix.core.audio.withBack
 import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
@@ -76,7 +78,7 @@ fun GameStyleRoute(
     val categories by viewModel.categories.collectAsState()
     val loaded = prefs
     if (loaded == null) {
-        Box(Modifier.fillMaxSize().background(LogicMixTokens.colors.backgroundBrush))
+        LogicMixBackdrop(Modifier.fillMaxSize())
         return
     }
     GameStyleFlow(start, loaded, categories, { s, t, p, a -> viewModel.confirm(s, t, p, a) }, onFinished, onBack)
@@ -103,7 +105,7 @@ internal fun GameStyleFlow(
     // Back from a second step returns to the style cards when the flow started there.
     BackHandler(enabled = step != start) { step = start }
 
-    Box(Modifier.fillMaxSize().background(LogicMixTokens.colors.backgroundBrush)) {
+    LogicMixScreen {
         Column(
             Modifier
                 .fillMaxSize()

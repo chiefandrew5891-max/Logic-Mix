@@ -74,7 +74,7 @@ fun ChoiceCard(state: ChoiceState, onClick: () -> Unit, modifier: Modifier = Mod
 /** Background, safe-area insets, scrolling and the 560 dp tablet cap shared by the category games. */
 @Composable
 fun CategoryScaffold(content: @Composable ColumnScope.() -> Unit) {
-    Box(Modifier.fillMaxSize().background(LogicMixTokens.colors.backgroundBrush).safeDrawingPadding()) {
+    LogicMixScreen(Modifier.safeDrawingPadding()) {
         Column(
             Modifier
                 .fillMaxSize()

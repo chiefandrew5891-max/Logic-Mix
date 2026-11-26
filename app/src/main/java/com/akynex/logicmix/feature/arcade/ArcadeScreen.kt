@@ -1,6 +1,8 @@
 package com.akynex.logicmix.feature.arcade
 
 import com.akynex.logicmix.core.designsystem.BrandFooter
+import com.akynex.logicmix.core.designsystem.LogicMixBackdrop
+import com.akynex.logicmix.core.designsystem.LogicMixScreen
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -61,7 +63,7 @@ fun ArcadeRoute(onBack: () -> Unit, onEditCategories: () -> Unit, viewModel: Arc
     val state by viewModel.state.collectAsState()
     val run = state.run
     if (state.loading) {
-        Box(Modifier.fillMaxSize().background(LogicMixTokens.colors.backgroundBrush))
+        LogicMixBackdrop(Modifier.fillMaxSize())
         return
     }
     if (run == null) {
@@ -70,7 +72,7 @@ fun ArcadeRoute(onBack: () -> Unit, onEditCategories: () -> Unit, viewModel: Arc
     }
     val leave = { viewModel.pause() }
     BackHandler(onBack = leave)
-    Box(Modifier.fillMaxSize().background(LogicMixTokens.colors.backgroundBrush)) {
+    LogicMixScreen {
         Column(Modifier.fillMaxSize()) {
             ArcadePanel(run, onSkip = viewModel::skip, onExit = leave, canSkip = state.celebration == null)
             Box(Modifier.weight(1f).consumeWindowInsets(WindowInsets.statusBars)) {
@@ -143,7 +145,7 @@ private fun ArcadeLobby(
     onStart: () -> Unit,
     onResume: () -> Unit,
 ) {
-    Box(Modifier.fillMaxSize().background(LogicMixTokens.colors.backgroundBrush).windowInsetsPadding(WindowInsets.safeDrawing)) {
+    LogicMixScreen(Modifier.windowInsetsPadding(WindowInsets.safeDrawing)) {
         Column(
             Modifier
                 .fillMaxSize()

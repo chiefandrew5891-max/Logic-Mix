@@ -1,6 +1,7 @@
 package com.akynex.logicmix.feature.sudoku
 
 import com.akynex.logicmix.core.designsystem.BrandFooter
+import com.akynex.logicmix.core.designsystem.LogicMixScreen
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -80,7 +81,7 @@ fun SudokuRoute(onBack: () -> Unit, viewModel: SudokuViewModel = hiltViewModel()
 @Composable
 private fun SudokuScreen(state: SudokuUiState, onBack: () -> Unit, vm: SudokuViewModel) {
     val colors = LogicMixTokens.colors
-    Box(Modifier.fillMaxSize().background(colors.backgroundBrush).safeDrawingPadding()) {
+    LogicMixScreen(Modifier.safeDrawingPadding()) {
         Column(
             Modifier
                 .fillMaxSize()

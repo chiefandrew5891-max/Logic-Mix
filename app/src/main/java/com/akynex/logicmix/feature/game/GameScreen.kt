@@ -1,6 +1,7 @@
 package com.akynex.logicmix.feature.game
 
 import com.akynex.logicmix.core.designsystem.BrandFooter
+import com.akynex.logicmix.core.designsystem.LogicMixScreen
 import com.akynex.logicmix.core.audio.withTap
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
@@ -78,7 +79,7 @@ fun GameScreen(
     onRestart: () -> Unit = {},
 ) {
     val colors = LogicMixTokens.colors
-    Box(Modifier.fillMaxSize().background(colors.backgroundBrush).safeDrawingPadding().imePadding()) {
+    LogicMixScreen(Modifier.safeDrawingPadding().imePadding()) {
         Column(
             Modifier
                 .fillMaxSize()

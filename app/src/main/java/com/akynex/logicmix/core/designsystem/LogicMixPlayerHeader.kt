@@ -196,6 +196,7 @@ private fun PlayerButton(
             .size(touch)
             .alpha(if (enabled) 1f else 0.4f)
             .semantics { contentDescription = label }
+            .instantPress(source)
             .clickable(interactionSource = source, indication = null, enabled = enabled, role = Role.Button, onClick = tap),
         contentAlignment = Alignment.Center,
     ) {
@@ -225,6 +226,7 @@ private fun SettingsGear(label: String, onClick: () -> Unit, touch: Dp, modifier
         modifier
             .size(touch)
             .semantics { contentDescription = label }
+            .instantPress(source)
             .clickable(interactionSource = source, indication = null, role = Role.Button, onClick = tap),
         contentAlignment = Alignment.Center,
     ) {

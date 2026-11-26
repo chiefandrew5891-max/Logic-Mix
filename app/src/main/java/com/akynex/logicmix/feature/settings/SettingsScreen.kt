@@ -1,6 +1,8 @@
 package com.akynex.logicmix.feature.settings
 
 import com.akynex.logicmix.core.designsystem.BrandFooter
+import com.akynex.logicmix.core.designsystem.instantPress
+import com.akynex.logicmix.core.designsystem.LogicMixScreen
 import com.akynex.logicmix.core.audio.withTap
 import androidx.annotation.DrawableRes
 import androidx.compose.material3.OutlinedButton
@@ -136,7 +138,7 @@ internal fun SettingsContent(
     onGamesConnect: () -> Unit = {},
 ) {
     val colors = LogicMixTokens.colors
-    Box(Modifier.fillMaxSize().background(colors.backgroundBrush)) {
+    LogicMixScreen {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -342,6 +344,7 @@ private fun ThemeTile(@DrawableRes icon: Int, label: Int, selected: Boolean, onC
             .clip(shape)
             .interactiveNeon(source, selected, 20.dp)
             .border(BorderStroke(2.dp, border), shape)
+            .instantPress(source)
             .selectable(selected = selected, interactionSource = source, indication = null, role = Role.RadioButton, onClick = onClick)
             .padding(vertical = LogicMixTokens.spacingM),
         horizontalAlignment = Alignment.CenterHorizontally,

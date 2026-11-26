@@ -1,6 +1,7 @@
 package com.akynex.logicmix.feature.privacy
 
 import com.akynex.logicmix.core.designsystem.BrandFooter
+import com.akynex.logicmix.core.designsystem.LogicMixScreen
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -42,7 +43,7 @@ fun PrivacyPolicyScreen(onBack: () -> Unit, viewModel: PrivacyPolicyViewModel = 
     val state by viewModel.state.collectAsState(initial = null)
     val colors = LogicMixTokens.colors
     val uriHandler = LocalUriHandler.current
-    Box(Modifier.fillMaxSize().background(colors.backgroundBrush).safeDrawingPadding()) {
+    LogicMixScreen(Modifier.safeDrawingPadding()) {
         Column(
             Modifier
                 .fillMaxSize()

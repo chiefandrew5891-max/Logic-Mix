@@ -1,6 +1,7 @@
 package com.akynex.logicmix.feature.matchstick
 
 import com.akynex.logicmix.core.designsystem.BrandFooter
+import com.akynex.logicmix.core.designsystem.LogicMixScreen
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -149,7 +150,7 @@ fun MatchstickRoute(onBack: () -> Unit, viewModel: MatchstickViewModel = hiltVie
 private fun MatchstickScreen(state: MatchUiState, onBack: () -> Unit, vm: MatchstickViewModel) {
     val colors = LogicMixTokens.colors
     val game = state.game
-    Box(Modifier.fillMaxSize().background(colors.backgroundBrush).safeDrawingPadding()) {
+    LogicMixScreen(Modifier.safeDrawingPadding()) {
         Column(
             Modifier
                 .fillMaxSize()

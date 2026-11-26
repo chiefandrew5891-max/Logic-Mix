@@ -1,6 +1,7 @@
 package com.akynex.logicmix.feature.orb
 
 import com.akynex.logicmix.core.designsystem.BrandFooter
+import com.akynex.logicmix.core.designsystem.LogicMixScreen
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -51,7 +52,7 @@ fun OrbRoute(onBack: () -> Unit, viewModel: OrbViewModel = hiltViewModel()) {
 private fun OrbScreen(state: OrbUiState, onBack: () -> Unit, vm: OrbViewModel) {
     val colors = LogicMixTokens.colors
     val game = state.game
-    Box(Modifier.fillMaxSize().background(colors.backgroundBrush).safeDrawingPadding()) {
+    LogicMixScreen(Modifier.safeDrawingPadding()) {
         Column(
             Modifier
                 .fillMaxSize()

@@ -192,7 +192,7 @@ fun CategoryCard(
     }
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
-    val spec = if (animated) tween<Float>(InteractiveTokens.TransitionMs) else snap()
+    val spec = if (animated) tween<Float>(if (pressed) InteractiveTokens.PressInMs else InteractiveTokens.TransitionMs) else snap()
     val scale by animateFloatAsState(if (pressed) CATEGORY_PRESS_SCALE else 1f, spec, label = "categoryScale")
     val glow by animateFloatAsState(if (pressed) 1f else 0f, spec, label = "categoryBorder")
     var hint by remember { mutableStateOf(false) }
@@ -226,6 +226,7 @@ fun CategoryCard(
                 contentDescription = title
                 if (selected != null) this.selected = selected
             }
+            .instantPress(interaction)
             .combinedClickable(
                 interactionSource = interaction, indication = null, role = role,
                 onClick = tap, onLongClick = { hint = true }, onLongClickLabel = title,
@@ -273,6 +274,7 @@ fun GameStyleCard(
             .neonFrame(RoundedCornerShape(20.dp), emphasis = selected)
             .interactiveNeon(source, selected, 20.dp)
             .semantics { this.selected = selected }
+            .instantPress(source)
             .clickable(interactionSource = source, indication = null, role = Role.RadioButton, onClick = withTap(onClick))
             .padding(LogicMixTokens.spacingM),
         horizontalArrangement = Arrangement.spacedBy(LogicMixTokens.spacingM),

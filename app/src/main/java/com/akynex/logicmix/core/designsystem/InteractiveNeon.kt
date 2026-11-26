@@ -3,7 +3,13 @@ package com.akynex.logicmix.core.designsystem
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,6 +32,9 @@ import androidx.compose.ui.unit.dp
  */
 object InteractiveTokens {
     const val TransitionMs = 140
+
+    /** Rise time of Pressed: short, so even a quick tap reaches a bright rim; release uses [TransitionMs]. */
+    const val PressInMs = 50
     const val SelectedGlow = 0.8f
     private const val RimStrokeDp = 2f
 
@@ -85,7 +94,7 @@ internal fun DrawScope.drawInnerNeon(glow: Float, r: Float, color: Color, dark: 
 fun Modifier.interactiveNeon(source: InteractionSource, selected: Boolean, radius: Dp, motion: Boolean = true): Modifier {
     val dark = LogicMixTokens.colors.isDark
     val pressed by source.collectIsPressedAsState()
-    val spec = if (motion) tween<Float>(InteractiveTokens.TransitionMs) else snap()
+    val spec = if (motion) tween<Float>(if (pressed) InteractiveTokens.PressInMs else InteractiveTokens.TransitionMs) else snap()
     val press = animateFloatAsState(if (pressed) 1f else 0f, spec, label = "neonPress")
     val sel = animateFloatAsState(if (selected) 1f else 0f, spec, label = "neonSelected")
     return drawWithCache {
@@ -102,5 +111,20 @@ fun Modifier.interactiveNeon(source: InteractionSource, selected: Boolean, radiu
                 drawInnerNeon(g, r, color, dark)
             }
         }
+    }
+}
+
+/**
+ * Emits Press into [source] at the very first touch. clickable inside a scrolling parent delays its own Press by the tap
+ * timeout, so a quick tap would show no feedback; this makes Pressed start on touch down and end on release, cancel, or
+ * when the parent takes the gesture over to scroll. The touch is not consumed, so clicking and scrolling are unchanged.
+ */
+fun Modifier.instantPress(source: MutableInteractionSource): Modifier = pointerInput(source) {
+    awaitEachGesture {
+        val down = awaitFirstDown(requireUnconsumed = false)
+        val press = PressInteraction.Press(down.position)
+        source.tryEmit(press)
+        val up = waitForUpOrCancellation()
+        source.tryEmit(if (up != null) PressInteraction.Release(press) else PressInteraction.Cancel(press))
     }
 }

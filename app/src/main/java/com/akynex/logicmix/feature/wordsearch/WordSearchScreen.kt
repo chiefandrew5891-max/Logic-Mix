@@ -1,6 +1,7 @@
 package com.akynex.logicmix.feature.wordsearch
 
 import com.akynex.logicmix.core.designsystem.BrandFooter
+import com.akynex.logicmix.core.designsystem.LogicMixScreen
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.animation.core.Animatable
@@ -95,7 +96,7 @@ fun WordSearchScreen(
     onRestart: () -> Unit = {},
 ) {
     val colors = LogicMixTokens.colors
-    Box(Modifier.fillMaxSize().background(colors.backgroundBrush).safeDrawingPadding()) {
+    LogicMixScreen(Modifier.safeDrawingPadding()) {
         Column(
             Modifier
                 .fillMaxSize()

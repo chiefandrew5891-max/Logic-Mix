@@ -1,6 +1,7 @@
 package com.akynex.logicmix.feature.home
 
 import androidx.annotation.StringRes
+import com.akynex.logicmix.core.designsystem.LogicMixScreen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,30 +21,31 @@ import com.akynex.logicmix.core.designsystem.LogicMixTokens
 /** Honest destination for modes whose engines are not implemented yet; replaced by the game screen later. */
 @Composable
 fun ComingSoonScreen(onBack: () -> Unit, @StringRes categoryTitle: Int? = null) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(LogicMixTokens.colors.backgroundBrush)
-            .padding(LogicMixTokens.spacingL),
-        verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacing, Alignment.CenterVertically),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        categoryTitle?.let {
-            Text(stringResource(it), style = LogicMixTokens.typography.titleLarge, color = LogicMixTokens.colors.gold, textAlign = TextAlign.Center)
+    LogicMixScreen {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(LogicMixTokens.spacingL),
+            verticalArrangement = Arrangement.spacedBy(LogicMixTokens.spacing, Alignment.CenterVertically),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            categoryTitle?.let {
+                Text(stringResource(it), style = LogicMixTokens.typography.titleLarge, color = LogicMixTokens.colors.gold, textAlign = TextAlign.Center)
+            }
+            Text(
+                stringResource(R.string.coming_soon_title),
+                style = LogicMixTokens.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Center,
+            )
+            Text(
+                stringResource(R.string.coming_soon_body),
+                style = LogicMixTokens.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Center,
+            )
+            Button(onClick = onBack) { Text(stringResource(R.string.back)) }
         }
-        Text(
-            stringResource(R.string.coming_soon_title),
-            style = LogicMixTokens.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onBackground,
-            textAlign = TextAlign.Center,
-        )
-        Text(
-            stringResource(R.string.coming_soon_body),
-            style = LogicMixTokens.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onBackground,
-            textAlign = TextAlign.Center,
-        )
-        Button(onClick = onBack) { Text(stringResource(R.string.back)) }
     }
 }
 //ok

@@ -1,6 +1,7 @@
 package com.akynex.logicmix.feature.home
 
 import com.akynex.logicmix.core.designsystem.BrandFooter
+import com.akynex.logicmix.core.designsystem.LogicMixScreen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,31 +33,32 @@ import com.akynex.logicmix.feature.gamestyle.titleRes
  */
 @Composable
 fun StyleInfoScreen(style: GameStyle, onHome: () -> Unit, onPlayAvailable: () -> Unit) {
-    Column(
-        Modifier
-            .fillMaxSize()
-            .background(LogicMixTokens.colors.backgroundBrush)
-            .verticalScroll(rememberScrollState())
-            .padding(LogicMixTokens.spacingL)
-            .widthIn(max = 560.dp),
-        verticalArrangement = com.akynex.logicmix.core.designsystem.stickyFooterArrangement(LogicMixTokens.spacing),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        AssetImage(style.imageName, Modifier.widthIn(max = 160.dp).fillMaxWidth().padding(bottom = LogicMixTokens.spacingS))
-        Text(
-            stringResource(style.titleRes()), style = LogicMixTokens.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onBackground, textAlign = TextAlign.Center,
-        )
-        Text(
-            stringResource(if (style == GameStyle.ARCADE) R.string.style_info_arcade_body else R.string.style_info_trainer_body),
-            style = LogicMixTokens.typography.bodyLarge, color = MaterialTheme.colorScheme.onBackground, textAlign = TextAlign.Center,
-        )
-        Text(
-            stringResource(R.string.coming_soon_body), style = LogicMixTokens.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center,
-        )
-        Button(onPlayAvailable, Modifier.fillMaxWidth()) { Text(stringResource(R.string.style_info_play)) }
-        OutlinedButton(onHome, Modifier.fillMaxWidth()) { Text(stringResource(R.string.style_info_home)) }
-        BrandFooter()
+    LogicMixScreen {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(LogicMixTokens.spacingL)
+                .widthIn(max = 560.dp),
+            verticalArrangement = com.akynex.logicmix.core.designsystem.stickyFooterArrangement(LogicMixTokens.spacing),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            AssetImage(style.imageName, Modifier.widthIn(max = 160.dp).fillMaxWidth().padding(bottom = LogicMixTokens.spacingS))
+            Text(
+                stringResource(style.titleRes()), style = LogicMixTokens.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onBackground, textAlign = TextAlign.Center,
+            )
+            Text(
+                stringResource(if (style == GameStyle.ARCADE) R.string.style_info_arcade_body else R.string.style_info_trainer_body),
+                style = LogicMixTokens.typography.bodyLarge, color = MaterialTheme.colorScheme.onBackground, textAlign = TextAlign.Center,
+            )
+            Text(
+                stringResource(R.string.coming_soon_body), style = LogicMixTokens.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center,
+            )
+            Button(onPlayAvailable, Modifier.fillMaxWidth()) { Text(stringResource(R.string.style_info_play)) }
+            OutlinedButton(onHome, Modifier.fillMaxWidth()) { Text(stringResource(R.string.style_info_home)) }
+            BrandFooter()
+        }
     }
 }
