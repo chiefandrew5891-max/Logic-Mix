@@ -1,6 +1,7 @@
 package com.akynex.logicmix.feature.game
 
 import com.akynex.logicmix.core.designsystem.BrandFooter
+import com.akynex.logicmix.core.designsystem.backdropVerticalScroll
 import com.akynex.logicmix.core.designsystem.LogicMixScreen
 import com.akynex.logicmix.core.audio.withTap
 import androidx.compose.animation.AnimatedVisibility
@@ -83,7 +84,7 @@ fun GameScreen(
         Column(
             Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .backdropVerticalScroll()
                 .padding(LogicMixTokens.spacing)
                 .widthIn(max = 560.dp)
                 .align(Alignment.TopCenter),

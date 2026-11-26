@@ -1,6 +1,7 @@
 package com.akynex.logicmix.feature.home
 
 import com.akynex.logicmix.core.designsystem.BrandFooter
+import com.akynex.logicmix.core.designsystem.backdropVerticalScroll
 import com.akynex.logicmix.core.designsystem.LogicMixScreen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -37,7 +38,7 @@ fun StyleInfoScreen(style: GameStyle, onHome: () -> Unit, onPlayAvailable: () ->
         Column(
             Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .backdropVerticalScroll()
                 .padding(LogicMixTokens.spacingL)
                 .widthIn(max = 560.dp),
             verticalArrangement = com.akynex.logicmix.core.designsystem.stickyFooterArrangement(LogicMixTokens.spacing),

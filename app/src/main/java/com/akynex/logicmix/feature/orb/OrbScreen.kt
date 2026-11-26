@@ -1,6 +1,7 @@
 package com.akynex.logicmix.feature.orb
 
 import com.akynex.logicmix.core.designsystem.BrandFooter
+import com.akynex.logicmix.core.designsystem.backdropVerticalScroll
 import com.akynex.logicmix.core.designsystem.LogicMixScreen
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -56,7 +57,7 @@ private fun OrbScreen(state: OrbUiState, onBack: () -> Unit, vm: OrbViewModel) {
         Column(
             Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .backdropVerticalScroll()
                 .padding(LogicMixTokens.spacing)
                 .widthIn(max = 560.dp)
                 .align(Alignment.TopCenter),

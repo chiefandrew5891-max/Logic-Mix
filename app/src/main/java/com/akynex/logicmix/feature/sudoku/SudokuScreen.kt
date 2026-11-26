@@ -1,6 +1,7 @@
 package com.akynex.logicmix.feature.sudoku
 
 import com.akynex.logicmix.core.designsystem.BrandFooter
+import com.akynex.logicmix.core.designsystem.backdropVerticalScroll
 import com.akynex.logicmix.core.designsystem.LogicMixScreen
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
@@ -85,7 +86,7 @@ private fun SudokuScreen(state: SudokuUiState, onBack: () -> Unit, vm: SudokuVie
         Column(
             Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .backdropVerticalScroll()
                 .padding(LogicMixTokens.spacing)
                 .widthIn(max = 560.dp)
                 .align(Alignment.TopCenter),

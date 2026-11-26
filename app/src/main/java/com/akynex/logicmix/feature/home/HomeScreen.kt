@@ -1,7 +1,8 @@
 package com.akynex.logicmix.feature.home
 
 import com.akynex.logicmix.core.designsystem.BrandFooter
-import com.akynex.logicmix.core.designsystem.PremiumAuroraBackground
+import com.akynex.logicmix.core.designsystem.backdropVerticalScroll
+import com.akynex.logicmix.core.designsystem.LogicMixScreen
 import com.akynex.logicmix.core.designsystem.WordSafeText
 import com.akynex.logicmix.feature.splash.AnimatedCube
 import com.akynex.logicmix.core.designsystem.PremiumAvatar
@@ -116,7 +117,7 @@ fun HomeScreen(
     games: com.akynex.logicmix.core.games.GamesState = com.akynex.logicmix.core.games.GamesState(),
 ) {
     val colors = LogicMixTokens.colors
-    PremiumAuroraBackground(Modifier.fillMaxSize()) {
+    LogicMixScreen {
         BoxWithConstraints(Modifier.fillMaxSize()) {
             // All proportions derive from the usable width (capped like the column), never from pixel positions.
             val pad = 12.dp
@@ -124,7 +125,7 @@ fun HomeScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
+                    .backdropVerticalScroll()
                     .padding(horizontal = pad, vertical = LogicMixTokens.spacingS)
                     .padding(top = LogicMixTokens.spacingL)
                     .widthIn(max = 560.dp - pad * 2)

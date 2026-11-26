@@ -1,6 +1,7 @@
 package com.akynex.logicmix.feature.gamestyle
 
 import com.akynex.logicmix.core.designsystem.BrandFooter
+import com.akynex.logicmix.core.designsystem.backdropVerticalScroll
 import com.akynex.logicmix.core.designsystem.LogicMixBackdrop
 import com.akynex.logicmix.core.designsystem.LogicMixScreen
 import com.akynex.logicmix.core.audio.withBack
@@ -109,7 +110,7 @@ internal fun GameStyleFlow(
         Column(
             Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .backdropVerticalScroll()
                 .padding(LogicMixTokens.spacing)
                 .padding(top = LogicMixTokens.spacingL)
                 .widthIn(max = 560.dp)

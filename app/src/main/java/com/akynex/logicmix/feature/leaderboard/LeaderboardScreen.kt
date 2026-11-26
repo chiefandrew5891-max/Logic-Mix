@@ -1,6 +1,7 @@
 package com.akynex.logicmix.feature.leaderboard
 
 import com.akynex.logicmix.core.designsystem.BrandFooter
+import com.akynex.logicmix.core.designsystem.backdropVerticalScroll
 import com.akynex.logicmix.core.designsystem.LogicMixScreen
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
@@ -111,7 +112,7 @@ fun LeaderboardScreen(onBack: () -> Unit, viewModel: LeaderboardViewModel = hilt
     val ui by viewModel.ui.collectAsState()
     LogicMixScreen {
         Column(
-            Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(LogicMixTokens.spacing)
+            Modifier.fillMaxSize().backdropVerticalScroll().padding(LogicMixTokens.spacing)
                 .widthIn(max = 560.dp).align(Alignment.TopCenter),
             verticalArrangement = com.akynex.logicmix.core.designsystem.stickyFooterArrangement(LogicMixTokens.spacingM),
         ) {

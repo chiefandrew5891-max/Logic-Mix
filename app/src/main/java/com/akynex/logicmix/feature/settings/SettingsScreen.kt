@@ -1,6 +1,7 @@
 package com.akynex.logicmix.feature.settings
 
 import com.akynex.logicmix.core.designsystem.BrandFooter
+import com.akynex.logicmix.core.designsystem.backdropVerticalScroll
 import com.akynex.logicmix.core.designsystem.instantPress
 import com.akynex.logicmix.core.designsystem.LogicMixScreen
 import com.akynex.logicmix.core.audio.withTap
@@ -142,7 +143,7 @@ internal fun SettingsContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .backdropVerticalScroll()
                 .padding(LogicMixTokens.spacing)
                 .padding(top = LogicMixTokens.spacingL)
                 .widthIn(max = 560.dp)

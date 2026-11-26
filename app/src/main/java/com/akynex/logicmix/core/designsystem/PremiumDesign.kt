@@ -163,15 +163,6 @@ fun PremiumCard(
     Box(m, contentAlignment = contentAlignment, content = content)
 }
 
-/** Home backdrop; the same silk-ribbon layer every screen uses, with [content] above it. */
-@Composable
-fun PremiumAuroraBackground(modifier: Modifier = Modifier, content: @Composable BoxScope.() -> Unit) {
-    Box(modifier) {
-        LogicMixBackdrop(Modifier.matchParentSize())
-        content()
-    }
-}
-
 /** Capsule track with a teal-to-sky fill, top gloss and inner shade. [label] is drawn inside when given. */
 @Composable
 fun PremiumProgressBar(fraction: Float, modifier: Modifier = Modifier, height: Dp = 22.dp, label: String? = null) {

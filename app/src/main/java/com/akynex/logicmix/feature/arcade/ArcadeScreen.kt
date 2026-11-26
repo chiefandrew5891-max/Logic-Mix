@@ -1,6 +1,7 @@
 package com.akynex.logicmix.feature.arcade
 
 import com.akynex.logicmix.core.designsystem.BrandFooter
+import com.akynex.logicmix.core.designsystem.backdropVerticalScroll
 import com.akynex.logicmix.core.designsystem.LogicMixBackdrop
 import com.akynex.logicmix.core.designsystem.LogicMixScreen
 import androidx.activity.compose.BackHandler
@@ -149,7 +150,7 @@ private fun ArcadeLobby(
         Column(
             Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .backdropVerticalScroll()
                 .padding(LogicMixTokens.spacing)
                 .widthIn(max = 560.dp)
                 .align(Alignment.TopCenter),
