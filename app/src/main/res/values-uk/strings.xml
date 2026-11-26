@@ -394,4 +394,31 @@
     <string name="games_signed_in_as">Ви увійшли як %1$s</string>
     <string name="home_leaderboards">Рейтинг гравців</string>
     <string name="home_leaderboards_sub">Світ, Аркада й категорії</string>
+
+    <!-- Visual Logic: interactive puzzles -->
+    <string name="vi_fam_polyomino">Укладання поліміно</string>
+    <string name="vi_fam_silhouette">Силует із деталей</string>
+    <string name="vi_fam_dissection">Перекроювання</string>
+    <string name="vi_fam_mosaic">Мозаїка</string>
+    <string name="vi_fam_hex">Шестикутне укладання</string>
+    <string name="vi_fam_paradox">Парадокс площі</string>
+    <string name="vi_fam_rush">Година пік</string>
+    <string name="vi_fam_klotski">Блоки, що зсуваються</string>
+    <string name="vi_fam_net">Розгортка куба</string>
+    <string name="vi_how_polyomino">Перетягніть усі деталі на поле, щоб заповнити його повністю. Торкніться деталі й поверніть або відобразіть її кнопками.</string>
+    <string name="vi_how_silhouette">Складіть силует з усіх деталей. Перетягуйте, обертайте й відображайте їх, поки нічого не перекривається і силует заповнений.</string>
+    <string name="vi_how_dissection">Ці деталі вирізано з прямокутника. Переставте їх так, щоб вийшла нова фігура без порожнин.</string>
+    <string name="vi_how_mosaic">Розставте кольорові деталі так, щоб кожен колір ліг на клітинку такого самого відтінку.</string>
+    <string name="vi_how_hex">Заповніть шестикутне поле деталями. Торкніться деталі та поверніть її, щоб знайти потрібне положення.</string>
+    <string name="vi_how_paradox">Покладіть обидві деталі в широке поле. Раніше вони займали менший прямокутник, а тепер вміщуються і залишається зайва клітинка. З\'ясуйте чому.</string>
+    <string name="vi_how_rush">Зсувайте машини, звільняючи шлях, і виведіть червону машину через виїзд праворуч.</string>
+    <string name="vi_how_klotski">Пересувайте блоки по полю, щоб великий червоний блок опинився на позначеному місці внизу.</string>
+    <string name="vi_how_net">Дано п\'ять квадратів розгортки куба. Торкніться порожньої клітинки, щоб розгортка склалася в куб. Підійде будь-яка правильна клітинка.</string>
+    <string name="vi_rotate">Повернути</string>
+    <string name="vi_flip">Відобразити</string>
+    <string name="vi_undo">Скасувати</string>
+    <string name="vi_reset">Скинути</string>
+    <string name="vi_moves">Ходів: %d</string>
+    <string name="vi_paradox_title">Куди зникла площа?</string>
+    <string name="vi_paradox_body">Деталі займають %1$d клітинок, а на цьому полі їх %2$d. Одна клітинка просто лишається порожньою: площа не з\'явилася й не зникла, зайве місце сховане в тонкій щілині.</string>
 </resources>

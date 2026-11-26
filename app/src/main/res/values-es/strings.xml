@@ -393,4 +393,31 @@
     <string name="games_signed_in_as">Sesión iniciada como %1$s</string>
     <string name="home_leaderboards">Clasificaciones</string>
     <string name="home_leaderboards_sub">Mundo, Arcade y categorías</string>
+
+    <!-- Visual Logic: interactive puzzles -->
+    <string name="vi_fam_polyomino">Empaquetado de poliominós</string>
+    <string name="vi_fam_silhouette">Silueta con piezas</string>
+    <string name="vi_fam_dissection">Disección</string>
+    <string name="vi_fam_mosaic">Mosaico</string>
+    <string name="vi_fam_hex">Empaquetado hexagonal</string>
+    <string name="vi_fam_paradox">Paradoja del área</string>
+    <string name="vi_fam_rush">Hora punta</string>
+    <string name="vi_fam_klotski">Bloques deslizantes</string>
+    <string name="vi_fam_net">Desarrollo del cubo</string>
+    <string name="vi_how_polyomino">Arrastra cada pieza al tablero hasta llenarlo. Toca una pieza y usa Girar o Reflejar para orientarla.</string>
+    <string name="vi_how_silhouette">Construye la silueta con todas las piezas. Arrástralas, gíralas y refléjalas hasta que nada se solape y la silueta quede llena.</string>
+    <string name="vi_how_dissection">Estas piezas se recortaron de un rectángulo. Reordénalas para formar la nueva figura sin huecos.</string>
+    <string name="vi_how_mosaic">Coloca las piezas de colores para que cada color caiga en la casilla del mismo tono.</string>
+    <string name="vi_how_hex">Llena el tablero hexagonal con las piezas. Toca una pieza y gírala para encontrar su sitio.</string>
+    <string name="vi_how_paradox">Encaja las dos piezas en el tablero ancho. Antes cubrían un rectángulo menor y ahora sobra una casilla. Descubre por qué.</string>
+    <string name="vi_how_rush">Desliza los coches para despejar el camino y saca el coche rojo por la salida de la derecha.</string>
+    <string name="vi_how_klotski">Mueve los bloques por el tablero para llevar el gran bloque rojo al punto marcado abajo.</string>
+    <string name="vi_how_net">Se dan cinco cuadrados del desarrollo de un cubo. Toca la casilla vacía que hace que se pliegue en un cubo. Sirve cualquier casilla correcta.</string>
+    <string name="vi_rotate">Girar</string>
+    <string name="vi_flip">Reflejar</string>
+    <string name="vi_undo">Deshacer</string>
+    <string name="vi_reset">Reiniciar</string>
+    <string name="vi_moves">Movimientos: %d</string>
+    <string name="vi_paradox_title">¿Adónde fue el área?</string>
+    <string name="vi_paradox_body">Las piezas cubren %1$d casillas y este tablero tiene %2$d. Una casilla queda vacía: el área no apareció ni desapareció, el espacio extra está escondido en una rendija fina.</string>
 </resources>

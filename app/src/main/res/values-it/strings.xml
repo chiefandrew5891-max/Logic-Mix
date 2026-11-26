@@ -393,4 +393,31 @@
     <string name="games_signed_in_as">Accesso come %1$s</string>
     <string name="home_leaderboards">Classifiche</string>
     <string name="home_leaderboards_sub">Mondo, Arcade e categorie</string>
+
+    <!-- Visual Logic: interactive puzzles -->
+    <string name="vi_fam_polyomino">Incastro di poliomini</string>
+    <string name="vi_fam_silhouette">Sagoma da comporre</string>
+    <string name="vi_fam_dissection">Dissezione</string>
+    <string name="vi_fam_mosaic">Mosaico</string>
+    <string name="vi_fam_hex">Incastro esagonale</string>
+    <string name="vi_fam_paradox">Paradosso dell\'area</string>
+    <string name="vi_fam_rush">Rush Hour</string>
+    <string name="vi_fam_klotski">Blocchi scorrevoli</string>
+    <string name="vi_fam_net">Sviluppo del cubo</string>
+    <string name="vi_how_polyomino">Trascina ogni pezzo sul tabellone fino a riempirlo. Tocca un pezzo e usa Ruota o Rifletti per girarlo.</string>
+    <string name="vi_how_silhouette">Costruisci la sagoma con tutti i pezzi. Trascinali, ruotali e riflettili finché nulla si sovrappone e la sagoma è piena.</string>
+    <string name="vi_how_dissection">Questi pezzi sono stati ritagliati da un rettangolo. Riordinali per formare la nuova figura senza vuoti.</string>
+    <string name="vi_how_mosaic">Posiziona i pezzi colorati in modo che ogni colore finisca sulla casella dello stesso colore.</string>
+    <string name="vi_how_hex">Riempi il tabellone esagonale con i pezzi. Tocca un pezzo e ruotalo per trovare l\'incastro.</string>
+    <string name="vi_how_paradox">Inserisci entrambi i pezzi nel tabellone largo. Prima coprivano un rettangolo più piccolo, ora ne avanza una casella. Scopri perché.</string>
+    <string name="vi_how_rush">Fai scorrere le auto per liberare la strada e porta l\'auto rossa fuori dall\'uscita a destra.</string>
+    <string name="vi_how_klotski">Sposta i blocchi sul tabellone per portare il grande blocco rosso nel punto segnato in basso.</string>
+    <string name="vi_how_net">Sono dati cinque quadrati dello sviluppo di un cubo. Tocca la casella vuota che fa ripiegare lo sviluppo in un cubo. Va bene ogni casella corretta.</string>
+    <string name="vi_rotate">Ruota</string>
+    <string name="vi_flip">Rifletti</string>
+    <string name="vi_undo">Annulla</string>
+    <string name="vi_reset">Azzera</string>
+    <string name="vi_moves">Mosse: %d</string>
+    <string name="vi_paradox_title">Dov\'è finita l\'area?</string>
+    <string name="vi_paradox_body">I pezzi coprono %1$d caselle, mentre questo tabellone ne ha %2$d. Una casella resta vuota: l\'area non è comparsa né sparita, lo spazio in più è nascosto in una fessura sottile.</string>
 </resources>

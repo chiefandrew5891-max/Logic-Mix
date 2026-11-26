@@ -392,4 +392,31 @@
     <string name="games_signed_in_as">Angemeldet als %1$s</string>
     <string name="home_leaderboards">Bestenlisten</string>
     <string name="home_leaderboards_sub">Welt, Arcade und Kategorien</string>
+
+    <!-- Visual Logic: interactive puzzles -->
+    <string name="vi_fam_polyomino">Polyomino-Packen</string>
+    <string name="vi_fam_silhouette">Silhouette legen</string>
+    <string name="vi_fam_dissection">Zerlegung</string>
+    <string name="vi_fam_mosaic">Mosaik</string>
+    <string name="vi_fam_hex">Hexagon-Packen</string>
+    <string name="vi_fam_paradox">Flächenparadoxon</string>
+    <string name="vi_fam_rush">Rush Hour</string>
+    <string name="vi_fam_klotski">Schiebeblöcke</string>
+    <string name="vi_fam_net">Würfelnetz</string>
+    <string name="vi_how_polyomino">Ziehe jedes Teil aufs Feld, bis es ganz gefüllt ist. Tippe ein Teil an und drehe oder spiegele es mit den Tasten.</string>
+    <string name="vi_how_silhouette">Lege die Silhouette aus allen Teilen. Ziehe, drehe und spiegele sie, bis nichts überlappt und die Form gefüllt ist.</string>
+    <string name="vi_how_dissection">Diese Teile wurden aus einem Rechteck geschnitten. Ordne sie zur neuen Form ohne Lücken.</string>
+    <string name="vi_how_mosaic">Setze die farbigen Teile so, dass jede Farbe auf dem gleichfarbigen Feld liegt.</string>
+    <string name="vi_how_hex">Fülle das sechseckige Feld mit den Teilen. Tippe ein Teil an und drehe es, bis es passt.</string>
+    <string name="vi_how_paradox">Lege beide Teile in das breite Feld. Vorher bedeckten sie ein kleineres Rechteck, jetzt bleibt ein Feld übrig. Finde heraus, warum.</string>
+    <string name="vi_how_rush">Schiebe die Autos weg und fahre das rote Auto durch die Ausfahrt rechts hinaus.</string>
+    <string name="vi_how_klotski">Schiebe die Blöcke so, dass der große rote Block auf die markierte Stelle unten kommt.</string>
+    <string name="vi_how_net">Fünf Quadrate eines Würfelnetzes sind gegeben. Tippe das leere Feld an, mit dem sich das Netz zum Würfel faltet. Jedes richtige Feld zählt.</string>
+    <string name="vi_rotate">Drehen</string>
+    <string name="vi_flip">Spiegeln</string>
+    <string name="vi_undo">Rückgängig</string>
+    <string name="vi_reset">Zurücksetzen</string>
+    <string name="vi_moves">Züge: %d</string>
+    <string name="vi_paradox_title">Wo ist die Fläche geblieben?</string>
+    <string name="vi_paradox_body">Die Teile bedecken %1$d Felder, dieses Feld hat %2$d. Ein Feld bleibt leer: Es ist keine Fläche entstanden oder verschwunden, der Platz steckt in einem dünnen Spalt.</string>
 </resources>

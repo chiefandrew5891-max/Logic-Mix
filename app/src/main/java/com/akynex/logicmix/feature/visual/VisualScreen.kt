@@ -71,7 +71,7 @@ fun VisualRoute(onBack: () -> Unit, viewModel: VisualViewModel = hiltViewModel()
         GameHeader(
             title = stringResource(R.string.category_visual_logic),
             onBack = onBack,
-            subtitle = if (game != null || state.geo != null) stringResource(R.string.cat_level, state.index + 1, state.total) else null,
+            subtitle = if (game != null || state.geo != null || state.family != null) stringResource(R.string.cat_level, state.index + 1, state.total) else null,
         )
         if (state.allDone) {
             Card {
@@ -80,6 +80,7 @@ fun VisualRoute(onBack: () -> Unit, viewModel: VisualViewModel = hiltViewModel()
             }
             ActionButton(stringResource(R.string.cat_play_again), viewModel::playAgain, filled = true)
         }
+        if (state.family != null) HandsContent(state, viewModel)
         state.geo?.let { GeoContent(it, state.xpAwarded, viewModel::choose, viewModel::hint, viewModel::next) }
         if (game != null) {
             val puzzle = game.puzzle

@@ -394,4 +394,31 @@
     <string name="games_signed_in_as">Вы вошли как %1$s</string>
     <string name="home_leaderboards">Рейтинг игроков</string>
     <string name="home_leaderboards_sub">Мир, Аркада и категории</string>
+
+    <!-- Visual Logic: interactive puzzles -->
+    <string name="vi_fam_polyomino">Укладка полимино</string>
+    <string name="vi_fam_silhouette">Силуэт из деталей</string>
+    <string name="vi_fam_dissection">Перекройка</string>
+    <string name="vi_fam_mosaic">Мозаика</string>
+    <string name="vi_fam_hex">Шестиугольная укладка</string>
+    <string name="vi_fam_paradox">Парадокс площади</string>
+    <string name="vi_fam_rush">Час пик</string>
+    <string name="vi_fam_klotski">Сдвигаемые блоки</string>
+    <string name="vi_fam_net">Развёртка куба</string>
+    <string name="vi_how_polyomino">Перетащите все детали на поле, чтобы заполнить его целиком. Нажмите на деталь и поверните или отразите её кнопками.</string>
+    <string name="vi_how_silhouette">Соберите силуэт из всех деталей. Перетаскивайте, вращайте и отражайте их, пока ничто не перекрывается и силуэт не заполнен.</string>
+    <string name="vi_how_dissection">Эти детали вырезаны из прямоугольника. Переставьте их так, чтобы получилась новая фигура без пустот.</string>
+    <string name="vi_how_mosaic">Расставьте цветные детали так, чтобы каждый цвет лёг на клетку такого же оттенка.</string>
+    <string name="vi_how_hex">Заполните шестиугольное поле деталями. Нажмите на деталь и поверните её, чтобы найти нужное положение.</string>
+    <string name="vi_how_paradox">Уложите обе детали в широкое поле. Раньше они занимали меньший прямоугольник, а теперь влезают и остаётся лишняя клетка. Узнайте почему.</string>
+    <string name="vi_how_rush">Сдвигайте машины, освобождая путь, и выведите красную машину через выезд справа.</string>
+    <string name="vi_how_klotski">Двигайте блоки по полю, чтобы большой красный блок оказался на отмеченном месте внизу.</string>
+    <string name="vi_how_net">Даны пять квадратов развёртки куба. Нажмите на пустую клетку, чтобы развёртка сложилась в куб. Подойдёт любая верная клетка.</string>
+    <string name="vi_rotate">Повернуть</string>
+    <string name="vi_flip">Отразить</string>
+    <string name="vi_undo">Отмена</string>
+    <string name="vi_reset">Сброс</string>
+    <string name="vi_moves">Ходов: %d</string>
+    <string name="vi_paradox_title">Куда делась площадь?</string>
+    <string name="vi_paradox_body">Детали занимают %1$d клеток, а на этом поле их %2$d. Одна клетка просто остаётся пустой: площадь не появилась и не исчезла, лишнее место спрятано в тонкой щели.</string>
 </resources>

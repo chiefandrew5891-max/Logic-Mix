@@ -392,4 +392,31 @@
     <string name="games_signed_in_as">Signed in as %1$s</string>
     <string name="home_leaderboards">Leaderboards</string>
     <string name="home_leaderboards_sub">World, Arcade and categories</string>
+
+    <!-- Visual Logic: interactive puzzles -->
+    <string name="vi_fam_polyomino">Polyomino packing</string>
+    <string name="vi_fam_silhouette">Silhouette builder</string>
+    <string name="vi_fam_dissection">Dissection</string>
+    <string name="vi_fam_mosaic">Mosaic</string>
+    <string name="vi_fam_hex">Hex packing</string>
+    <string name="vi_fam_paradox">Area paradox</string>
+    <string name="vi_fam_rush">Rush Hour</string>
+    <string name="vi_fam_klotski">Sliding blocks</string>
+    <string name="vi_fam_net">Cube net</string>
+    <string name="vi_how_polyomino">Drag every piece onto the board so the whole board is filled. Tap a piece, then use Rotate or Flip to turn it.</string>
+    <string name="vi_how_silhouette">Build the outline using all the pieces. Drag, rotate and flip them until nothing overlaps and the outline is full.</string>
+    <string name="vi_how_dissection">These pieces were cut from a rectangle. Rearrange them to form the new shape without gaps.</string>
+    <string name="vi_how_mosaic">Place the coloured pieces so every colour lands on its matching tinted square.</string>
+    <string name="vi_how_hex">Fill the hexagonal board with the pieces. Tap a piece and rotate it to find the fit.</string>
+    <string name="vi_how_paradox">Fit both pieces into the wide board. They covered a smaller rectangle before, yet now they fit with one cell left over. Find out why.</string>
+    <string name="vi_how_rush">Slide the cars to clear a path and drive the red car out through the exit on the right.</string>
+    <string name="vi_how_klotski">Slide the blocks around the board to bring the big red block to the marked spot at the bottom.</string>
+    <string name="vi_how_net">Five squares of a cube net are given. Tap the empty square that makes the net fold into a cube. Any correct square works.</string>
+    <string name="vi_rotate">Rotate</string>
+    <string name="vi_flip">Flip</string>
+    <string name="vi_undo">Undo</string>
+    <string name="vi_reset">Reset</string>
+    <string name="vi_moves">Moves: %d</string>
+    <string name="vi_paradox_title">Where did the area go?</string>
+    <string name="vi_paradox_body">The pieces cover %1$d cells, while this board has %2$d. One cell simply stays empty, so no area appeared or vanished: the extra space was hidden in a gap that is spread thin.</string>
 </resources>

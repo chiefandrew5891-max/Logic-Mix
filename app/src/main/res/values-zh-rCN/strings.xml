@@ -391,4 +391,31 @@
     <string name="games_signed_in_as">已登录：%1$s</string>
     <string name="home_leaderboards">排行榜</string>
     <string name="home_leaderboards_sub">世界、街机与各类别</string>
+
+    <!-- Visual Logic: interactive puzzles -->
+    <string name="vi_fam_polyomino">多联方块拼装</string>
+    <string name="vi_fam_silhouette">轮廓拼图</string>
+    <string name="vi_fam_dissection">图形剖分</string>
+    <string name="vi_fam_mosaic">马赛克</string>
+    <string name="vi_fam_hex">六边形拼装</string>
+    <string name="vi_fam_paradox">面积悖论</string>
+    <string name="vi_fam_rush">华容道（汽车版）</string>
+    <string name="vi_fam_klotski">滑块拼图</string>
+    <string name="vi_fam_net">立方体展开图</string>
+    <string name="vi_how_polyomino">把每块拼图拖到棋盘上，直到填满整个棋盘。点按一块，再用旋转或翻转按钮调整方向。</string>
+    <string name="vi_how_silhouette">用全部拼块搭出给定轮廓。拖动、旋转、翻转它们，直到没有重叠且轮廓被填满。</string>
+    <string name="vi_how_dissection">这些拼块是从一个长方形上剪下来的。请重新排列它们，拼成新的图形且不留空隙。</string>
+    <string name="vi_how_mosaic">摆放彩色拼块，使每种颜色落在相同色调的格子上。</string>
+    <string name="vi_how_hex">用拼块填满六边形棋盘。点按一块并旋转它，找到合适的位置。</string>
+    <string name="vi_how_paradox">把两块拼块放进宽棋盘。它们原来覆盖较小的长方形，现在却多出一格。想想这是为什么。</string>
+    <string name="vi_how_rush">滑动汽车清出道路，让红色汽车从右侧出口开出去。</string>
+    <string name="vi_how_klotski">在棋盘上移动方块，把大红块移到底部标记的位置。</string>
+    <string name="vi_how_net">给出立方体展开图的五个方格。点按空格，使展开图能折成立方体。任何正确的格子都可以。</string>
+    <string name="vi_rotate">旋转</string>
+    <string name="vi_flip">翻转</string>
+    <string name="vi_undo">撤销</string>
+    <string name="vi_reset">重置</string>
+    <string name="vi_moves">步数：%d</string>
+    <string name="vi_paradox_title">面积去哪儿了？</string>
+    <string name="vi_paradox_body">拼块共覆盖 %1$d 格，而这块棋盘有 %2$d 格。多出的一格只是空着：面积既没有凭空出现也没有消失，多出的空间藏在一条细缝里。</string>
 </resources>

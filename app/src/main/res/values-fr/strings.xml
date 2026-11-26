@@ -393,4 +393,31 @@
     <string name="games_signed_in_as">Connecté en tant que %1$s</string>
     <string name="home_leaderboards">Classements</string>
     <string name="home_leaderboards_sub">Monde, Arcade et catégories</string>
+
+    <!-- Visual Logic: interactive puzzles -->
+    <string name="vi_fam_polyomino">Pavage de polyominos</string>
+    <string name="vi_fam_silhouette">Silhouette à composer</string>
+    <string name="vi_fam_dissection">Dissection</string>
+    <string name="vi_fam_mosaic">Mosaïque</string>
+    <string name="vi_fam_hex">Pavage hexagonal</string>
+    <string name="vi_fam_paradox">Paradoxe de l\'aire</string>
+    <string name="vi_fam_rush">Rush Hour</string>
+    <string name="vi_fam_klotski">Blocs coulissants</string>
+    <string name="vi_fam_net">Patron de cube</string>
+    <string name="vi_how_polyomino">Faites glisser chaque pièce sur le plateau jusqu\'à le remplir. Touchez une pièce puis utilisez Pivoter ou Retourner.</string>
+    <string name="vi_how_silhouette">Construisez la silhouette avec toutes les pièces. Déplacez, pivotez et retournez-les jusqu\'à ce que rien ne se chevauche.</string>
+    <string name="vi_how_dissection">Ces pièces ont été découpées dans un rectangle. Réarrangez-les pour former la nouvelle forme sans trou.</string>
+    <string name="vi_how_mosaic">Placez les pièces colorées pour que chaque couleur tombe sur la case de la même teinte.</string>
+    <string name="vi_how_hex">Remplissez le plateau hexagonal avec les pièces. Touchez une pièce et pivotez-la pour la placer.</string>
+    <string name="vi_how_paradox">Placez les deux pièces dans le plateau large. Avant, elles couvraient un rectangle plus petit, maintenant il reste une case. Trouvez pourquoi.</string>
+    <string name="vi_how_rush">Faites glisser les voitures pour dégager le passage et sortez la voiture rouge par la sortie à droite.</string>
+    <string name="vi_how_klotski">Déplacez les blocs pour amener le grand bloc rouge à l\'endroit marqué en bas.</string>
+    <string name="vi_how_net">Cinq carrés d\'un patron de cube sont donnés. Touchez la case vide qui permet de plier le patron en cube. Toute case correcte convient.</string>
+    <string name="vi_rotate">Pivoter</string>
+    <string name="vi_flip">Retourner</string>
+    <string name="vi_undo">Annuler</string>
+    <string name="vi_reset">Réinitialiser</string>
+    <string name="vi_moves">Coups : %d</string>
+    <string name="vi_paradox_title">Où est passée l\'aire ?</string>
+    <string name="vi_paradox_body">Les pièces couvrent %1$d cases, alors que ce plateau en a %2$d. Une case reste vide : aucune aire n\'est apparue ni disparue, l\'espace en plus est caché dans une fine fente.</string>
 </resources>
