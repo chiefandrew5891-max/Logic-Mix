@@ -93,7 +93,7 @@ fun VisualRoute(onBack: () -> Unit, viewModel: VisualViewModel = hiltViewModel()
                                 Box(
                                     Modifier.weight(1f).aspectRatio(1f).clip(LogicMixTokens.radii.small)
                                         .border(BorderStroke(1.dp, LogicMixTokens.colors.cardBorder), LogicMixTokens.radii.small)
-                                        .background(Color.White.copy(alpha = 0.06f)),
+                                        .background(MaterialTheme.colorScheme.surface),
                                     contentAlignment = Alignment.Center,
                                 ) {
                                     if (shown != null) TileCanvas(shown, Modifier.fillMaxWidth().aspectRatio(1f).padding(2.dp))
@@ -269,7 +269,7 @@ private fun GeoPanel(figure: Figure?, modifier: Modifier) {
     Box(
         modifier.aspectRatio(1f).clip(LogicMixTokens.radii.small)
             .border(BorderStroke(1.dp, LogicMixTokens.colors.cardBorder), LogicMixTokens.radii.small)
-            .background(Color.White.copy(alpha = 0.06f)),
+            .background(MaterialTheme.colorScheme.surface),
         contentAlignment = Alignment.Center,
     ) {
         if (figure != null) FigureCanvas(figure, Modifier.fillMaxWidth().aspectRatio(1f).padding(4.dp))

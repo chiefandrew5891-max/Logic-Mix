@@ -237,7 +237,7 @@ private fun Board(state: MatchUiState, game: MatchGame, vm: MatchstickViewModel)
             .onSizeChanged { width = it.width.toFloat() }
             .clip(LogicMixTokens.radii.medium)
             .background(if (dark) Color(0xFF14264F) else Color(0xFFF7F5FF))
-            .then(if (dark) Modifier else Modifier.border(BorderStroke(1.5.dp, Color(0xFFD8C7F4)), LogicMixTokens.radii.medium))
+            .border(BorderStroke(1.dp, LogicMixTokens.colors.cardBorder), LogicMixTokens.radii.medium)
             .pointerInput(locked) {
                 if (locked) return@pointerInput
                 detectDragGestures(

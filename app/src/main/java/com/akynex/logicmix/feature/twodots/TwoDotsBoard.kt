@@ -1,6 +1,9 @@
 package com.akynex.logicmix.feature.twodots
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.border
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -115,6 +118,7 @@ fun TwoDotsBoard(
             .aspectRatio(1f)
             .clip(LogicMixTokens.radii.large)
             .background(container)
+            .border(BorderStroke(1.dp, LogicMixTokens.colors.cardBorder), LogicMixTokens.radii.large)
             .pointerInput(enabled) {
                 if (!enabled) return@pointerInput
                 awaitEachGesture {

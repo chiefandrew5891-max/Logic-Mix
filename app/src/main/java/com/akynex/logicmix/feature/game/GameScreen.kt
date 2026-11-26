@@ -1,6 +1,7 @@
 package com.akynex.logicmix.feature.game
 
 import com.akynex.logicmix.core.designsystem.BrandFooter
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import com.akynex.logicmix.core.designsystem.backdropVerticalScroll
 import com.akynex.logicmix.core.designsystem.LogicMixScreen
 import com.akynex.logicmix.core.audio.withTap
@@ -151,6 +152,12 @@ fun GameScreen(
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
                             keyboardActions = KeyboardActions(onDone = { onSubmit() }),
                             shape = LogicMixTokens.radii.medium,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                                errorContainerColor = MaterialTheme.colorScheme.surface,
+                                disabledContainerColor = MaterialTheme.colorScheme.surface,
+                            ),
                             modifier = Modifier.fillMaxWidth(),
                         )
                     }

@@ -250,6 +250,7 @@ private fun Clues(game: CrosswordGame, direction: Direction, title: Int, vm: Cro
         val isActive = entry == game.activeEntry
         Row(
             Modifier.fillMaxWidth().clip(LogicMixTokens.radii.small)
+                .background(MaterialTheme.colorScheme.surface)
                 .background(if (isActive) LogicMixTokens.colors.gold.copy(alpha = 0.18f) else Color.Transparent)
                 .clickable(onClick = { vm.selectEntry(entry) })
                 .padding(LogicMixTokens.spacingS),
